@@ -9,6 +9,9 @@ namespace MonoJam
 {
     public class GameController
     {
+        public const int MAX_ENEMIES = 500;
+        public int totalEnemies;
+
         private MonoJam mj;
 
         public Player player;
@@ -19,8 +22,10 @@ namespace MonoJam
 
         public static Random random;
         public bool ReadyToSpawnCoins { get; set; }
+        public bool ReadyToSpawnEnemy { get; set; }
 
         Timer coinSpawner;
+        Timer enemySpawner;
 
         public int placedCoins;
         public int currentCoins;
@@ -31,6 +36,7 @@ namespace MonoJam
             mj = mjIn;
 
             player = new Player();
+            enemies = new Enemy[MAX_ENEMIES];
 
             ResetCoinData();
 
@@ -40,6 +46,10 @@ namespace MonoJam
             coinSpawner = new Timer(1);
             coinSpawner.Elapsed += (a, b) => ReadyToSpawnCoins = true;
             coinSpawner.Start();
+
+            enemySpawner = new Timer(10);
+            enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
+            enemySpawner.Start();
 
             currentCoins = 0;
             coinsToSpawn = 0;
@@ -58,6 +68,11 @@ namespace MonoJam
             Console.Clear();
 
             player.Update();
+
+            for(int i = 0; i < totalEnemies; i++)
+            {
+                enemies[i].Update();
+            }
 
             if(Keyboard.GetState().IsKeyDown(Keys.C))
             {
@@ -98,6 +113,15 @@ namespace MonoJam
                 }
             }
 
+            // Remove destroyed enemies.
+            for(int i = 0; i < totalEnemies; i++)
+            {
+                if(enemies[i].ReadyToRemove)
+                {
+                    DestroyEnemy(enemies[i]);
+                }
+            }
+
             if(ReadyToSpawnCoins)
             {
                 for (int i = 0; i < 2; i++)
@@ -115,12 +139,64 @@ namespace MonoJam
                     }
                 }
             }
+            
+            if(ReadyToSpawnEnemy)
+            {
+                SpawnEnemy();
+
+                ReadyToSpawnEnemy = false;
+            }
         }
 
         public void AddCoins(int coins)
         {
             currentCoins += coins;
             coinsToSpawn += coins;
+        }
+
+        public void SpawnEnemy()
+        {
+            if(totalEnemies < MAX_ENEMIES)
+            {
+                var newEnemy = new Enemy();
+                enemies[totalEnemies++] = newEnemy;
+            }
+            else
+            {
+                // Temporary for debugging
+                throw new Exception("Created too many enemies");
+            }
+        }
+
+        public void DestroyEnemy(Enemy e)
+        {
+            bool foundEnemy = false;
+
+            for(int i = 0; i < totalEnemies; i++)
+            {
+                if(enemies[i] == e)
+                {
+                    foundEnemy = true;
+                }
+
+                // Shift remaining enemies down the array.
+                if(foundEnemy)
+                {
+                    if(i + 1 < totalEnemies)
+                    {
+                        enemies[i] = enemies[i + 1];
+                    }
+                    else
+                    {
+                        enemies[i] = null;
+                    }
+                }
+            }
+
+            if(foundEnemy)
+            {
+                totalEnemies--;
+            }
         }
     }
 }

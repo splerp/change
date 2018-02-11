@@ -25,6 +25,7 @@ namespace MonoJam
         private Texture2D coinGraphic;
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
+        private Texture2D enemyGraphic;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
@@ -79,9 +80,11 @@ namespace MonoJam
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.WINDOW_HEIGHT);
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH + vaultWallWidth * 2, 20);
+            enemyGraphic = new Texture2D(graphicsDevice, Enemy.WIDTH, Enemy.HEIGHT);
 
             VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
             VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
+            enemyGraphic.SetData(Enumerable.Repeat(Color.DarkSlateGray, enemyGraphic.Width * enemyGraphic.Height).ToArray());
         }
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
@@ -144,10 +147,22 @@ namespace MonoJam
             }
             batch.End();
 
+            // Draw enemies.
+            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            {
+                for (int i = 0; i < gc.totalEnemies; i++)
+                {
+                    batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(), Color.White);
+                }
+            }
+            batch.End();
+
+            // Draw player.
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
                 batch.Draw(playerGraphic, gc.player.CollisionRect.Location.ToVector2(), Color.White);
 
+                // Draw coins.
                 foreach (var coin in gc.coins)
                 {
                     batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);

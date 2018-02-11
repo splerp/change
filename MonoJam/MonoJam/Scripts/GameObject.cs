@@ -10,11 +10,11 @@ namespace MonoJam
         {
             Position += pos;
         }
-        public void SetX(int x)
+        public void SetX(float x)
         {
             Position = new Vector2(x, Position.Y);
         }
-        public void SetY(int y)
+        public void SetY(float y)
         {
             Position = new Vector2(Position.X, y);
         }
