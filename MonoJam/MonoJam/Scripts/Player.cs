@@ -1,0 +1,6 @@
+﻿namespace MonoJam
+{
+    class Player
+    {
+    }
+}
