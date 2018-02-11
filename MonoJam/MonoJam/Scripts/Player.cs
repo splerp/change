@@ -14,10 +14,15 @@ namespace MonoJam
         public Vector2 speed;
         public float thrust = 0.1f;
         public float friction = 0.9f;
+
+        public bool FiringLaser { get; set; }
         
         public void Update()
         {
             var kbs = Keyboard.GetState();
+            var ms = Mouse.GetState();
+
+            FiringLaser = ms.LeftButton == ButtonState.Pressed;
 
             var inputVector = new Vector2(
                 kbs.IsKeyDown(Keys.A) ? -1 : kbs.IsKeyDown(Keys.D) ? 1 : 0,

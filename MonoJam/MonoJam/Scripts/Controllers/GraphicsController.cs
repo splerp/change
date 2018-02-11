@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace MonoJam
 
         #region Game graphics
         private Texture2D playerGraphic;
+        private Texture2D playerLasersLayer;
         private Texture2D coinGraphic;
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
@@ -69,6 +71,7 @@ namespace MonoJam
         public void LoadContent(ContentManager Content)
         {
             playerGraphic = Content.Load<Texture2D>("Graphics/Player");
+            playerLasersLayer = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT);
 
             coinGraphic = new Texture2D(graphicsDevice, Coin.COIN_WIDTH, 1);
             coinGraphic.SetData(Enumerable.Repeat(Color.Yellow, Coin.COIN_WIDTH).ToArray());
@@ -144,14 +147,42 @@ namespace MonoJam
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
                 batch.Draw(playerGraphic, gc.player.CollisionRect.Location.ToVector2(), Color.White);
-            }
 
-            foreach(var coin in gc.coins)
-            {
-                batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
+                foreach (var coin in gc.coins)
+                {
+                    batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
+                }
             }
-
             batch.End();
+
+            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE);
+            var playerPos = gc.player.CollisionRect.Location;
+
+            // TODO: Combine both sets of data, add to texture2D, draw once.
+            if (gc.player.FiringLaser)
+            {
+                if (mousePos.X >= 0 && mousePos.Y >= 0 &&
+                    mousePos.X < MonoJam.WINDOW_WIDTH && mousePos.Y < MonoJam.WINDOW_HEIGHT)
+                {
+                    var newData = LineGraphic.CreateLine(playerPos.X + 2, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
+                    playerLasersLayer.SetData(newData);
+
+                    batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+                    {
+                        batch.Draw(playerLasersLayer, Vector2.Zero, Color.White);
+                    }
+                    batch.End();
+
+                    newData = LineGraphic.CreateLine(playerPos.X + 5, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
+                    playerLasersLayer.SetData(newData);
+
+                    batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+                    {
+                        batch.Draw(playerLasersLayer, Vector2.Zero, Color.White);
+                    }
+                    batch.End();
+                }
+            }
         }
     }
 }
