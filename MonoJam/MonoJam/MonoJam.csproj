@@ -44,9 +44,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scripts\ICollisionObject.cs" />
     <Compile Include="Scripts\Core\MonoJam.cs" />
     <Compile Include="Scripts\Controllers\GameController.cs" />
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
+    <Compile Include="Scripts\GameObject.cs" />
+    <Compile Include="Scripts\Enemy.cs" />
     <Compile Include="Scripts\Player.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
