@@ -3,9 +3,9 @@ using System;
 
 namespace MonoJam
 {
-    class Coin : GameObject, ICollisionObject
+    public class Coin : GameObject, ICollisionObject
     {
-        public const int COIN_WIDTH = 3;
+        public const int COIN_WIDTH = 1;
 
         public Point Size => new Point(COIN_WIDTH, 1);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
@@ -14,10 +14,10 @@ namespace MonoJam
 
         public Coin()
         {
-            fallBy = new Random().Next(2, 5);
+            fallBy = GameController.random.Next(2, 5);
         }
 
-        public bool MoveCheckLand(byte[] coinData)
+        public bool MoveAndCheckLand(byte[] coinData)
         {
             Point coinCorner = CollisionRect.Location;
             int arrayLoc = coinCorner.Y * MonoJam.WINDOW_WIDTH + coinCorner.X;
@@ -32,7 +32,7 @@ namespace MonoJam
             }
             
             // End WIDTH to the right.
-            var endCheck = Math.Min(startCheck + COIN_WIDTH, finalIndex - 1);
+            var endCheck = Math.Min(startCheck + COIN_WIDTH, finalIndex);
 
             for(int i = startCheck; i < endCheck; i++)
             {

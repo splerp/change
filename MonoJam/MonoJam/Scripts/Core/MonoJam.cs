@@ -11,7 +11,7 @@ namespace MonoJam
         
         GraphicsDeviceManager graphics;
 
-        GraphicsController grc;
+        public GraphicsController grc;
         GameController gc;
 
         public MonoJam()

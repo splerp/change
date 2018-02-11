@@ -7,7 +7,7 @@ using System.Timers;
 
 namespace MonoJam
 {
-    class GameController
+    public class GameController
     {
         private MonoJam mj;
 
@@ -17,11 +17,12 @@ namespace MonoJam
 
         public byte[] coinData;
 
-        public Random random;
+        public static Random random;
         public bool ReadyToSpawnCoins { get; set; }
 
         Timer coinSpawner;
 
+        public int placedCoins;
         public int currentCoins;
         public int coinsToSpawn;
 
@@ -30,7 +31,8 @@ namespace MonoJam
             mj = mjIn;
 
             player = new Player();
-            coinData = new byte[MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT];
+
+            ResetCoinData();
 
             coins = new List<Coin>();
             random = new Random();
@@ -41,6 +43,13 @@ namespace MonoJam
 
             currentCoins = 0;
             coinsToSpawn = 0;
+            placedCoins = 0;
+            placedCoins = 0;
+        }
+
+        private void ResetCoinData()
+        {
+            coinData = new byte[MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT];
         }
 
         public void Update()
@@ -64,7 +73,7 @@ namespace MonoJam
                 {
                     coins[i].MoveBy(new Vector2(0, 1));
 
-                    if (coins[i].MoveCheckLand(coinData))
+                    if (coins[i].MoveAndCheckLand(coinData))
                     {
                         var pos = coins[i].CollisionRect.Location;
                         int arrayLoc = pos.Y * MonoJam.WINDOW_WIDTH + pos.X;
@@ -74,23 +83,36 @@ namespace MonoJam
                         Buffer.BlockCopy(coinArray, 0, coinData, arrayLoc, coinArray.Length);
 
                         coins.RemoveAt(i);
+
+                        placedCoins++;
                         break;
                     }
+                }
+
+                // Move coin buffers if required.
+                if(placedCoins > 5000)
+                {
+                    placedCoins = 0;
+                    mj.grc.CreateNewCoinBuffer();
+                    ResetCoinData();
                 }
             }
 
             if(ReadyToSpawnCoins)
             {
-                if (coinsToSpawn > 0)
+                for (int i = 0; i < 2; i++)
                 {
-                    coinsToSpawn--;
+                    if (coinsToSpawn > 0)
+                    {
+                        coinsToSpawn--;
 
-                    var newCoin = new Coin();
-                    newCoin.SetX(random.Next(0, MonoJam.WINDOW_WIDTH - Coin.COIN_WIDTH + 1));
+                        // TODO: "Trend" coins into piles
+                        var newCoin = new Coin();
+                        newCoin.SetX(random.Next(0, MonoJam.WINDOW_WIDTH - Coin.COIN_WIDTH + 1));
+                        coins.Add(newCoin);
 
-                    coins.Add(newCoin);
-
-                    ReadyToSpawnCoins = false;
+                        ReadyToSpawnCoins = false;
+                    }
                 }
             }
         }
