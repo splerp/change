@@ -4,10 +4,10 @@ namespace MonoJam
 {
     public class MonoJam : Game
     {
-        public const int SCALE = 4;
+        public const int SCALE = 8;
 
-        public const int WINDOW_WIDTH = 250;
-        public const int WINDOW_HEIGHT = 150;
+        public const int WINDOW_WIDTH = 120;
+        public const int WINDOW_HEIGHT = 70;
         
         GraphicsDeviceManager graphics;
 

@@ -6,8 +6,8 @@ namespace MonoJam
 {
     public class Player : GameObject, ICollisionObject
     {
-        public Point Size => new Point(10, 10);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
+        public Point Size => new Point(8, 8);
 
         public Vector2 speed;
         public float thrust = 1f;
