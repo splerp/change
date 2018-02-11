@@ -4,9 +4,11 @@ namespace MonoJam
 {
     public class MonoJam : Game
     {
-        public const int WINDOW_WIDTH = 500;
-        public const int WINDOW_HEIGHT = 300;
+        public const int SCALE = 4;
 
+        public const int WINDOW_WIDTH = 250;
+        public const int WINDOW_HEIGHT = 150;
+        
         GraphicsDeviceManager graphics;
 
         GraphicsController grc;
@@ -17,8 +19,8 @@ namespace MonoJam
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
-            graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
+            graphics.PreferredBackBufferWidth = WINDOW_WIDTH * SCALE;
+            graphics.PreferredBackBufferHeight = WINDOW_HEIGHT * SCALE;
             graphics.ApplyChanges();
 
             var screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
@@ -26,13 +28,17 @@ namespace MonoJam
 
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
-            Window.Position = new Point((screenWidth - WINDOW_WIDTH) / 2, (screenHeight - WINDOW_HEIGHT) / 2 - 100);
+            Window.Position = new Point(
+                (screenWidth - graphics.PreferredBackBufferWidth) / 2,
+                (screenHeight - graphics.PreferredBackBufferHeight) / 2 - 100);
         }
         
         protected override void Initialize()
         {
             gc = new GameController(this);
             grc = new GraphicsController(gc, GraphicsDevice);
+
+            grc.LoadContent(Content);
 
             base.Initialize();
         }
