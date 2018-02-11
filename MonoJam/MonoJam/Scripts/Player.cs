@@ -26,7 +26,33 @@ namespace MonoJam
 
             MoveBy(speed);
 
+            RestrictToBounds();
+
             PrintPlayerInfo();
+        }
+
+        private void RestrictToBounds()
+        {
+            if (Position.X < 0)
+            {
+                SetX(0);
+                speed.X *= -1;
+            }
+            else if (Position.X + Size.X > MonoJam.WINDOW_WIDTH)
+            {
+                SetX(MonoJam.WINDOW_WIDTH - Size.X);
+                speed.X *= -1;
+            }
+            if (Position.Y < 0)
+            {
+                SetY(0);
+                speed.Y *= -1;
+            }
+            else if (Position.Y + Size.Y > MonoJam.WINDOW_HEIGHT)
+            {
+                SetY(MonoJam.WINDOW_HEIGHT - Size.Y);
+                speed.Y *= -1;
+            }
         }
 
         private void PrintPlayerInfo()
