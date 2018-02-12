@@ -29,6 +29,8 @@ namespace MonoJam
         private Texture2D enemyGraphic;
         private Texture2D[] enemyFireGraphics;
         private Texture2D hudLaserCharge;
+        private Texture2D titleGraphic;
+        private Texture2D titleCursor;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
@@ -49,6 +51,11 @@ namespace MonoJam
             baseMatrix =
                   Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0)
                 * baseScaleMatrix;
+        }
+
+        public void ResetCoinBuffers()
+        {
+            coinBackgroundLayers.Clear();
         }
 
         public void CreateNewCoinBuffer()
@@ -84,10 +91,13 @@ namespace MonoJam
             coinGraphic = new Texture2D(graphicsDevice, Coin.COIN_WIDTH, 1);
             coinGraphic.SetData(Enumerable.Repeat(Color.Yellow, Coin.COIN_WIDTH).ToArray());
 
+            titleGraphic = Content.Load<Texture2D>("Graphics/Title");
+            titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
+
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, 20);
-            hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 5);
+            hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
 
             enemyGraphic = Content.Load<Texture2D>("Graphics/Enemy");
             enemyFireGraphics = new Texture2D[]
@@ -111,6 +121,42 @@ namespace MonoJam
         }
 
         public void Draw()
+        {
+            if(gc.IsPlaying)
+            {
+                DrawGame();
+            }
+            else
+            {
+                DrawMenu();
+            }
+        }
+
+        public void DrawMenu()
+        {
+            Vector2 coinPos = Vector2.Zero;
+            switch(gc.mainMenu.selectedOption)
+            {
+                case 0:
+                    coinPos = new Vector2(9, 7);
+                    break;
+                case 1:
+                    coinPos = new Vector2(9, 20);
+                    break;
+                case 2:
+                    coinPos = new Vector2(9, 35);
+                    break;
+            }
+
+            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            {
+                batch.Draw(titleGraphic, Vector2.Zero, Color.White);
+                batch.Draw(titleCursor, coinPos, Color.White);
+            }
+            batch.End();
+        }
+
+        public void DrawGame()
         {
             var baseMatrixWithMainShake =
                 Matrix.CreateTranslation(new Vector3(gc.mainShaker.CurrentShake, 0))
@@ -163,7 +209,7 @@ namespace MonoJam
                 }
                 batch.End();
             }
-            
+
             // Update current coin data.
             UpdateCoinBGData();
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
@@ -249,6 +295,13 @@ namespace MonoJam
             {
                 batch.Draw(hudLaserCharge,
                     Vector2.Zero,
+                    null,
+                    Color.White,
+                    0, Vector2.Zero,
+                    new Vector2(laserPercentage, 1),
+                    SpriteEffects.None, 0);
+                batch.Draw(hudLaserCharge,
+                    new Vector2(0, 3),
                     null,
                     Color.White,
                     0, Vector2.Zero,

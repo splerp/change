@@ -15,6 +15,7 @@ namespace MonoJam
 
         private MonoJam mj;
         public ShakeController mainShaker;
+        public MainMenuController mainMenu;
 
         public Player player;
         public Enemy[] enemies;
@@ -34,15 +35,16 @@ namespace MonoJam
         public int currentCoins;
         public int coinsToSpawn;
 
+        public bool IsPlaying { get; set; }
+
         public GameController(MonoJam mjIn)
         {
             mj = mjIn;
             mainShaker = new ShakeController();
+            mainMenu = new MainMenuController(this);
 
             player = new Player(this);
             enemies = new Enemy[MAX_ENEMIES];
-
-            ResetCoinData();
 
             coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
@@ -50,21 +52,41 @@ namespace MonoJam
 
             coinSpawner = new Timer(1);
             coinSpawner.Elapsed += (a, b) => ReadyToSpawnCoins = true;
-            coinSpawner.Start();
 
             enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
+        }
+
+        public void StartGame()
+        {
             enemySpawner.Start();
+            coinSpawner.Start();
+
+            ResetCoinData();
+
+            player.Reset();
+
+            IsPlaying = true;
+        }
+
+        public void EndGame()
+        {
+            enemySpawner.Stop();
+            coinSpawner.Stop();
 
             currentCoins = 0;
             coinsToSpawn = 0;
             placedCoins = 0;
-            placedCoins = 0;
+            
+            DestroyAllEnemies();
+            DestroyAllCoins();
+
+            IsPlaying = false;
         }
 
-        private void ResetCoinData()
+        public void Exit()
         {
-            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
+            mj.Exit();
         }
 
         public void Update()
@@ -72,48 +94,15 @@ namespace MonoJam
             // Always keep console window clear.
             Console.Clear();
 
-            #region Create objects
-            if (ReadyToSpawnCoins)
+            if(IsPlaying)
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    if (coinsToSpawn > 0)
-                    {
-                        coinsToSpawn--;
-
-                        // TODO: "Trend" coins into piles
-                        var newCoin = new Coin();
-                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH - Coin.COIN_WIDTH + 1));
-                        coins.Add(newCoin);
-
-                        ReadyToSpawnCoins = false;
-                    }
-                }
+                UpdatePlay();
             }
-
-            if (ReadyToSpawnEnemy)
+            else
             {
-                SpawnEnemy();
-
-                ReadyToSpawnEnemy = false;
+                mainMenu.Update();
             }
-            #endregion
-
-            #region Update objects
-            player.Update();
-
-            // Update enemies.
-            for (int i = 0; i < totalEnemies; i++)
-            {
-                enemies[i].Update();
-            }
-
-            foreach (var c in corpses)
-            {
-                c.Update();
-            }
-            #endregion
-
+            
             #region Remove objects
             // Remove destroyed coins.
             for (int i = coins.Count - 1; i >= 0; i--)
@@ -181,19 +170,78 @@ namespace MonoJam
                 mainShaker.currentAmplitude = 1f;
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.C))
-            {
-                AddCoins(2);
-            }
-
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine("Corpses: " + corpses.Count);
+        }
+
+        public void UpdatePlay()
+        {
+            #region Create objects
+            if (ReadyToSpawnCoins)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    if (coinsToSpawn > 0)
+                    {
+                        coinsToSpawn--;
+
+                        // TODO: "Trend" coins into piles
+                        var newCoin = new Coin();
+                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH - Coin.COIN_WIDTH + 1));
+                        coins.Add(newCoin);
+
+                        ReadyToSpawnCoins = false;
+                    }
+                }
+            }
+
+            if (ReadyToSpawnEnemy)
+            {
+                SpawnEnemy();
+
+                ReadyToSpawnEnemy = false;
+            }
+            #endregion
+
+            #region Update objects
+            player.Update();
+
+            // Update enemies.
+            for (int i = 0; i < totalEnemies; i++)
+            {
+                enemies[i].Update();
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                EndGame();
+            }
+
+            foreach (var c in corpses)
+            {
+                c.Update();
+            }
+            #endregion
         }
 
         public void AddCoins(int coins)
         {
             currentCoins += coins;
             coinsToSpawn += coins;
+        }
+
+        public void ResetCoinData()
+        {
+            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
+        }
+
+        public void DestroyAllCoins()
+        {
+            coins.Clear();
+
+            mj.grc.ResetCoinBuffers();
+
+            ResetCoinData();
         }
 
         public void SpawnEnemy()
@@ -208,6 +256,17 @@ namespace MonoJam
                 // Temporary for debugging
                 throw new Exception("Created too many enemies");
             }
+        }
+
+        public void DestroyAllEnemies()
+        {
+            for(int i = totalEnemies - 1; i >= 0; i--)
+            {
+                DestroyEnemy(enemies[i]);
+            }
+
+            // And remove all corpses.
+            corpses.Clear();
         }
 
         public void DestroyEnemy(Enemy e)

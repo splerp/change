@@ -23,7 +23,7 @@ namespace MonoJam
 
         public float laserChargeReduceBy = 0.02f;
         public float laserChargeIncreaseBy = 0.05f;
-        public float laserCharge = 1f;
+        public float laserCharge;
 
         public bool FiringLaser { get; set; }
         
@@ -31,6 +31,17 @@ namespace MonoJam
         {
             gc = gcIn;
             laserShake = new ShakeController();
+
+            Reset();
+        }
+
+        public void Reset()
+        {
+            SetX(0);
+            SetY(0);
+            speed = Vector2.Zero;
+
+            laserCharge = 1f;
         }
 
         public void Update()
