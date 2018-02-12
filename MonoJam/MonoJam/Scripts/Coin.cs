@@ -14,7 +14,7 @@ namespace MonoJam
 
         public Coin()
         {
-            fallBy = GameController.random.Next(2, 5);
+            fallBy = GameController.random.Next(1, 5);
         }
 
         public bool MoveAndCheckLand(byte[] coinData)
