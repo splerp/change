@@ -22,7 +22,7 @@ namespace MonoJam
         public float sinAmp = 8f;
         public float sinPer = 0.08f;
         
-        public bool ReadyToRemove => totalHealth <= 0 || Position.X + Size.X < 0 || Position.X > MonoJam.WINDOW_WIDTH;
+        public bool ReadyToRemove => totalHealth <= 0 || Position.X + Size.X < 0 || Position.X > MonoJam.PLAYABLE_AREA_WIDTH;
 
         public int totalHealth = 1000;
 
@@ -33,10 +33,10 @@ namespace MonoJam
             direction = GameController.random.Next(1, 3) == 1 ? 1 : -1;
             thrust *= direction;
 
-            int halfAreaSize = (MonoJam.WINDOW_WIDTH + Size.X) / 2;
-            SetX(MonoJam.WINDOW_WIDTH - (halfAreaSize * direction + halfAreaSize));
+            int halfAreaSize = (MonoJam.PLAYABLE_AREA_WIDTH + Size.X) / 2;
+            SetX(MonoJam.PLAYABLE_AREA_WIDTH - (halfAreaSize * direction + halfAreaSize));
 
-            yPos = GameController.random.Next((int)sinAmp, MonoJam.WINDOW_HEIGHT - Size.Y - (int)sinAmp / 2);
+            yPos = GameController.random.Next((int)sinAmp, MonoJam.PLAYABLE_AREA_HEIGHT - Size.Y - (int)sinAmp / 2);
         }
 
         public void Update()

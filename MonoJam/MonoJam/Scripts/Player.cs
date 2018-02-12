@@ -52,14 +52,14 @@ namespace MonoJam
                 {
                     var enemy = gc.enemies[i];
                     
-                    var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE);
+                    var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
                     var lineToMouse = mousePos - Position.ToPoint();
 
                     var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, Position.ToPoint(), lineToMouse);
 
                     if(hittingEnemy)
                     {
-                        if((mousePos - enemy.CollisionRect.Location).ToVector2().Length() < 5f)
+                        if((mousePos - enemy.CollisionRect.Center).ToVector2().Length() < 5f)
                         {
                             enemy.Damage(DAMAGE_LASER_DIRECT);
                         }
@@ -82,9 +82,9 @@ namespace MonoJam
                 SetX(0);
                 speed.X *= -1;
             }
-            else if (Position.X + Size.X > MonoJam.WINDOW_WIDTH)
+            else if (Position.X + Size.X > MonoJam.PLAYABLE_AREA_WIDTH)
             {
-                SetX(MonoJam.WINDOW_WIDTH - Size.X);
+                SetX(MonoJam.PLAYABLE_AREA_WIDTH - Size.X);
                 speed.X *= -1;
             }
             if (Position.Y < 0)
@@ -92,9 +92,9 @@ namespace MonoJam
                 SetY(0);
                 speed.Y *= -1;
             }
-            else if (Position.Y + Size.Y > MonoJam.WINDOW_HEIGHT)
+            else if (Position.Y + Size.Y > MonoJam.PLAYABLE_AREA_HEIGHT)
             {
-                SetY(MonoJam.WINDOW_HEIGHT - Size.Y);
+                SetY(MonoJam.PLAYABLE_AREA_HEIGHT - Size.Y);
                 speed.Y *= -1;
             }
         }

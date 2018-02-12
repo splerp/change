@@ -62,7 +62,7 @@ namespace MonoJam
 
         private void ResetCoinData()
         {
-            coinData = new byte[MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT];
+            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
         }
 
         public void Update()
@@ -81,7 +81,7 @@ namespace MonoJam
 
                         // TODO: "Trend" coins into piles
                         var newCoin = new Coin();
-                        newCoin.SetX(random.Next(0, MonoJam.WINDOW_WIDTH - Coin.COIN_WIDTH + 1));
+                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH - Coin.COIN_WIDTH + 1));
                         coins.Add(newCoin);
 
                         ReadyToSpawnCoins = false;
@@ -123,7 +123,7 @@ namespace MonoJam
                     if (coins[i].MoveAndCheckLand(coinData))
                     {
                         var pos = coins[i].CollisionRect.Location;
-                        int arrayLoc = pos.Y * MonoJam.WINDOW_WIDTH + pos.X;
+                        int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
 
                         var coinArray = Enumerable.Repeat((byte)1, Coin.COIN_WIDTH).ToArray();
 

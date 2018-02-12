@@ -20,11 +20,11 @@ namespace MonoJam
         public bool MoveAndCheckLand(byte[] coinData)
         {
             Point coinCorner = CollisionRect.Location;
-            int arrayLoc = coinCorner.Y * MonoJam.WINDOW_WIDTH + coinCorner.X;
-            int finalIndex = MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT;
+            int arrayLoc = coinCorner.Y * MonoJam.PLAYABLE_AREA_WIDTH + coinCorner.X;
+            int finalIndex = MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT;
 
             // Start exactly one line below.
-            var startCheck = arrayLoc + MonoJam.WINDOW_WIDTH;
+            var startCheck = arrayLoc + MonoJam.PLAYABLE_AREA_WIDTH;
 
             if (startCheck >= finalIndex)
             {

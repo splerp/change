@@ -42,7 +42,7 @@ namespace MonoJam
 
             batch = new SpriteBatch(graphicsDevice);
             samplerState = new SamplerState() { Filter = TextureFilter.Point };
-            baseScaleMatrix = Matrix.CreateScale(MonoJam.SCALE);
+            baseScaleMatrix = Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0) * Matrix.CreateScale(MonoJam.SCALE);
         }
 
         public void CreateNewCoinBuffer()
@@ -50,11 +50,11 @@ namespace MonoJam
             // First ensure graphic is up to date.
             UpdateCoinBGData();
             
-            Color[] theCurrentData = new Color[MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT];
+            Color[] theCurrentData = new Color[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
 
             var NewCoinBackground = new CoinBackgroundLayer
             {
-                graphic = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT)
+                graphic = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT)
             };
             
             // Put data into background.
@@ -73,14 +73,14 @@ namespace MonoJam
         public void LoadContent(ContentManager Content)
         {
             playerGraphic = Content.Load<Texture2D>("Graphics/Player");
-            playerLasersLayer = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT);
+            playerLasersLayer = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
 
             coinGraphic = new Texture2D(graphicsDevice, Coin.COIN_WIDTH, 1);
             coinGraphic.SetData(Enumerable.Repeat(Color.Yellow, Coin.COIN_WIDTH).ToArray());
 
-            currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT);
-            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.WINDOW_HEIGHT);
-            VaultFloor = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH + vaultWallWidth * 2, 20);
+            currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
+            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
+            VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, 20);
 
             enemyGraphic = Content.Load<Texture2D>("Graphics/Enemy");
             enemyFireGraphics = new Texture2D[]
@@ -126,12 +126,13 @@ namespace MonoJam
 
                 // Create matrix for coin backgrounds.
                 Matrix coinBackgroundMatrix =
-                      Matrix.CreateTranslation(-MonoJam.WINDOW_WIDTH / 2, -MonoJam.WINDOW_HEIGHT, 0)
+                      Matrix.CreateTranslation(-MonoJam.WINDOW_WIDTH / 2, -MonoJam.PLAYABLE_AREA_HEIGHT, 0)
                     * baseScaleMatrix
                     * Matrix.CreateScale(coinBackground.currentScale)
                     * Matrix.CreateTranslation(
-                        MonoJam.WINDOW_WIDTH * MonoJam.SCALE / 2,
-                        MonoJam.WINDOW_HEIGHT * MonoJam.SCALE - coinBackground.currentTranslate, 0);
+                        MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.SCALE / 2,
+                        MonoJam.PLAYABLE_AREA_HEIGHT * MonoJam.SCALE - coinBackground.currentTranslate,
+                        0);
 
                 // Draw buffer coin background.
                 batch.Begin(
@@ -141,8 +142,8 @@ namespace MonoJam
                 {
                     batch.Draw(coinBackground.graphic, new Vector2(0, 0), drawColour);
                     batch.Draw(VaultWalls, new Vector2(-vaultWallWidth, 0), drawColour);
-                    batch.Draw(VaultWalls, new Vector2(MonoJam.WINDOW_WIDTH, 0), drawColour);
-                    batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, MonoJam.WINDOW_HEIGHT), drawColour);
+                    batch.Draw(VaultWalls, new Vector2(MonoJam.PLAYABLE_AREA_WIDTH, 0), drawColour);
+                    batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT), drawColour);
                 }
                 batch.End();
             }
@@ -170,7 +171,7 @@ namespace MonoJam
                         Color.White,
                         0, Vector2.Zero, 1, effect, 0);
 
-                    batch.Draw(enemyGraphic, c.Position, Color.White);
+                    batch.Draw(enemyGraphic, c.Position.ToPoint().ToVector2(), Color.White);
                 }
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
@@ -192,14 +193,14 @@ namespace MonoJam
             }
             batch.End();
 
-            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE);
+            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
             var playerPos = gc.player.CollisionRect.Location;
 
             // TODO: Combine both sets of data, add to texture2D, draw once.
             if (gc.player.FiringLaser)
             {
                 if (mousePos.X >= 0 && mousePos.Y >= 0 &&
-                    mousePos.X < MonoJam.WINDOW_WIDTH && mousePos.Y < MonoJam.WINDOW_HEIGHT)
+                    mousePos.X < MonoJam.PLAYABLE_AREA_WIDTH && mousePos.Y < MonoJam.PLAYABLE_AREA_HEIGHT)
                 {
                     var newData = LineGraphic.CreateLine(playerPos.X + 2, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
                     playerLasersLayer.SetData(newData);

@@ -9,7 +9,8 @@ namespace MonoJam
         // https://stackoverflow.com/a/11683720
         public static Color[] CreateLine(int x, int y, int x2, int y2, Color lineColour)
         {
-            Color[] lineData = Enumerable.Repeat(Color.Transparent, MonoJam.WINDOW_WIDTH * MonoJam.WINDOW_HEIGHT).ToArray();
+            Color[] lineData = Enumerable.Repeat(Color.Transparent,
+                MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT).ToArray();
 
             int w = x2 - x;
             int h = y2 - y;

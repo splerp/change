@@ -5,10 +5,13 @@ namespace MonoJam
     public class MonoJam : Game
     {
         public const int SCALE = 8;
-
-        public const int WINDOW_WIDTH = 120;
-        public const int WINDOW_HEIGHT = 70;
         
+        public const int PLAYABLE_AREA_WIDTH = 120;
+        public const int PLAYABLE_AREA_HEIGHT = 70;
+        public const int PLAYABLE_AREA_Y = 0;
+        public const int WINDOW_WIDTH = 120;
+        public const int WINDOW_HEIGHT = PLAYABLE_AREA_Y + PLAYABLE_AREA_HEIGHT;
+
         GraphicsDeviceManager graphics;
 
         public GraphicsController grc;
