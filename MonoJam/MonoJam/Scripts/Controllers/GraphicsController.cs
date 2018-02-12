@@ -81,8 +81,8 @@ namespace MonoJam
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.WINDOW_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.WINDOW_HEIGHT);
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH + vaultWallWidth * 2, 20);
-            enemyGraphic = new Texture2D(graphicsDevice, Enemy.WIDTH, Enemy.HEIGHT);
 
+            enemyGraphic = Content.Load<Texture2D>("Graphics/Enemy");
             enemyFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/Fire2"),
@@ -93,7 +93,6 @@ namespace MonoJam
 
             VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
             VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
-            enemyGraphic.SetData(Enumerable.Repeat(Color.DarkSlateGray, enemyGraphic.Width * enemyGraphic.Height).ToArray());
         }
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
