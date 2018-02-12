@@ -178,7 +178,7 @@ namespace MonoJam
 
             if(corpses.Any())
             {
-                mainShaker.currentAmplitude = 10f;
+                mainShaker.currentAmplitude = 1f;
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.C))

@@ -8,15 +8,10 @@ namespace MonoJam
         public float pos;
 
         public Vector2 CurrentShake => new Vector2(currentAmplitude * Perlin.Noise(pos, 0), currentAmplitude * Perlin.Noise(0, pos));
-        
-        public ShakeController()
-        {
-            currentAmplitude = 25f;
-        }
 
         public void Update()
         {
-            currentAmplitude--;
+            currentAmplitude-= 0.2f;
             if(currentAmplitude < 0)
             {
                 currentAmplitude = 0;

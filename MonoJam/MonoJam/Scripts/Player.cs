@@ -75,7 +75,7 @@ namespace MonoJam
             // Damage enemies in line.
             if(FiringLaser)
             {
-                laserShake.currentAmplitude = 15f;
+                laserShake.currentAmplitude = 2f;
 
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {

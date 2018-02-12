@@ -112,8 +112,13 @@ namespace MonoJam
 
         public void Draw()
         {
-            var baseMatrixWithMainShake = baseMatrix * Matrix.CreateTranslation(new Vector3(gc.mainShaker.CurrentShake, 0));
-            var baseMatrixWithLaserShake = baseMatrixWithMainShake * Matrix.CreateTranslation(new Vector3(gc.player.laserShake.CurrentShake, 0));
+            var baseMatrixWithMainShake =
+                Matrix.CreateTranslation(new Vector3(gc.mainShaker.CurrentShake, 0))
+                * baseMatrix;
+
+            var baseMatrixWithLaserShake = Matrix.CreateTranslation(
+                new Vector3(gc.player.laserShake.CurrentShake, 0))
+                * baseMatrixWithMainShake;
 
             graphicsDevice.Clear(Color.Black);
 
