@@ -46,7 +46,9 @@ namespace MonoJam
             samplerState = new SamplerState() { Filter = TextureFilter.Point };
 
             baseScaleMatrix = Matrix.CreateScale(MonoJam.SCALE);
-            baseMatrix = Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0) * baseScaleMatrix;
+            baseMatrix =
+                  Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0)
+                * baseScaleMatrix;
         }
 
         public void CreateNewCoinBuffer()
@@ -110,6 +112,9 @@ namespace MonoJam
 
         public void Draw()
         {
+            var baseMatrixWithMainShake = baseMatrix * Matrix.CreateTranslation(new Vector3(gc.mainShaker.CurrentShake, 0));
+            var baseMatrixWithLaserShake = baseMatrixWithMainShake * Matrix.CreateTranslation(new Vector3(gc.player.laserShake.CurrentShake, 0));
+
             graphicsDevice.Clear(Color.Black);
 
             for (int i = coinBackgroundLayers.Count - 1; i >= 0; i--)
@@ -133,7 +138,7 @@ namespace MonoJam
                 // Create matrix for coin backgrounds.
                 Matrix coinBackgroundMatrix =
                       Matrix.CreateTranslation(-MonoJam.WINDOW_WIDTH / 2, -MonoJam.PLAYABLE_AREA_HEIGHT, 0)
-                    * baseMatrix
+                    * baseMatrixWithMainShake
                     * Matrix.CreateScale(coinBackground.currentScale)
                     * Matrix.CreateTranslation(
                         MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.SCALE / 2,
@@ -156,14 +161,14 @@ namespace MonoJam
             
             // Update current coin data.
             UpdateCoinBGData();
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
             {
                 batch.Draw(currentCoinBackground, new Vector2(0, 0), Color.White);
             }
             batch.End();
 
             // Draw enemies.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
             {
                 foreach (var c in gc.corpses)
                 {
@@ -187,10 +192,14 @@ namespace MonoJam
             batch.End();
 
             // Draw player.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
             {
                 batch.Draw(playerGraphic, gc.player.CollisionRect.Location.ToVector2(), Color.White);
+            }
+            batch.End();
 
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            {
                 // Draw coins.
                 foreach (var coin in gc.coins)
                 {
@@ -211,7 +220,7 @@ namespace MonoJam
                     var newData = LineGraphic.CreateLine(playerPos.X + 2, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
                     playerLasersLayer.SetData(newData);
 
-                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
                     {
                         batch.Draw(playerLasersLayer, Vector2.Zero, Color.White);
                     }
@@ -220,7 +229,7 @@ namespace MonoJam
                     newData = LineGraphic.CreateLine(playerPos.X + 5, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
                     playerLasersLayer.SetData(newData);
 
-                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
                     {
                         batch.Draw(playerLasersLayer, Vector2.Zero, Color.White);
                     }

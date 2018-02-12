@@ -55,9 +55,11 @@
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
     <Compile Include="Scripts\GameObject.cs" />
     <Compile Include="Scripts\Enemy.cs" />
+    <Compile Include="Scripts\Perlin.cs" />
     <Compile Include="Scripts\Player.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\ShakeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

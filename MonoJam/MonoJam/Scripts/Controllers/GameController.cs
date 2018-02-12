@@ -14,6 +14,7 @@ namespace MonoJam
         public int totalEnemies;
 
         private MonoJam mj;
+        public ShakeController mainShaker;
 
         public Player player;
         public Enemy[] enemies;
@@ -36,6 +37,7 @@ namespace MonoJam
         public GameController(MonoJam mjIn)
         {
             mj = mjIn;
+            mainShaker = new ShakeController();
 
             player = new Player(this);
             enemies = new Enemy[MAX_ENEMIES];
@@ -171,6 +173,13 @@ namespace MonoJam
                 }
             }
             #endregion
+
+            mainShaker.Update();
+
+            if(corpses.Any())
+            {
+                mainShaker.currentAmplitude = 10f;
+            }
 
             if (Keyboard.GetState().IsKeyDown(Keys.C))
             {

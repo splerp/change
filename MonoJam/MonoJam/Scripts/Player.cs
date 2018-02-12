@@ -10,6 +10,7 @@ namespace MonoJam
         public const int DAMAGE_LASER_INDIRECT = 20;
 
         private GameController gc;
+        public ShakeController laserShake;
 
         public Point Size => new Point(8, 8);
         public Rectangle CollisionRect => new Rectangle(new Point(
@@ -29,12 +30,15 @@ namespace MonoJam
         public Player(GameController gcIn)
         {
             gc = gcIn;
+            laserShake = new ShakeController();
         }
 
         public void Update()
         {
             var kbs = Keyboard.GetState();
             var ms = Mouse.GetState();
+
+            laserShake.Update();
 
             var laserButtonDown = ms.LeftButton == ButtonState.Pressed;
 
@@ -71,6 +75,8 @@ namespace MonoJam
             // Damage enemies in line.
             if(FiringLaser)
             {
+                laserShake.currentAmplitude = 15f;
+
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
                     var enemy = gc.enemies[i];
