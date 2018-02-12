@@ -26,6 +26,7 @@ namespace MonoJam
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
         private Texture2D enemyGraphic;
+        private Texture2D[] enemyFireGraphics;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
@@ -81,6 +82,14 @@ namespace MonoJam
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.WINDOW_HEIGHT);
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH + vaultWallWidth * 2, 20);
             enemyGraphic = new Texture2D(graphicsDevice, Enemy.WIDTH, Enemy.HEIGHT);
+
+            enemyFireGraphics = new Texture2D[]
+            {
+                Content.Load<Texture2D>("Graphics/Fire2"),
+                Content.Load<Texture2D>("Graphics/Fire1"),
+                Content.Load<Texture2D>("Graphics/Fire3"),
+                Content.Load<Texture2D>("Graphics/Fire1"),
+            };
 
             VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
             VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
@@ -150,6 +159,20 @@ namespace MonoJam
             // Draw enemies.
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
+                foreach (var c in gc.corpses)
+                {
+                    var fireOffset = new Vector2(-5, -5);
+
+                    var effect = c.speed.X < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+                    batch.Draw(enemyFireGraphics[c.animationFrame % enemyFireGraphics.Length],
+                        (c.Position + fireOffset).ToPoint().ToVector2(),
+                        null,
+                        Color.White,
+                        0, Vector2.Zero, 1, effect, 0);
+
+                    batch.Draw(enemyGraphic, c.Position, Color.White);
+                }
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
                     batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(), Color.White);

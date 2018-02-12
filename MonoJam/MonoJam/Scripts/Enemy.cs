@@ -15,10 +15,13 @@ namespace MonoJam
         public int direction = 1;
 
         public float yOffsetCount;
-        public float sinAmp = 8f;
-        public float sinPer = 0.08f;
+        public float yOffset;
+        public float yOffsetDiff;
         public float yPos;
 
+        public float sinAmp = 8f;
+        public float sinPer = 0.08f;
+        
         public bool ReadyToRemove => totalHealth <= 0 || Position.X + Size.X < 0 || Position.X > MonoJam.WINDOW_WIDTH;
 
         public int totalHealth = 1000;
@@ -38,11 +41,16 @@ namespace MonoJam
 
         public void Update()
         {
+            var previousYOffset = yOffset;
+
             // TODO: Based on time passed.
             yOffsetCount++;
 
+            yOffset = sinAmp * (float)Math.Sin(yOffsetCount * sinPer);
+            yOffsetDiff = yOffset - previousYOffset;
+
             MoveBy(new Vector2(thrust, 0));
-            SetY(yPos + sinAmp * (float)Math.Sin(yOffsetCount * sinPer));
+            SetY(yPos + yOffset);
         }
 
         public void Damage(int amount)

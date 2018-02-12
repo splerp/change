@@ -6,6 +6,11 @@ namespace MonoJam
 {
     public class Player : GameObject, ICollisionObject
     {
+        public const int DAMAGE_LASER_DIRECT = 100;
+        public const int DAMAGE_LASER_INDIRECT = 20;
+
+        private GameController gc;
+
         public Point Size => new Point(8, 8);
         public Rectangle CollisionRect => new Rectangle(new Point(
             (int)Math.Round(Position.X),
@@ -17,6 +22,11 @@ namespace MonoJam
 
         public bool FiringLaser { get; set; }
         
+        public Player(GameController gcIn)
+        {
+            gc = gcIn;
+        }
+
         public void Update()
         {
             var kbs = Keyboard.GetState();
@@ -34,6 +44,33 @@ namespace MonoJam
             MoveBy(speed);
 
             RestrictToBounds();
+
+            // Damage enemies in line.
+            if(FiringLaser)
+            {
+                for (int i = 0; i < gc.totalEnemies; i++)
+                {
+                    var enemy = gc.enemies[i];
+                    
+                    var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE);
+                    var lineToMouse = mousePos - Position.ToPoint();
+
+                    var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, Position.ToPoint(), lineToMouse);
+
+                    if(hittingEnemy)
+                    {
+                        if((mousePos - enemy.CollisionRect.Location).ToVector2().Length() < 5f)
+                        {
+                            enemy.Damage(DAMAGE_LASER_DIRECT);
+                        }
+                        else
+                        {
+                            enemy.Damage(DAMAGE_LASER_INDIRECT);
+                        }
+                        
+                    }
+                }
+            }
 
             PrintPlayerInfo();
         }

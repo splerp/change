@@ -9,7 +9,7 @@ namespace MonoJam
 {
     public class GameController
     {
-        public const int MAX_ENEMIES = 500;
+        public const int MAX_ENEMIES = 20;
         public int totalEnemies;
 
         private MonoJam mj;
@@ -17,6 +17,7 @@ namespace MonoJam
         public Player player;
         public Enemy[] enemies;
         public List<Coin> coins;
+        public List<EnemyCorpse> corpses;
 
         public byte[] coinData;
 
@@ -35,19 +36,20 @@ namespace MonoJam
         {
             mj = mjIn;
 
-            player = new Player();
+            player = new Player(this);
             enemies = new Enemy[MAX_ENEMIES];
 
             ResetCoinData();
 
             coins = new List<Coin>();
+            corpses = new List<EnemyCorpse>();
             random = new Random();
 
             coinSpawner = new Timer(1);
             coinSpawner.Elapsed += (a, b) => ReadyToSpawnCoins = true;
             coinSpawner.Start();
 
-            enemySpawner = new Timer(10);
+            enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
             enemySpawner.Start();
 
@@ -69,12 +71,19 @@ namespace MonoJam
 
             player.Update();
 
-            for(int i = 0; i < totalEnemies; i++)
+
+            // Update enemies.
+            for (int i = 0; i < totalEnemies; i++)
             {
                 enemies[i].Update();
             }
 
-            if(Keyboard.GetState().IsKeyDown(Keys.C))
+            foreach (var c in corpses)
+            {
+                c.Update();
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.C))
             {
                 AddCoins(2);
             }
@@ -114,15 +123,29 @@ namespace MonoJam
             }
 
             // Remove destroyed enemies.
-            for(int i = 0; i < totalEnemies; i++)
+            for (int i = 0; i < totalEnemies; i++)
             {
-                if(enemies[i].ReadyToRemove)
+                if (enemies[i].ReadyToRemove)
                 {
+                    // A "killed" enemy. Show the death sequence.
+                    if (enemies[i].totalHealth <= 0)
+                    {
+                        var newCorpse = new EnemyCorpse(enemies[i]);
+                        corpses.Add(newCorpse);
+                    }
+
                     DestroyEnemy(enemies[i]);
                 }
             }
+            for (int i = corpses.Count - 1; i >= 0; i--)
+            {
+                if (corpses[i].ReadyToRemove)
+                {
+                    corpses.RemoveAt(i);
+                }
+            }
 
-            if(ReadyToSpawnCoins)
+            if (ReadyToSpawnCoins)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -146,6 +169,8 @@ namespace MonoJam
 
                 ReadyToSpawnEnemy = false;
             }
+
+            Console.WriteLine("Corpses: " + corpses.Count);
         }
 
         public void AddCoins(int coins)
