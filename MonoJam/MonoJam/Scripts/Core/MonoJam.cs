@@ -30,7 +30,6 @@ namespace MonoJam
             var screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
 
             IsMouseVisible = true;
-            Window.AllowUserResizing = true;
             Window.Position = new Point(
                 (screenWidth - graphics.PreferredBackBufferWidth) / 2,
                 (screenHeight - graphics.PreferredBackBufferHeight) / 2 - 100);
