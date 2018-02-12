@@ -20,6 +20,10 @@ namespace MonoJam
         public float thrust = 0.1f;
         public float friction = 0.9f;
 
+        public float laserChargeReduceBy = 0.02f;
+        public float laserChargeIncreaseBy = 0.05f;
+        public float laserCharge = 1f;
+
         public bool FiringLaser { get; set; }
         
         public Player(GameController gcIn)
@@ -32,7 +36,26 @@ namespace MonoJam
             var kbs = Keyboard.GetState();
             var ms = Mouse.GetState();
 
-            FiringLaser = ms.LeftButton == ButtonState.Pressed;
+            var laserButtonDown = ms.LeftButton == ButtonState.Pressed;
+
+            if(laserButtonDown)
+            {
+                laserCharge -= laserChargeReduceBy;
+                if(laserCharge < 0)
+                {
+                    laserCharge = 0;
+                }
+            }
+            else
+            {
+                laserCharge += laserChargeIncreaseBy;
+                if (laserCharge > 1)
+                {
+                    laserCharge = 1;
+                }
+            }
+
+            FiringLaser = laserButtonDown && laserCharge > 0;
 
             var inputVector = new Vector2(
                 kbs.IsKeyDown(Keys.A) ? -1 : kbs.IsKeyDown(Keys.D) ? 1 : 0,
@@ -51,15 +74,15 @@ namespace MonoJam
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
                     var enemy = gc.enemies[i];
-                    
+
                     var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
                     var lineToMouse = mousePos - Position.ToPoint();
 
                     var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, Position.ToPoint(), lineToMouse);
 
-                    if(hittingEnemy)
+                    if (hittingEnemy)
                     {
-                        if((mousePos - enemy.CollisionRect.Center).ToVector2().Length() < 5f)
+                        if ((mousePos - enemy.CollisionRect.Center).ToVector2().Length() < 5f)
                         {
                             enemy.Damage(DAMAGE_LASER_DIRECT);
                         }
@@ -67,7 +90,6 @@ namespace MonoJam
                         {
                             enemy.Damage(DAMAGE_LASER_INDIRECT);
                         }
-                        
                     }
                 }
             }

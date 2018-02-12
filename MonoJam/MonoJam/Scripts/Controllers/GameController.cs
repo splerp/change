@@ -10,7 +10,7 @@ namespace MonoJam
     public class GameController
     {
         public const int MAX_ENEMIES = 20;
-        public const int COINS_PER_LAYER = 100;
+        public const int COINS_PER_LAYER = 1000;
         public int totalEnemies;
 
         private MonoJam mj;
@@ -137,7 +137,7 @@ namespace MonoJam
                 }
 
                 // Move coin buffers if required.
-                if(placedCoins > COINS_PER_LAYER)
+                if(placedCoins >= COINS_PER_LAYER)
                 {
                     placedCoins = 0;
                     mj.grc.CreateNewCoinBuffer();
@@ -153,6 +153,8 @@ namespace MonoJam
                     // A "killed" enemy. Show the death sequence.
                     if (enemies[i].totalHealth <= 0)
                     {
+                        AddCoins(100);
+
                         var newCorpse = new EnemyCorpse(enemies[i]);
                         corpses.Add(newCorpse);
                     }
