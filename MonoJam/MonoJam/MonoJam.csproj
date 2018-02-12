@@ -44,8 +44,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="EnemyCorpse.cs" />
-    <Compile Include="LineCollisionTest.cs" />
+    <Compile Include="Scripts\EnemyCorpse.cs" />
+    <Compile Include="Scripts\LineCollisionTest.cs" />
     <Compile Include="Scripts\Coin.cs" />
     <Compile Include="Scripts\CoinBackgroundLayer.cs" />
     <Compile Include="Scripts\LineGraphic.cs" />
