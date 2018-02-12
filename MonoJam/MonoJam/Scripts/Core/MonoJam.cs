@@ -6,11 +6,14 @@ namespace MonoJam
     {
         public const int SCALE = 8;
         
-        public const int PLAYABLE_AREA_WIDTH = 120;
-        public const int PLAYABLE_AREA_HEIGHT = 70;
-        public const int PLAYABLE_AREA_Y = 0;
         public const int WINDOW_WIDTH = 120;
-        public const int WINDOW_HEIGHT = PLAYABLE_AREA_Y + PLAYABLE_AREA_HEIGHT;
+        public const int WINDOW_HEIGHT = 70;
+
+        public const int HUD_HEIGHT = 5;
+
+        public const int PLAYABLE_AREA_WIDTH = 120;
+        public const int PLAYABLE_AREA_HEIGHT = WINDOW_HEIGHT - HUD_HEIGHT;
+        public const int PLAYABLE_AREA_Y = HUD_HEIGHT;
 
         GraphicsDeviceManager graphics;
 
