@@ -10,6 +10,7 @@ namespace MonoJam
     public class GameController
     {
         public const int MAX_ENEMIES = 20;
+        public const int COINS_PER_LAYER = 100;
         public int totalEnemies;
 
         private MonoJam mj;
@@ -69,8 +70,35 @@ namespace MonoJam
             // Always keep console window clear.
             Console.Clear();
 
-            player.Update();
+            #region Create objects
+            if (ReadyToSpawnCoins)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    if (coinsToSpawn > 0)
+                    {
+                        coinsToSpawn--;
 
+                        // TODO: "Trend" coins into piles
+                        var newCoin = new Coin();
+                        newCoin.SetX(random.Next(0, MonoJam.WINDOW_WIDTH - Coin.COIN_WIDTH + 1));
+                        coins.Add(newCoin);
+
+                        ReadyToSpawnCoins = false;
+                    }
+                }
+            }
+
+            if (ReadyToSpawnEnemy)
+            {
+                SpawnEnemy();
+
+                ReadyToSpawnEnemy = false;
+            }
+            #endregion
+
+            #region Update objects
+            player.Update();
 
             // Update enemies.
             for (int i = 0; i < totalEnemies; i++)
@@ -82,16 +110,11 @@ namespace MonoJam
             {
                 c.Update();
             }
+            #endregion
 
-            if (Keyboard.GetState().IsKeyDown(Keys.C))
-            {
-                AddCoins(2);
-            }
-
-            Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
-
+            #region Remove objects
             // Remove destroyed coins.
-            for(int i = coins.Count - 1; i >= 0; i--)
+            for (int i = coins.Count - 1; i >= 0; i--)
             {
                 for(int m = 0; m < coins[i].fallBy; m++)
                 {
@@ -114,7 +137,7 @@ namespace MonoJam
                 }
 
                 // Move coin buffers if required.
-                if(placedCoins > 5000)
+                if(placedCoins > COINS_PER_LAYER)
                 {
                     placedCoins = 0;
                     mj.grc.CreateNewCoinBuffer();
@@ -137,6 +160,7 @@ namespace MonoJam
                     DestroyEnemy(enemies[i]);
                 }
             }
+
             for (int i = corpses.Count - 1; i >= 0; i--)
             {
                 if (corpses[i].ReadyToRemove)
@@ -144,32 +168,14 @@ namespace MonoJam
                     corpses.RemoveAt(i);
                 }
             }
+            #endregion
 
-            if (ReadyToSpawnCoins)
+            if (Keyboard.GetState().IsKeyDown(Keys.C))
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    if (coinsToSpawn > 0)
-                    {
-                        coinsToSpawn--;
-
-                        // TODO: "Trend" coins into piles
-                        var newCoin = new Coin();
-                        newCoin.SetX(random.Next(0, MonoJam.WINDOW_WIDTH - Coin.COIN_WIDTH + 1));
-                        coins.Add(newCoin);
-
-                        ReadyToSpawnCoins = false;
-                    }
-                }
-            }
-            
-            if(ReadyToSpawnEnemy)
-            {
-                SpawnEnemy();
-
-                ReadyToSpawnEnemy = false;
+                AddCoins(2);
             }
 
+            Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine("Corpses: " + corpses.Count);
         }
 
