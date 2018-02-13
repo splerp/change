@@ -23,6 +23,7 @@ namespace MonoJam.Controllers
         public List<Coin> coins;
         public List<EnemyCorpse> corpses;
         public List<Note> notes;
+        public List<NoteOnFire> notesOnFire;
 
         public byte[] coinData;
 
@@ -53,6 +54,7 @@ namespace MonoJam.Controllers
             coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
             notes = new List<Note>();
+            notesOnFire = new List<NoteOnFire>();
             random = new Random();
 
             coinSpawner = new Timer(1);
@@ -61,7 +63,7 @@ namespace MonoJam.Controllers
             enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
 
-            noteSpawner = new Timer(2200);
+            noteSpawner = new Timer(900);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
         }
 
@@ -176,9 +178,12 @@ namespace MonoJam.Controllers
 
             for (int i = notes.Count - 1; i >= 0; i--)
             {
-                // TODO: Set on fire. No money earnt.
+                // Set on fire. No money earnt.
                 if (notes[i].IsDead)
                 {
+                    var newOnFire = new NoteOnFire(notes[i]);
+                    notesOnFire.Add(newOnFire);
+
                     notes.RemoveAt(i);
                 }
                 // Otherwise, if reached bottom, give money.
@@ -187,6 +192,14 @@ namespace MonoJam.Controllers
                     AddCoins(500);
 
                     notes.RemoveAt(i);
+                }
+            }
+
+            for (int i = notesOnFire.Count - 1; i >= 0; i--)
+            {
+                if (notesOnFire[i].ReadyToRemove)
+                {
+                    notesOnFire.RemoveAt(i);
                 }
             }
 
@@ -260,6 +273,11 @@ namespace MonoJam.Controllers
             }
 
             foreach (var c in corpses)
+            {
+                c.Update();
+            }
+
+            foreach (var c in notesOnFire)
             {
                 c.Update();
             }

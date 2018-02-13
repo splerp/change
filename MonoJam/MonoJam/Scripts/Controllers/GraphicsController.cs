@@ -31,6 +31,7 @@ namespace MonoJam.Controllers
         private Texture2D enemyGraphic;
         private Texture2D noteGraphic;
         private Texture2D[] enemyFireGraphics;
+        private Texture2D[] noteFireGraphics;
         private Texture2D hudLaserCharge;
         private Texture2D titleGraphic;
         private Texture2D titleCursor;
@@ -112,6 +113,15 @@ namespace MonoJam.Controllers
             };
 
             noteGraphic = Content.Load<Texture2D>("Graphics/5Dollars");
+            noteFireGraphics = new Texture2D[]
+            {
+                Content.Load<Texture2D>("Graphics/FireMoney1"),
+                Content.Load<Texture2D>("Graphics/FireMoney2"),
+                Content.Load<Texture2D>("Graphics/FireMoney3"),
+                Content.Load<Texture2D>("Graphics/FireMoney4"),
+                Content.Load<Texture2D>("Graphics/FireMoney5"),
+                Content.Load<Texture2D>("Graphics/FireMoney6"),
+            };
 
             VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
             VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
@@ -250,6 +260,18 @@ namespace MonoJam.Controllers
             // Draw money.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
             {
+                foreach (var c in gc.notesOnFire)
+                {
+                    var fireOffset = new Vector2(-1, -(NoteOnFire.HEIGHT - Note.HEIGHT));
+
+                    var effect = c.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+                    batch.Draw(noteFireGraphics[c.animationFrame % noteFireGraphics.Length],
+                        (c.Position + fireOffset).ToPoint().ToVector2(),
+                        null,
+                        Color.White,
+                        0, Vector2.Zero, 1, effect, 0);
+                }
                 foreach (var note in gc.notes)
                 {
                     batch.Draw(noteGraphic, note.CollisionRect.Location.ToVector2(), Color.White);
