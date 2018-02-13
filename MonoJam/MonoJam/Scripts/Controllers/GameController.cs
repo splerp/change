@@ -46,6 +46,10 @@ namespace MonoJam.Controllers
         {
             mj = mjIn;
             mainShaker = new ShakeController();
+        }
+
+        public void Init()
+        {
             mainMenu = new MainMenuController(this);
 
             player = new Player(this);
@@ -65,6 +69,8 @@ namespace MonoJam.Controllers
 
             noteSpawner = new Timer(900);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
+
+            EndGame();
         }
 
         public void StartGame()
@@ -93,6 +99,7 @@ namespace MonoJam.Controllers
             DestroyAllEnemies();
             DestroyAllCoins();
             DestroyAllMoney();
+            mj.grc.ResetCoinBuffers();
 
             IsPlaying = false;
         }
@@ -298,15 +305,14 @@ namespace MonoJam.Controllers
         public void DestroyAllCoins()
         {
             coins.Clear();
-
-            mj.grc.ResetCoinBuffers();
-
+            
             ResetCoinData();
         }
 
         public void DestroyAllMoney()
         {
             notes.Clear();
+            notesOnFire.Clear();
         }
 
         public void SpawnEnemy()

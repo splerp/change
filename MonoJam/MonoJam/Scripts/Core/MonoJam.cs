@@ -47,6 +47,7 @@ namespace MonoJam
             grc = new GraphicsController(gc, GraphicsDevice);
 
             grc.LoadContent(Content);
+            gc.Init();
 
             base.Initialize();
         }

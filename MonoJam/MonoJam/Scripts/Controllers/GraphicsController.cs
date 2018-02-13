@@ -32,7 +32,9 @@ namespace MonoJam.Controllers
         private Texture2D noteGraphic;
         private Texture2D[] enemyFireGraphics;
         private Texture2D[] noteFireGraphics;
+        private Texture2D hudBackground;
         private Texture2D hudLaserCharge;
+        private Texture2D backgroundGraphic;
         private Texture2D titleGraphic;
         private Texture2D titleCursor;
 
@@ -41,6 +43,7 @@ namespace MonoJam.Controllers
         #endregion
 
         private const int vaultWallWidth = 10;
+        private const int vaultFloorHeight = 20;
 
         public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
@@ -60,6 +63,7 @@ namespace MonoJam.Controllers
         public void ResetCoinBuffers()
         {
             coinBackgroundLayers.Clear();
+            coinBackgroundLayers.Add(new CoinBackgroundLayer() { graphic = backgroundGraphic });
         }
 
         public void CreateNewCoinBuffer()
@@ -95,12 +99,14 @@ namespace MonoJam.Controllers
             coinGraphic = new Texture2D(graphicsDevice, Coin.COIN_WIDTH, 1);
             coinGraphic.SetData(Enumerable.Repeat(Color.Yellow, Coin.COIN_WIDTH).ToArray());
 
+            backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
-            VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, 20);
+            VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
+            hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
 
             enemyGraphic = Content.Load<Texture2D>("Graphics/Enemy");
@@ -123,8 +129,9 @@ namespace MonoJam.Controllers
                 Content.Load<Texture2D>("Graphics/FireMoney6"),
             };
 
-            VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
-            VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
+            VaultWalls.SetData(Enumerable.Repeat(new Color(59, 33, 12), VaultWalls.Width * VaultWalls.Height).ToArray());
+            VaultFloor.SetData(Enumerable.Repeat(new Color(36, 17, 1), VaultFloor.Width * VaultFloor.Height).ToArray());
+            hudBackground.SetData(Enumerable.Repeat(Color.Black, hudBackground.Width * hudBackground.Height).ToArray());
             hudLaserCharge.SetData(Enumerable.Repeat(Color.Red, hudLaserCharge.Width * hudLaserCharge.Height).ToArray());
         }
 
@@ -187,14 +194,18 @@ namespace MonoJam.Controllers
             {
                 var coinBackground = coinBackgroundLayers[i];
 
-                // Move each background layer towards target values.
-                var lerpSpeed = 0.01f;
+                // Set to values immediately when start of the game (no smoothing should be applied).
+                var lerpSpeed = coinBackgroundLayers.Count == 1 ? 1f : 0.01f;
+
                 float targetScale = 1 * (float)Math.Pow(0.9f, (i + 1));
                 float targetTranslate = 300 - (300 * (float)Math.Pow(0.9f, (i + 1)));
                 float targetAlpha = 0.75f - ((i / (float)MAX_VAULT_BG_LAYERS_VISIBLE) * 0.75f);
+
+                // Move each background layer towards target values.
                 coinBackground.currentScale = MathHelper.Lerp(coinBackground.currentScale, targetScale, lerpSpeed);
                 coinBackground.currentTranslate = MathHelper.Lerp(coinBackground.currentTranslate, targetTranslate, lerpSpeed);
                 coinBackground.currentAlpha = MathHelper.Lerp(coinBackground.currentAlpha, targetAlpha, lerpSpeed);
+
 
                 var drawColour = new Color(
                     coinBackground.currentAlpha,
@@ -220,6 +231,7 @@ namespace MonoJam.Controllers
                     batch.Draw(coinBackground.graphic, new Vector2(0, 0), drawColour);
                     batch.Draw(VaultWalls, new Vector2(-vaultWallWidth, 0), drawColour);
                     batch.Draw(VaultWalls, new Vector2(MonoJam.PLAYABLE_AREA_WIDTH, 0), drawColour);
+                    batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, -vaultFloorHeight), drawColour);
                     batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT), drawColour);
                 }
                 batch.End();
@@ -330,6 +342,8 @@ namespace MonoJam.Controllers
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
+                batch.Draw(hudBackground, Vector2.Zero, Color.White);
+                
                 batch.Draw(hudLaserCharge,
                     Vector2.Zero,
                     null,
