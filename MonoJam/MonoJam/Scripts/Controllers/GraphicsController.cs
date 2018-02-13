@@ -27,6 +27,7 @@ namespace MonoJam
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
         private Texture2D enemyGraphic;
+        private Texture2D noteGraphic;
         private Texture2D[] enemyFireGraphics;
         private Texture2D hudLaserCharge;
         private Texture2D titleGraphic;
@@ -107,6 +108,8 @@ namespace MonoJam
                 Content.Load<Texture2D>("Graphics/Fire3"),
                 Content.Load<Texture2D>("Graphics/Fire1"),
             };
+
+            noteGraphic = Content.Load<Texture2D>("Graphics/5Dollars");
 
             VaultWalls.SetData(Enumerable.Repeat(Color.Brown, VaultWalls.Width * VaultWalls.Height).ToArray());
             VaultFloor.SetData(Enumerable.Repeat(Color.DarkSlateGray, VaultFloor.Width * VaultFloor.Height).ToArray());
@@ -238,6 +241,16 @@ namespace MonoJam
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
                     batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(), Color.White);
+                }
+            }
+            batch.End();
+
+            // Draw money.
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            {
+                foreach (var note in gc.notes)
+                {
+                    batch.Draw(noteGraphic, note.CollisionRect.Location.ToVector2(), Color.White);
                 }
             }
             batch.End();

@@ -21,15 +21,18 @@ namespace MonoJam
         public Enemy[] enemies;
         public List<Coin> coins;
         public List<EnemyCorpse> corpses;
+        public List<Note> notes;
 
         public byte[] coinData;
 
         public static Random random;
         public bool ReadyToSpawnCoins { get; set; }
         public bool ReadyToSpawnEnemy { get; set; }
+        public bool ReadyToSpawnNote { get; set; }
 
         Timer coinSpawner;
         Timer enemySpawner;
+        Timer noteSpawner;
 
         public int placedCoins;
         public int currentCoins;
@@ -48,6 +51,7 @@ namespace MonoJam
 
             coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
+            notes = new List<Note>();
             random = new Random();
 
             coinSpawner = new Timer(1);
@@ -55,12 +59,16 @@ namespace MonoJam
 
             enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
+
+            noteSpawner = new Timer(800);
+            noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
         }
 
         public void StartGame()
         {
             enemySpawner.Start();
             coinSpawner.Start();
+            noteSpawner.Start();
 
             ResetCoinData();
 
@@ -73,6 +81,7 @@ namespace MonoJam
         {
             enemySpawner.Stop();
             coinSpawner.Stop();
+            noteSpawner.Stop();
 
             currentCoins = 0;
             coinsToSpawn = 0;
@@ -80,6 +89,7 @@ namespace MonoJam
             
             DestroyAllEnemies();
             DestroyAllCoins();
+            DestroyAllMoney();
 
             IsPlaying = false;
         }
@@ -161,6 +171,8 @@ namespace MonoJam
                     corpses.RemoveAt(i);
                 }
             }
+
+            // TODO: Explode the money
             #endregion
 
             mainShaker.Update();
@@ -201,6 +213,13 @@ namespace MonoJam
 
                 ReadyToSpawnEnemy = false;
             }
+
+            if (ReadyToSpawnNote)
+            {
+                SpawnNote();
+
+                ReadyToSpawnNote = false;
+            }
             #endregion
 
             #region Update objects
@@ -210,6 +229,11 @@ namespace MonoJam
             for (int i = 0; i < totalEnemies; i++)
             {
                 enemies[i].Update();
+            }
+
+            for (int i = 0; i < notes.Count; i++)
+            {
+                notes[i].Update();
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -244,9 +268,14 @@ namespace MonoJam
             ResetCoinData();
         }
 
+        public void DestroyAllMoney()
+        {
+            notes.Clear();
+        }
+
         public void SpawnEnemy()
         {
-            if(totalEnemies < MAX_ENEMIES)
+            if (totalEnemies < MAX_ENEMIES)
             {
                 var newEnemy = new Enemy();
                 enemies[totalEnemies++] = newEnemy;
@@ -256,6 +285,12 @@ namespace MonoJam
                 // Temporary for debugging
                 throw new Exception("Created too many enemies");
             }
+        }
+
+        public void SpawnNote()
+        {
+            var newNote = new Note();
+            notes.Add(newNote);
         }
 
         public void DestroyAllEnemies()

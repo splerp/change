@@ -56,6 +56,7 @@
     <Compile Include="Scripts\GameObject.cs" />
     <Compile Include="Scripts\Enemy.cs" />
     <Compile Include="Scripts\MainMenuController.cs" />
+    <Compile Include="Scripts\Note.cs" />
     <Compile Include="Scripts\Perlin.cs" />
     <Compile Include="Scripts\Player.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
