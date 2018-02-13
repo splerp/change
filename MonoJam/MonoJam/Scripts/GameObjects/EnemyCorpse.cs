@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace MonoJam
+namespace MonoJam.GameObjects
 {
     public class EnemyCorpse : GameObject
     {

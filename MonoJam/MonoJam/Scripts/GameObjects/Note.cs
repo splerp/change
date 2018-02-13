@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoJam.Controllers;
 
-namespace MonoJam
+namespace MonoJam.GameObjects
 {
     public class Note : GameObject, ICollisionObject, IHurtable
     {

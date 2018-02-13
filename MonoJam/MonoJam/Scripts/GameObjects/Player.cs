@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoJam.Controllers;
+using MonoJam.Utils;
 using System;
 using System.Linq;
 
-namespace MonoJam
+namespace MonoJam.GameObjects
 {
     public class Player : GameObject, ICollisionObject
     {

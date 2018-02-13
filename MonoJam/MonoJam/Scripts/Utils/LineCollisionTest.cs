@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace MonoJam
+namespace MonoJam.Utils
 {
-    class LineCollisionTest
+    public class LineCollisionTest
     {
         // https://tavianator.com/fast-branchless-raybounding-box-intersections/
         public static bool IntersectRay(Rectangle r, Point rayStart, Point rayEnd)

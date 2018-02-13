@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoJam.Utils;
 
-namespace MonoJam
+namespace MonoJam.Controllers
 {
     public class ShakeController
     {

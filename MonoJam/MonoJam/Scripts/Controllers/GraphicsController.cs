@@ -2,11 +2,13 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoJam.GameObjects;
+using MonoJam.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MonoJam
+namespace MonoJam.Controllers
 {
     public class GraphicsController
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace MonoJam
+namespace MonoJam.Controllers
 {
     public class MainMenuController
     {

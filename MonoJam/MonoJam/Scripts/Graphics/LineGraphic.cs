@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace MonoJam
+namespace MonoJam.Graphics
 {
     public class LineGraphic
     {

@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoJam.Controllers;
 using System;
 
-namespace MonoJam
+namespace MonoJam.GameObjects
 {
     public class Coin : GameObject, ICollisionObject
     {

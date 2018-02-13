@@ -44,25 +44,25 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Scripts\EnemyCorpse.cs" />
+    <Compile Include="Scripts\GameObjects\EnemyCorpse.cs" />
     <Compile Include="Scripts\IHurtable.cs" />
-    <Compile Include="Scripts\LineCollisionTest.cs" />
-    <Compile Include="Scripts\Coin.cs" />
-    <Compile Include="Scripts\CoinBackgroundLayer.cs" />
-    <Compile Include="Scripts\LineGraphic.cs" />
+    <Compile Include="Scripts\Utils\LineCollisionTest.cs" />
+    <Compile Include="Scripts\GameObjects\Coin.cs" />
+    <Compile Include="Scripts\Graphics\CoinBackgroundLayer.cs" />
+    <Compile Include="Scripts\Graphics\LineGraphic.cs" />
     <Compile Include="Scripts\ICollisionObject.cs" />
     <Compile Include="Scripts\Core\MonoJam.cs" />
     <Compile Include="Scripts\Controllers\GameController.cs" />
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
     <Compile Include="Scripts\GameObject.cs" />
-    <Compile Include="Scripts\Enemy.cs" />
-    <Compile Include="Scripts\MainMenuController.cs" />
-    <Compile Include="Scripts\Note.cs" />
-    <Compile Include="Scripts\Perlin.cs" />
-    <Compile Include="Scripts\Player.cs" />
+    <Compile Include="Scripts\GameObjects\Enemy.cs" />
+    <Compile Include="Scripts\Controllers\MainMenuController.cs" />
+    <Compile Include="Scripts\GameObjects\Note.cs" />
+    <Compile Include="Scripts\Utils\Perlin.cs" />
+    <Compile Include="Scripts\GameObjects\Player.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scripts\ShakeController.cs" />
+    <Compile Include="Scripts\Controllers\ShakeController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

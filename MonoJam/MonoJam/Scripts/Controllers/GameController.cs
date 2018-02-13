@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoJam.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 
-namespace MonoJam
+namespace MonoJam.Controllers
 {
     public class GameController
     {
