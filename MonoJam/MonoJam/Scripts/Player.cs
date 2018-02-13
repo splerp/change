@@ -82,20 +82,26 @@ namespace MonoJam
             MoveBy(speed);
 
             RestrictToBounds();
-
+            
             // Damage enemies in line.
-            if(FiringLaser)
+            if (FiringLaser)
             {
                 laserShake.currentAmplitude = 2f;
+
+                var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+
+                // Fire both lasers.
+                var laserStartPos1 = Position.ToPoint() + new Point(2, 2);
+                var laserStartPos2 = Position.ToPoint() + new Point(5, 2);
+                var lineToMouse1 = mousePos - laserStartPos1;
+                var lineToMouse2 = mousePos - laserStartPos2;
 
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
                     var enemy = gc.enemies[i];
 
-                    var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
-                    var lineToMouse = mousePos - Position.ToPoint();
-
-                    var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, Position.ToPoint(), lineToMouse);
+                    var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, laserStartPos1, lineToMouse1)
+                        || LineCollisionTest.IntersectSegment(enemy.CollisionRect, laserStartPos2, lineToMouse2);
 
                     if (hittingEnemy)
                     {
@@ -107,6 +113,17 @@ namespace MonoJam
                         {
                             enemy.Damage(DAMAGE_LASER_INDIRECT);
                         }
+                    }
+                }
+
+                foreach (var note in gc.notes)
+                {
+                    var hittingNote = LineCollisionTest.IntersectSegment(note.CollisionRect, laserStartPos1, lineToMouse1)
+                        || LineCollisionTest.IntersectSegment(note.CollisionRect, laserStartPos2, lineToMouse2);
+
+                    if (hittingNote)
+                    {
+                        note.Destroyed = true;
                     }
                 }
             }

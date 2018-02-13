@@ -4,13 +4,16 @@ namespace MonoJam
 {
     public class Note : GameObject, ICollisionObject
     {
-        public const int WIDTH = 16;
-        public const int HEIGHT = 7;
+        public const int WIDTH = 8;
+        public const int HEIGHT = 4;
 
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
 
-        public float downSpeed = 0.3f;
+        public bool ReadyToRemove => Position.Y > MonoJam.PLAYABLE_AREA_HEIGHT;
+        public bool Destroyed { get; set; }
+
+        public float downSpeed = 0.1f;
 
         public Note()
         {

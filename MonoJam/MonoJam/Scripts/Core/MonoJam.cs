@@ -36,6 +36,8 @@ namespace MonoJam
             Window.Position = new Point(
                 (screenWidth - graphics.PreferredBackBufferWidth) / 2,
                 (screenHeight - graphics.PreferredBackBufferHeight) / 2 - 100);
+
+            Window.Title = "CHANGE";
         }
         
         protected override void Initialize()

@@ -60,7 +60,7 @@ namespace MonoJam
             enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
 
-            noteSpawner = new Timer(800);
+            noteSpawner = new Timer(2200);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
         }
 
@@ -169,6 +169,22 @@ namespace MonoJam
                 if (corpses[i].ReadyToRemove)
                 {
                     corpses.RemoveAt(i);
+                }
+            }
+
+            for (int i = notes.Count - 1; i >= 0; i--)
+            {
+                // TODO: Set on fire. No money earnt.
+                if (notes[i].Destroyed)
+                {
+                    notes.RemoveAt(i);
+                }
+                // Otherwise, if reached bottom, give money.
+                else if (notes[i].ReadyToRemove)
+                {
+                    AddCoins(500);
+
+                    notes.RemoveAt(i);
                 }
             }
 
