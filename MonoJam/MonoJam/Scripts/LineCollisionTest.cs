@@ -33,16 +33,17 @@ namespace MonoJam
         // https://noonat.github.io/intersect/#aabb-vs-segment
         public static bool IntersectSegment(Rectangle box, Point pos, Point delta)
         {
-            var half = box.Size;
+            var boxPos = box.Center.ToVector2();
+            var half = box.Size.ToVector2() / new Vector2(2);
 
             double scaleX = 1.0 / delta.X;
             double scaleY = 1.0 / delta.Y;
             double signX = Math.Sign(scaleX);
             double signY = Math.Sign(scaleY);
-            double nearTimeX = (box.Location.X - signX * half.X - pos.X) * scaleX;
-            double nearTimeY = (box.Location.Y - signY * half.Y - pos.Y) * scaleY;
-            double farTimeX = (box.Location.X + signX * half.X - pos.X) * scaleX;
-            double farTimeY = (box.Location.Y + signY * half.Y - pos.Y) * scaleY;
+            double nearTimeX = (boxPos.X - signX * half.X - pos.X) * scaleX;
+            double nearTimeY = (boxPos.Y - signY * half.Y - pos.Y) * scaleY;
+            double farTimeX = (boxPos.X + signX * half.X - pos.X) * scaleX;
+            double farTimeY = (boxPos.Y + signY * half.Y - pos.Y) * scaleY;
 
             if (nearTimeX > farTimeY || nearTimeY > farTimeX)
             {
