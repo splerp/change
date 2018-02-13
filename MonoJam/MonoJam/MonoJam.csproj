@@ -45,6 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Scripts\EnemyCorpse.cs" />
+    <Compile Include="Scripts\IHurtable.cs" />
     <Compile Include="Scripts\LineCollisionTest.cs" />
     <Compile Include="Scripts\Coin.cs" />
     <Compile Include="Scripts\CoinBackgroundLayer.cs" />

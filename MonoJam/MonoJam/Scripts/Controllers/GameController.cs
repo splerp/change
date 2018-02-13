@@ -149,17 +149,18 @@ namespace MonoJam
             // Remove destroyed enemies.
             for (int i = 0; i < totalEnemies; i++)
             {
-                if (enemies[i].ReadyToRemove)
+                // A "killed" enemy. Show the death sequence.
+                if (enemies[i].IsDead)
                 {
-                    // A "killed" enemy. Show the death sequence.
-                    if (enemies[i].totalHealth <= 0)
-                    {
-                        AddCoins(100);
+                    AddCoins(100);
 
-                        var newCorpse = new EnemyCorpse(enemies[i]);
-                        corpses.Add(newCorpse);
-                    }
+                    var newCorpse = new EnemyCorpse(enemies[i]);
+                    corpses.Add(newCorpse);
 
+                    DestroyEnemy(enemies[i]);
+                }
+                else if (enemies[i].ReadyToRemove)
+                {
                     DestroyEnemy(enemies[i]);
                 }
             }
@@ -175,7 +176,7 @@ namespace MonoJam
             for (int i = notes.Count - 1; i >= 0; i--)
             {
                 // TODO: Set on fire. No money earnt.
-                if (notes[i].Destroyed)
+                if (notes[i].IsDead)
                 {
                     notes.RemoveAt(i);
                 }

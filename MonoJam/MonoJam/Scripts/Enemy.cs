@@ -3,7 +3,7 @@ using System;
 
 namespace MonoJam
 {
-    public class Enemy : GameObject, ICollisionObject
+    public class Enemy : GameObject, ICollisionObject, IHurtable
     {
         public const int WIDTH = 10;
         public const int HEIGHT = 10;
@@ -22,12 +22,16 @@ namespace MonoJam
         public float sinAmp = 8f;
         public float sinPer = 0.08f;
         
-        public bool ReadyToRemove => totalHealth <= 0 || Position.X + Size.X < 0 || Position.X > MonoJam.PLAYABLE_AREA_WIDTH;
+        public bool ReadyToRemove => Position.X + Size.X < 0 || Position.X > MonoJam.PLAYABLE_AREA_WIDTH;
 
-        public int totalHealth = 1000;
+        public int MaxHealth => 1000;
+        public int CurrentHealth { get; set; }
+        public bool IsDead => CurrentHealth <= 0;
 
         public Enemy()
         {
+            CurrentHealth = MaxHealth;
+
             yOffsetCount = GameController.random.Next(1, 1000);
 
             direction = GameController.random.Next(1, 3) == 1 ? 1 : -1;
@@ -55,7 +59,7 @@ namespace MonoJam
 
         public void Damage(int amount)
         {
-            totalHealth -= amount;
+            CurrentHealth -= amount;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
 
 namespace MonoJam
 {
@@ -83,7 +84,6 @@ namespace MonoJam
 
             RestrictToBounds();
             
-            // Damage enemies in line.
             if (FiringLaser)
             {
                 laserShake.currentAmplitude = 2f;
@@ -96,34 +96,26 @@ namespace MonoJam
                 var lineToMouse1 = mousePos - laserStartPos1;
                 var lineToMouse2 = mousePos - laserStartPos2;
 
-                for (int i = 0; i < gc.totalEnemies; i++)
+                var allHurtables = gc.enemies
+                    .Take(gc.totalEnemies)
+                    .Cast<IHurtable>()
+                    .Concat(gc.notes);
+
+                foreach(var h in allHurtables)
                 {
-                    var enemy = gc.enemies[i];
+                    var isHitting = LineCollisionTest.IntersectSegment(h.CollisionRect, laserStartPos1, lineToMouse1)
+                        || LineCollisionTest.IntersectSegment(h.CollisionRect, laserStartPos2, lineToMouse2);
 
-                    var hittingEnemy = LineCollisionTest.IntersectSegment(enemy.CollisionRect, laserStartPos1, lineToMouse1)
-                        || LineCollisionTest.IntersectSegment(enemy.CollisionRect, laserStartPos2, lineToMouse2);
-
-                    if (hittingEnemy)
+                    if (isHitting)
                     {
-                        if ((mousePos - enemy.CollisionRect.Center).ToVector2().Length() < 5f)
+                        if ((mousePos - h.CollisionRect.Center).ToVector2().Length() < 5f)
                         {
-                            enemy.Damage(DAMAGE_LASER_DIRECT);
+                            h.Damage(DAMAGE_LASER_DIRECT);
                         }
                         else
                         {
-                            enemy.Damage(DAMAGE_LASER_INDIRECT);
+                            h.Damage(DAMAGE_LASER_INDIRECT);
                         }
-                    }
-                }
-
-                foreach (var note in gc.notes)
-                {
-                    var hittingNote = LineCollisionTest.IntersectSegment(note.CollisionRect, laserStartPos1, lineToMouse1)
-                        || LineCollisionTest.IntersectSegment(note.CollisionRect, laserStartPos2, lineToMouse2);
-
-                    if (hittingNote)
-                    {
-                        note.Destroyed = true;
                     }
                 }
             }
