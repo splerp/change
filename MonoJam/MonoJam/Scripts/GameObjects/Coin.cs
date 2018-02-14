@@ -16,6 +16,7 @@ namespace MonoJam.GameObjects
         public Coin()
         {
             fallBy = GameController.random.Next(1, 5);
+            SetY(-Size.Y);
         }
 
         public bool MoveAndCheckLand(byte[] coinData)
