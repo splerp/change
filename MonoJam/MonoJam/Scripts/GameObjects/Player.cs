@@ -74,10 +74,23 @@ namespace MonoJam.GameObjects
             }
 
             FiringLaser = laserButtonDown && laserCharge > 0;
+            
+            Vector2 inputVector = Vector2.Zero;
+            if (kbs.IsKeyDown(Keys.W))
+            {
+                var angle = Math.Atan2(lineToMouse.Y, lineToMouse.X);
 
-            var inputVector = new Vector2(
-                kbs.IsKeyDown(Keys.A) ? -1 : kbs.IsKeyDown(Keys.D) ? 1 : 0,
-                kbs.IsKeyDown(Keys.W) ? -1 : kbs.IsKeyDown(Keys.S) ? 1 : 0) * thrust;
+                if(lineToMouse.ToVector2().LengthSquared() > 1f)
+                {
+                    inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
+                }
+            }
+            else if (kbs.IsKeyDown(Keys.S))
+            {
+                var angle = Math.Atan2(-lineToMouse.Y, -lineToMouse.X);
+
+                inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
+            }
 
             speed += inputVector;
             speed *= friction;
