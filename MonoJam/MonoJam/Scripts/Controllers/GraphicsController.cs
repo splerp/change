@@ -323,7 +323,6 @@ namespace MonoJam.Controllers
             batch.End();
 
             var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
-            var playerPos = gc.player.CollisionRect.Location;
 
             // TODO: Combine both sets of data, add to texture2D, draw once.
             if (gc.player.FiringLaser)
@@ -334,7 +333,9 @@ namespace MonoJam.Controllers
                 if (mousePos.X >= 0 && mousePos.Y >= 0 &&
                     mousePos.X < MonoJam.PLAYABLE_AREA_WIDTH && mousePos.Y < MonoJam.PLAYABLE_AREA_HEIGHT)
                 {
-                    var newData = LineGraphic.CreateLine(playerPos.X + 2, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
+
+                    var startPos = gc.player.LeftEyePos;
+                    var newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
                     playerLasersLayer.SetData(newData);
 
                     batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
@@ -343,7 +344,8 @@ namespace MonoJam.Controllers
                     }
                     batch.End();
 
-                    newData = LineGraphic.CreateLine(playerPos.X + 5, playerPos.Y + 2, mousePos.X, mousePos.Y, Color.Red);
+                    startPos = gc.player.RightEyePos;
+                    newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
                     playerLasersLayer.SetData(newData);
 
                     batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);

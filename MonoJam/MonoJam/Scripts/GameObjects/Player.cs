@@ -29,6 +29,9 @@ namespace MonoJam.GameObjects
         public float laserCharge;
 
         public bool FiringLaser { get; set; }
+
+        public Point LeftEyePos => CollisionRect.Location + new Point(2, 2);
+        public Point RightEyePos => CollisionRect.Location + new Point(5, 2);
         
         public Player(GameController gcIn)
         {
@@ -51,6 +54,9 @@ namespace MonoJam.GameObjects
         {
             var kbs = Keyboard.GetState();
             var ms = Mouse.GetState();
+
+            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+            var lineToMouse = (mousePos - CollisionRect.Center);
 
             laserShake.Update();
 
@@ -103,11 +109,9 @@ namespace MonoJam.GameObjects
             {
                 laserShake.currentAmplitude = 2f;
 
-                var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
-
                 // Fire both lasers.
-                var laserStartPos1 = Position.ToPoint() + new Point(2, 2);
-                var laserStartPos2 = Position.ToPoint() + new Point(5, 2);
+                var laserStartPos1 = LeftEyePos;
+                var laserStartPos2 = RightEyePos;
                 var lineToMouse1 = mousePos - laserStartPos1;
                 var lineToMouse2 = mousePos - laserStartPos2;
 
