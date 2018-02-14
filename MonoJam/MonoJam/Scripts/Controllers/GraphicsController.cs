@@ -109,7 +109,7 @@ namespace MonoJam.Controllers
             hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
 
-            enemyGraphic = Content.Load<Texture2D>("Graphics/Enemy");
+            enemyGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/Fire2"),
@@ -250,9 +250,14 @@ namespace MonoJam.Controllers
             {
                 foreach (var c in gc.corpses)
                 {
-                    var fireOffset = new Vector2(-5, -5);
+                    var oldEnemySize = new Vector2(10, 10);
+                    var enemyDiff = new Vector2(enemyGraphic.Width, enemyGraphic.Height) - oldEnemySize;
+
+
+                    var fireOffset = new Vector2(-1, -5);
 
                     var effect = c.speed.X < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+                    var effectInv = c.speed.X > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
                     batch.Draw(enemyFireGraphics[c.animationFrame % enemyFireGraphics.Length],
                         (c.Position + fireOffset).ToPoint().ToVector2(),
@@ -260,11 +265,20 @@ namespace MonoJam.Controllers
                         Color.White,
                         0, Vector2.Zero, 1, effect, 0);
 
-                    batch.Draw(enemyGraphic, c.Position.ToPoint().ToVector2(), Color.White);
+                    batch.Draw(enemyGraphic, c.Position.ToPoint().ToVector2(),
+                        null,
+                        Color.White,
+                        0, Vector2.Zero, 1, effectInv, 0);
                 }
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
-                    batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(), Color.White);
+                    var effect = gc.enemies[i].direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+                    var effectInv = gc.enemies[i].direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+                    batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(),
+                        null,
+                        Color.White,
+                        0, Vector2.Zero, 1, effectInv, 0);
                 }
             }
             batch.End();

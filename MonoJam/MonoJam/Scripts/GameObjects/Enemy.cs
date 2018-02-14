@@ -6,8 +6,8 @@ namespace MonoJam.GameObjects
 {
     public class Enemy : GameObject, ICollisionObject, IHurtable
     {
-        public const int WIDTH = 10;
-        public const int HEIGHT = 10;
+        public const int WIDTH = 18;
+        public const int HEIGHT = 12;
 
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
