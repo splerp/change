@@ -28,7 +28,7 @@ namespace MonoJam.Controllers
         private Texture2D coinGraphic;
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
-        private Texture2D enemyGraphic;
+        private Texture2D piggyBankGraphic;
         private Texture2D noteGraphic;
         private Texture2D[] enemyFireGraphics;
         private Texture2D[] noteFireGraphics;
@@ -109,7 +109,7 @@ namespace MonoJam.Controllers
             hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
 
-            enemyGraphic = Content.Load<Texture2D>("Graphics/Pig");
+            piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/Fire2"),
@@ -251,7 +251,7 @@ namespace MonoJam.Controllers
                 foreach (var c in gc.corpses)
                 {
                     var oldEnemySize = new Vector2(10, 10);
-                    var enemyDiff = new Vector2(enemyGraphic.Width, enemyGraphic.Height) - oldEnemySize;
+                    var enemyDiff = new Vector2(piggyBankGraphic.Width, piggyBankGraphic.Height) - oldEnemySize;
 
 
                     var fireOffset = new Vector2(-1, -5);
@@ -265,7 +265,7 @@ namespace MonoJam.Controllers
                         Color.White,
                         0, Vector2.Zero, 1, effect, 0);
 
-                    batch.Draw(enemyGraphic, c.Position.ToPoint().ToVector2(),
+                    batch.Draw(piggyBankGraphic, c.Position.ToPoint().ToVector2(),
                         null,
                         Color.White,
                         0, Vector2.Zero, 1, effectInv, 0);
@@ -275,7 +275,7 @@ namespace MonoJam.Controllers
                     var effect = gc.enemies[i].direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
                     var effectInv = gc.enemies[i].direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-                    batch.Draw(enemyGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(),
+                    batch.Draw(piggyBankGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(),
                         null,
                         Color.White,
                         0, Vector2.Zero, 1, effectInv, 0);

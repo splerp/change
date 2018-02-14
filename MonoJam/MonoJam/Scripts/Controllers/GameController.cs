@@ -319,7 +319,7 @@ namespace MonoJam.Controllers
         {
             if (totalEnemies < MAX_ENEMIES)
             {
-                var newEnemy = new Enemy();
+                var newEnemy = new PiggyBank();
                 enemies[totalEnemies++] = newEnemy;
             }
             else
