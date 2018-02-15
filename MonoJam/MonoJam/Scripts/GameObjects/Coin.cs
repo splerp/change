@@ -4,19 +4,16 @@ using System;
 
 namespace MonoJam.GameObjects
 {
-    public class Coin : GameObject, ICollisionObject
+    public class Coin : GameObject
     {
-        public const int COIN_WIDTH = 1;
-
-        public Point Size => new Point(COIN_WIDTH, 1);
-        public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
+        public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), new Point(1, 1));
 
         public int fallBy;
 
         public Coin()
         {
             fallBy = GameController.random.Next(1, 5);
-            SetY(-Size.Y);
+            SetY(-1);
         }
 
         public bool MoveAndCheckLand(byte[] coinData)
@@ -33,15 +30,9 @@ namespace MonoJam.GameObjects
                 return true;
             }
             
-            // End WIDTH to the right.
-            var endCheck = Math.Min(startCheck + COIN_WIDTH, finalIndex);
-
-            for(int i = startCheck; i < endCheck; i++)
+            if (coinData[startCheck] == 1)
             {
-                if(coinData[i] == 1)
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;

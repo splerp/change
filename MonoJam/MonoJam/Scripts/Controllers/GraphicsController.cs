@@ -96,8 +96,8 @@ namespace MonoJam.Controllers
             playerGraphic = Content.Load<Texture2D>("Graphics/Player");
             playerLasersLayer = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
 
-            coinGraphic = new Texture2D(graphicsDevice, Coin.COIN_WIDTH, 1);
-            coinGraphic.SetData(Enumerable.Repeat(Color.Yellow, Coin.COIN_WIDTH).ToArray());
+            coinGraphic = new Texture2D(graphicsDevice, 1, 1);
+            coinGraphic.SetData(new Color[] { Color.Yellow });
 
             backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");

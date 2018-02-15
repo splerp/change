@@ -136,9 +136,7 @@ namespace MonoJam.Controllers
                         var pos = coins[i].CollisionRect.Location;
                         int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
 
-                        var coinArray = Enumerable.Repeat((byte)1, Coin.COIN_WIDTH).ToArray();
-
-                        Buffer.BlockCopy(coinArray, 0, coinData, arrayLoc, coinArray.Length);
+                        coinData[arrayLoc] = 1;
 
                         coins.RemoveAt(i);
 
@@ -237,7 +235,7 @@ namespace MonoJam.Controllers
 
                         // TODO: "Trend" coins into piles
                         var newCoin = new Coin();
-                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH - Coin.COIN_WIDTH + 1));
+                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH));
                         coins.Add(newCoin);
 
                         ReadyToSpawnCoins = false;
