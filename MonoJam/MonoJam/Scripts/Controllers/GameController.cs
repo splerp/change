@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoJam.GameObjects;
+using MonoJam.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,9 @@ namespace MonoJam.Controllers
         public bool ReadyToSpawnEnemy { get; set; }
         public bool ReadyToSpawnNote { get; set; }
 
+        public int[] currentLayerTrend;
+        public int totalTrendCount;
+
         Timer coinSpawner;
         Timer enemySpawner;
         Timer noteSpawner;
@@ -83,6 +87,8 @@ namespace MonoJam.Controllers
             noteSpawner = new Timer(900);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
+            currentLayerTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
+            
             ToMainMenu();
         }
 
@@ -95,6 +101,7 @@ namespace MonoJam.Controllers
             ResetCoinData();
 
             player.Reset();
+            CalculateCoinTrend();
 
             currentState = GameState.Playing;
         }
@@ -187,6 +194,7 @@ namespace MonoJam.Controllers
                 if(placedCoins >= COINS_PER_LAYER)
                 {
                     placedCoins = 0;
+                    CalculateCoinTrend();
                     mj.grc.CreateNewCoinBuffer();
                     ResetCoinData();
                 }
@@ -279,9 +287,16 @@ namespace MonoJam.Controllers
                     {
                         coinsToSpawn--;
 
-                        // TODO: "Trend" coins into piles
+                        var randomNum = random.Next(0, totalTrendCount);
+                        int j = 0;
+                        while(randomNum > 0)
+                        {
+                            randomNum -= currentLayerTrend[j];
+                            j++;
+                        }
+                        
                         var newCoin = new Coin();
-                        newCoin.SetX(random.Next(0, MonoJam.PLAYABLE_AREA_WIDTH));
+                        newCoin.SetX(j);
                         coins.Add(newCoin);
 
                         ReadyToSpawnCoins = false;
@@ -333,6 +348,18 @@ namespace MonoJam.Controllers
                 c.Update();
             }
             #endregion
+        }
+
+        public void CalculateCoinTrend()
+        {
+            float randomStartPos = random.Next(0, 100) / 100f;
+            totalTrendCount = 0;
+            for (int i = 0; i < currentLayerTrend.Length; i++)
+            {
+                float newVal = 5 + (Perlin.Noise(0, i * 0.05f + randomStartPos) * 5) + 1;
+                currentLayerTrend[i] = (int)newVal;
+                totalTrendCount += (int)newVal;
+            }
         }
 
         public void AddCoins(int coins)
