@@ -12,6 +12,8 @@ namespace MonoJam.GameObjects
         public const int DAMAGE_LASER_DIRECT = 100;
         public const int DAMAGE_LASER_INDIRECT = 20;
 
+        public const float LASER_FIRE_SHAKE_AMOUNT = 2f;
+
         private GameController gc;
         public ShakeController laserShake;
 
@@ -107,7 +109,7 @@ namespace MonoJam.GameObjects
             
             if (FiringLaser)
             {
-                laserShake.currentAmplitude = 2f;
+                laserShake.currentAmplitude = LASER_FIRE_SHAKE_AMOUNT;
 
                 // Fire both lasers.
                 var laserStartPos1 = LeftEyePos;

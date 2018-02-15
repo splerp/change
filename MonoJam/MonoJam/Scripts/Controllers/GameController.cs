@@ -15,6 +15,13 @@ namespace MonoJam.Controllers
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
         public const int MAX_NOTES_MISSED = 3;
+
+        public const int PINK_NOTE_VALUE = 500;
+        public const int PIGGY_BANK_VALUE = 2000;
+        public const int COINS_SPAWNED_PER_FRAME = 8;
+
+        public const float SMALL_SHAKE_AMOUNT = 1f;
+
         public int totalEnemies;
 
         private MonoJam mj;
@@ -191,7 +198,7 @@ namespace MonoJam.Controllers
                 // A "killed" enemy. Show the death sequence.
                 if (enemies[i].IsDead)
                 {
-                    AddCoins(2000);
+                    AddCoins(PIGGY_BANK_VALUE);
 
                     var newCorpse = new EnemyCorpse(enemies[i]);
                     corpses.Add(newCorpse);
@@ -227,7 +234,7 @@ namespace MonoJam.Controllers
                 // Otherwise, if reached bottom, give money.
                 else if (notes[i].ReadyToRemove)
                 {
-                    AddCoins(500);
+                    AddCoins(PIGGY_BANK_VALUE);
 
                     notes.RemoveAt(i);
                 }
@@ -248,7 +255,7 @@ namespace MonoJam.Controllers
 
             if(corpses.Any())
             {
-                mainShaker.currentAmplitude = 1f;
+                mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
             }
             
             if(currentState != GameState.GameOver && notesMissed >= MAX_NOTES_MISSED)
@@ -266,7 +273,7 @@ namespace MonoJam.Controllers
             #region Create objects
             if (ReadyToSpawnCoins)
             {
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
                 {
                     if (coinsToSpawn > 0)
                     {
