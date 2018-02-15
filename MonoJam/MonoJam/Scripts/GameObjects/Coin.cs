@@ -18,8 +18,8 @@ namespace MonoJam.GameObjects
 
         public bool MoveAndCheckLand(byte[] coinData)
         {
-            Point coinCorner = CollisionRect.Location;
-            int arrayLoc = coinCorner.Y * MonoJam.PLAYABLE_AREA_WIDTH + coinCorner.X;
+            Point coinPos = CollisionRect.Location;
+            int arrayLoc = coinPos.Y * MonoJam.PLAYABLE_AREA_WIDTH + coinPos.X;
             int finalIndex = MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT;
 
             // Start exactly one line below.
@@ -30,9 +30,41 @@ namespace MonoJam.GameObjects
                 return true;
             }
             
+            // Landed on a coin.
             if (coinData[startCheck] == 1)
             {
-                return true;
+                const int MOVE_LEFT = 0;
+                const int STAY_HERE = 1;
+                const int MOVE_RIGHT = 2;
+
+                // Choose whether to land perfectly, or slide to the sides.
+                switch(GameController.random.Next(0, 3))
+                {
+                    case MOVE_LEFT:
+                        // Move to the left?
+                        if (coinPos.X > 0)
+                        {
+                            if (coinData[startCheck - 1] == 0)
+                            {
+                                MoveBy(new Vector2(-1, 0));
+                                return false;
+                            }
+                        }
+                        return true;
+                    case MOVE_RIGHT:
+                        // Move to the left?
+                        if (coinPos.X < MonoJam.PLAYABLE_AREA_WIDTH - 1)
+                        {
+                            if (coinData[startCheck + 1] == 0)
+                            {
+                                MoveBy(new Vector2(1, 0));
+                                return false;
+                            }
+                        }
+                        return true;
+                    case STAY_HERE:
+                        return true;
+                }
             }
 
             return false;
