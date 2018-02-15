@@ -10,6 +10,8 @@ namespace MonoJam.Controllers
 {
     public class GameController
     {
+        public enum GameState { Title, Playing, GameOver }
+
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
         public const int MAX_NOTES_MISSED = 3;
@@ -18,6 +20,7 @@ namespace MonoJam.Controllers
         private MonoJam mj;
         public ShakeController mainShaker;
         public MainMenuController mainMenu;
+        public GameOverMenuController gameOverMenu;
 
         public Player player;
         public Enemy[] enemies;
@@ -42,7 +45,7 @@ namespace MonoJam.Controllers
         public int coinsToSpawn;
         public int notesMissed;
 
-        public bool IsPlaying { get; set; }
+        public GameState currentState;
 
         public GameController(MonoJam mjIn)
         {
@@ -53,6 +56,7 @@ namespace MonoJam.Controllers
         public void Init()
         {
             mainMenu = new MainMenuController(this);
+            gameOverMenu = new GameOverMenuController(this);
 
             player = new Player(this);
             enemies = new Enemy[MAX_ENEMIES];
@@ -72,7 +76,7 @@ namespace MonoJam.Controllers
             noteSpawner = new Timer(900);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
-            EndGame();
+            ToMainMenu();
         }
 
         public void StartGame()
@@ -85,10 +89,10 @@ namespace MonoJam.Controllers
 
             player.Reset();
 
-            IsPlaying = true;
+            currentState = GameState.Playing;
         }
 
-        public void EndGame()
+        public void ResetContent()
         {
             enemySpawner.Stop();
             coinSpawner.Stop();
@@ -104,7 +108,27 @@ namespace MonoJam.Controllers
             DestroyAllMoney();
             mj.grc.ResetCoinBuffers();
 
-            IsPlaying = false;
+            player.FiringLaser = false;
+        }
+
+        public void RestartGame()
+        {
+            ResetContent();
+            StartGame();
+        }
+
+        public void ToGameOver()
+        {
+            gameOverMenu.Drop();
+            currentState = GameState.GameOver;
+
+            player.FiringLaser = false;
+        }
+
+        public void ToMainMenu()
+        {
+            ResetContent();
+            currentState = GameState.Title;
         }
 
         public void Exit()
@@ -117,13 +141,17 @@ namespace MonoJam.Controllers
             // Always keep console window clear.
             Console.Clear();
 
-            if(IsPlaying)
+            switch(currentState)
             {
-                UpdatePlay();
-            }
-            else
-            {
-                mainMenu.Update();
+                case GameState.Title:
+                    mainMenu.Update();
+                    break;
+                case GameState.Playing:
+                    UpdatePlay();
+                    break;
+                case GameState.GameOver:
+                    gameOverMenu.Update();
+                    break;
             }
             
             #region Remove objects
@@ -222,15 +250,15 @@ namespace MonoJam.Controllers
             {
                 mainShaker.currentAmplitude = 1f;
             }
-
-
-            if(notesMissed >= MAX_NOTES_MISSED)
+            
+            if(currentState != GameState.GameOver && notesMissed >= MAX_NOTES_MISSED)
             {
-                EndGame();
+                ToGameOver();
             }
 
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine("Corpses: " + corpses.Count);
+            Console.WriteLine("Current state: " + currentState);
         }
 
         public void UpdatePlay()
@@ -285,7 +313,7 @@ namespace MonoJam.Controllers
 
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                EndGame();
+                ToMainMenu();
             }
 
             foreach (var c in corpses)

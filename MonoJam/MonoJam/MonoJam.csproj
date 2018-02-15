@@ -44,6 +44,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scripts\Controllers\GameOverMenuController.cs" />
     <Compile Include="Scripts\GameObjects\PiggyBank.cs" />
     <Compile Include="Scripts\GameObjects\NoteOnFire.cs" />
     <Compile Include="Scripts\GameObjects\EnemyCorpse.cs" />

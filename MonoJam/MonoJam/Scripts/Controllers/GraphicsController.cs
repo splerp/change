@@ -38,6 +38,7 @@ namespace MonoJam.Controllers
         private Texture2D backgroundGraphic;
         private Texture2D titleGraphic;
         private Texture2D titleCursor;
+        private Texture2D gameOverBackground;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
@@ -45,6 +46,7 @@ namespace MonoJam.Controllers
 
         private const int vaultWallWidth = 10;
         private const int vaultFloorHeight = 20;
+        private Point gameOverOffset = new Point(0, -6);
 
         public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
@@ -103,6 +105,7 @@ namespace MonoJam.Controllers
             backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
+            gameOverBackground = Content.Load<Texture2D>("Graphics/GameOver");
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -151,20 +154,25 @@ namespace MonoJam.Controllers
 
         public void Draw()
         {
-            if(gc.IsPlaying)
+            switch(gc.currentState)
             {
-                DrawGame();
-            }
-            else
-            {
-                DrawMenu();
+                case GameController.GameState.Title:
+                    DrawMenu();
+                    break;
+                case GameController.GameState.Playing:
+                    DrawGame();
+                    break;
+                case GameController.GameState.GameOver:
+                    DrawGame();
+                    DrawGameOverMenu();
+                    break;
             }
         }
 
         public void DrawMenu()
         {
             Vector2 coinPos = Vector2.Zero;
-            switch(gc.mainMenu.selectedOption)
+            switch (gc.mainMenu.selectedOption)
             {
                 case 0:
                     coinPos = new Vector2(9, 7);
@@ -181,6 +189,29 @@ namespace MonoJam.Controllers
             {
                 batch.Draw(titleGraphic, Vector2.Zero, Color.White);
                 batch.Draw(titleCursor, coinPos, Color.White);
+            }
+            batch.End();
+        }
+
+        public void DrawGameOverMenu()
+        {
+            Vector2 coinPos = Vector2.Zero;
+            switch (gc.gameOverMenu.selectedOption)
+            {
+                case 0:
+                    coinPos = new Vector2(33, 30);
+                    break;
+                case 1:
+                    coinPos = new Vector2(34, 46);
+                    break;
+            }
+
+            var menuPos = (gameOverOffset + new Point(0, (int)gc.gameOverMenu.currentY)).ToVector2();
+
+            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            {
+                batch.Draw(gameOverBackground, menuPos, Color.White);
+                batch.Draw(titleCursor, coinPos + menuPos, Color.White);
             }
             batch.End();
         }
