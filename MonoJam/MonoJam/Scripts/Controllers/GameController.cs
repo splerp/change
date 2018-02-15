@@ -11,7 +11,7 @@ namespace MonoJam.Controllers
     public class GameController
     {
         public const int MAX_ENEMIES = 20;
-        public const int COINS_PER_LAYER = 1000;
+        public const int COINS_PER_LAYER = 5000;
         public int totalEnemies;
 
         private MonoJam mj;
@@ -160,7 +160,7 @@ namespace MonoJam.Controllers
                 // A "killed" enemy. Show the death sequence.
                 if (enemies[i].IsDead)
                 {
-                    AddCoins(100);
+                    AddCoins(2000);
 
                     var newCorpse = new EnemyCorpse(enemies[i]);
                     corpses.Add(newCorpse);
@@ -227,7 +227,7 @@ namespace MonoJam.Controllers
             #region Create objects
             if (ReadyToSpawnCoins)
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     if (coinsToSpawn > 0)
                     {
