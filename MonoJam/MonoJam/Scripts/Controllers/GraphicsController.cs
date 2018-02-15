@@ -34,6 +34,7 @@ namespace MonoJam.Controllers
         private Texture2D[] noteFireGraphics;
         private Texture2D hudBackground;
         private Texture2D hudLaserCharge;
+        private Texture2D hudPlayerHealth;
         private Texture2D backgroundGraphic;
         private Texture2D titleGraphic;
         private Texture2D titleCursor;
@@ -108,6 +109,7 @@ namespace MonoJam.Controllers
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
             hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
+            hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 3);
 
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
@@ -133,6 +135,11 @@ namespace MonoJam.Controllers
             VaultFloor.SetData(Enumerable.Repeat(new Color(36, 17, 1), VaultFloor.Width * VaultFloor.Height).ToArray());
             hudBackground.SetData(Enumerable.Repeat(Color.Black, hudBackground.Width * hudBackground.Height).ToArray());
             hudLaserCharge.SetData(Enumerable.Repeat(Color.Red, hudLaserCharge.Width * hudLaserCharge.Height).ToArray());
+
+            var hpBar = Enumerable.Repeat(Color.Green, hudPlayerHealth.Width * (hudPlayerHealth.Height - 1))
+                .Concat(Enumerable.Repeat(Color.DarkGreen, hudPlayerHealth.Width * 1))
+                .ToArray();
+            hudPlayerHealth.SetData(hpBar);
         }
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
@@ -205,8 +212,7 @@ namespace MonoJam.Controllers
                 coinBackground.currentScale = MathHelper.Lerp(coinBackground.currentScale, targetScale, lerpSpeed);
                 coinBackground.currentTranslate = MathHelper.Lerp(coinBackground.currentTranslate, targetTranslate, lerpSpeed);
                 coinBackground.currentAlpha = MathHelper.Lerp(coinBackground.currentAlpha, targetAlpha, lerpSpeed);
-
-
+                
                 var drawColour = new Color(
                     coinBackground.currentAlpha,
                     coinBackground.currentAlpha,
@@ -358,24 +364,26 @@ namespace MonoJam.Controllers
 
             // Draw hud.
             var laserPercentage = (int)(gc.player.laserCharge * MonoJam.PLAYABLE_AREA_WIDTH) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
+            var healthPercentage = (GameController.MAX_NOTES_MISSED - gc.notesMissed) / (float)GameController.MAX_NOTES_MISSED;
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
                 batch.Draw(hudBackground, Vector2.Zero, Color.White);
-                
-                batch.Draw(hudLaserCharge,
-                    Vector2.Zero,
-                    null,
-                    Color.White,
-                    0, Vector2.Zero,
-                    new Vector2(laserPercentage, 1),
-                    SpriteEffects.None, 0);
+
                 batch.Draw(hudLaserCharge,
                     new Vector2(0, 3),
                     null,
                     Color.White,
                     0, Vector2.Zero,
                     new Vector2(laserPercentage, 1),
+                    SpriteEffects.None, 0);
+
+                batch.Draw(hudPlayerHealth,
+                    new Vector2(0, 0),
+                    null,
+                    Color.White,
+                    0, Vector2.Zero,
+                    new Vector2(healthPercentage, 1),
                     SpriteEffects.None, 0);
             }
             batch.End();

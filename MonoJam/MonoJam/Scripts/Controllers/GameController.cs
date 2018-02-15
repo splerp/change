@@ -12,6 +12,7 @@ namespace MonoJam.Controllers
     {
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
+        public const int MAX_NOTES_MISSED = 3;
         public int totalEnemies;
 
         private MonoJam mj;
@@ -39,6 +40,7 @@ namespace MonoJam.Controllers
         public int placedCoins;
         public int currentCoins;
         public int coinsToSpawn;
+        public int notesMissed;
 
         public bool IsPlaying { get; set; }
 
@@ -95,7 +97,8 @@ namespace MonoJam.Controllers
             currentCoins = 0;
             coinsToSpawn = 0;
             placedCoins = 0;
-            
+            notesMissed = 0;
+
             DestroyAllEnemies();
             DestroyAllCoins();
             DestroyAllMoney();
@@ -190,6 +193,8 @@ namespace MonoJam.Controllers
                     notesOnFire.Add(newOnFire);
 
                     notes.RemoveAt(i);
+
+                    notesMissed++;
                 }
                 // Otherwise, if reached bottom, give money.
                 else if (notes[i].ReadyToRemove)
@@ -216,6 +221,12 @@ namespace MonoJam.Controllers
             if(corpses.Any())
             {
                 mainShaker.currentAmplitude = 1f;
+            }
+
+
+            if(notesMissed >= MAX_NOTES_MISSED)
+            {
+                EndGame();
             }
 
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
