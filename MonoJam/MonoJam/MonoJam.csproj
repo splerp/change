@@ -45,10 +45,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Scripts\Controllers\GameOverMenuController.cs" />
+    <Compile Include="Scripts\GameObjects\PaddlePlayer.cs" />
     <Compile Include="Scripts\GameObjects\PiggyBank.cs" />
     <Compile Include="Scripts\GameObjects\NoteOnFire.cs" />
     <Compile Include="Scripts\GameObjects\EnemyCorpse.cs" />
     <Compile Include="Scripts\IHurtable.cs" />
+    <Compile Include="Scripts\Utils\BoxCollisionTest.cs" />
     <Compile Include="Scripts\Utils\LineCollisionTest.cs" />
     <Compile Include="Scripts\GameObjects\Coin.cs" />
     <Compile Include="Scripts\Graphics\CoinBackgroundLayer.cs" />
@@ -62,7 +64,7 @@
     <Compile Include="Scripts\Controllers\MainMenuController.cs" />
     <Compile Include="Scripts\GameObjects\Note.cs" />
     <Compile Include="Scripts\Utils\Perlin.cs" />
-    <Compile Include="Scripts\GameObjects\Player.cs" />
+    <Compile Include="Scripts\GameObjects\LaserPlayer.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Controllers\ShakeController.cs" />

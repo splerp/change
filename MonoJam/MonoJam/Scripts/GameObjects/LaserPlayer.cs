@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MonoJam.GameObjects
 {
-    public class Player : GameObject, ICollisionObject
+    public class LaserPlayer : GameObject, ICollisionObject
     {
         public const int DAMAGE_LASER_DIRECT = 100;
         public const int DAMAGE_LASER_INDIRECT = 20;
@@ -35,7 +35,7 @@ namespace MonoJam.GameObjects
         public Point LeftEyePos => CollisionRect.Location + new Point(2, 2);
         public Point RightEyePos => CollisionRect.Location + new Point(5, 2);
         
-        public Player(GameController gcIn)
+        public LaserPlayer(GameController gcIn)
         {
             gc = gcIn;
             laserShake = new ShakeController();

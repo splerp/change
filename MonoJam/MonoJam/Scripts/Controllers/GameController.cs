@@ -15,7 +15,7 @@ namespace MonoJam.Controllers
 
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
-        public const int MAX_NOTES_MISSED = 3;
+        public const int MAX_NOTES_MISSED = 20;
 
         public const int PINK_NOTE_VALUE = 500;
         public const int PIGGY_BANK_VALUE = 2000;
@@ -30,7 +30,8 @@ namespace MonoJam.Controllers
         public MainMenuController mainMenu;
         public GameOverMenuController gameOverMenu;
 
-        public Player player;
+        public LaserPlayer laserPlayer;
+        public PaddlePlayer paddlePlayer;
         public Enemy[] enemies;
         public List<Coin> coins;
         public List<EnemyCorpse> corpses;
@@ -69,7 +70,9 @@ namespace MonoJam.Controllers
             mainMenu = new MainMenuController(this);
             gameOverMenu = new GameOverMenuController(this);
 
-            player = new Player(this);
+            laserPlayer = new LaserPlayer(this);
+            paddlePlayer = new PaddlePlayer(this);
+
             enemies = new Enemy[MAX_ENEMIES];
 
             coins = new List<Coin>();
@@ -84,7 +87,7 @@ namespace MonoJam.Controllers
             enemySpawner = new Timer(1500);
             enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
 
-            noteSpawner = new Timer(900);
+            noteSpawner = new Timer(1800);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
             currentLayerTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
@@ -100,7 +103,8 @@ namespace MonoJam.Controllers
 
             ResetCoinData();
 
-            player.Reset();
+            laserPlayer.Reset();
+            paddlePlayer.Reset();
             CalculateCoinTrend();
 
             currentState = GameState.Playing;
@@ -122,7 +126,7 @@ namespace MonoJam.Controllers
             DestroyAllMoney();
             mj.grc.ResetCoinBuffers();
 
-            player.FiringLaser = false;
+            laserPlayer.FiringLaser = false;
         }
 
         public void RestartGame()
@@ -136,7 +140,7 @@ namespace MonoJam.Controllers
             gameOverMenu.Drop();
             currentState = GameState.GameOver;
 
-            player.FiringLaser = false;
+            laserPlayer.FiringLaser = false;
         }
 
         public void ToMainMenu()
@@ -239,12 +243,18 @@ namespace MonoJam.Controllers
 
                     notesMissed++;
                 }
-                // Otherwise, if reached bottom, give money.
+                // Otherwise, if caught, give money.
+                else if (BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
+                {
+                    // TODO: Play "caught" animation
+                    AddCoins(PIGGY_BANK_VALUE);
+                    notes.RemoveAt(i);
+                }
+                // Otherwise, missed
                 else if (notes[i].ReadyToRemove)
                 {
-                    AddCoins(PIGGY_BANK_VALUE);
-
                     notes.RemoveAt(i);
+                    notesMissed++;
                 }
             }
 
@@ -260,11 +270,6 @@ namespace MonoJam.Controllers
             #endregion
 
             mainShaker.Update();
-
-            if(corpses.Any())
-            {
-                mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
-            }
             
             if(currentState != GameState.GameOver && notesMissed >= MAX_NOTES_MISSED)
             {
@@ -274,6 +279,7 @@ namespace MonoJam.Controllers
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine("Corpses: " + corpses.Count);
             Console.WriteLine("Current state: " + currentState);
+            Console.WriteLine("COLLIDING???: " + BoxCollisionTest.IntersectAABB(laserPlayer.CollisionRect, new Rectangle(15, 15, 5, 5)));
         }
 
         public void UpdatePlay()
@@ -320,7 +326,8 @@ namespace MonoJam.Controllers
             #endregion
 
             #region Update objects
-            player.Update();
+            laserPlayer.Update();
+            paddlePlayer.Update();
 
             // Update enemies.
             for (int i = 0; i < totalEnemies; i++)
@@ -348,6 +355,11 @@ namespace MonoJam.Controllers
                 c.Update();
             }
             #endregion
+
+            if (corpses.Any())
+            {
+                mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
+            }
         }
 
         public void CalculateCoinTrend()
