@@ -331,8 +331,7 @@ namespace MonoJam.Controllers
                 {
                     var oldEnemySize = new Vector2(10, 10);
                     var enemyDiff = new Vector2(piggyBankGraphic.Width, piggyBankGraphic.Height) - oldEnemySize;
-
-
+                    
                     bool isBackwardsVacuum = c.EnemyReference is VacuumEnemy && c.EnemyReference.direction < 0;
 
                     var fireOffset = new Vector2(-1, -5);

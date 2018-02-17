@@ -101,11 +101,14 @@ namespace MonoJam.GameObjects
         {
             for(int i = totalNotesHeld - 1; i >= 0; i--)
             {
+                if(NotesHeld[i].InsideVacuum)
+                {
+                    NotesHeld[i].SetX(GameController.random.Next(1, 5) - 2 + CentreBodyX);
+                }
+
                 NotesHeld[i].CaughtByVacuum = null;
                 NotesHeld[i].InsideVacuum = false;
-
-                NotesHeld[i].SetX(CentreBodyX);
-
+                
                 NotesHeld[i] = null;
             }
         }
