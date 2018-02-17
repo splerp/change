@@ -13,6 +13,7 @@ namespace MonoJam.GameObjects
         public const int DAMAGE_LASER_INDIRECT = 20;
 
         public const float LASER_FIRE_SHAKE_AMOUNT = 2f;
+        public const int GRAPHIC_OUTER_WIDTH = 2;
 
         private GameController gc;
         public ShakeController laserShake;

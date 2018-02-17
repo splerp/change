@@ -11,6 +11,7 @@ namespace MonoJam.GameObjects
 
         public const int WIDTH = 14;
         public const int HEIGHT = 5;
+        public const int GRAPHIC_EDGE_WIDTH = 1;
 
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(new Point(
@@ -31,7 +32,7 @@ namespace MonoJam.GameObjects
         public void Reset()
         {
             SetX(0);
-            SetY(MonoJam.PLAYABLE_AREA_HEIGHT);
+            SetY(MonoJam.PLAYABLE_AREA_HEIGHT + MonoJam.PADDLE_AREA_HEIGHT - HEIGHT);
             speed = Vector2.Zero;
         }
 

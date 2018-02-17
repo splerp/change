@@ -25,7 +25,8 @@ namespace MonoJam.Controllers
         #region Game graphics
         private Texture2D playerGraphic;
         private Texture2D playerLasersLayer;
-        private Texture2D paddleGraphic;
+        private Texture2D paddleGraphicFront;
+        private Texture2D paddleGraphicBack;
         private Texture2D coinGraphic;
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
@@ -49,6 +50,7 @@ namespace MonoJam.Controllers
         private const int vaultWallWidth = 10;
         private const int vaultFloorHeight = 20;
         private Point gameOverOffset = new Point(0, -6);
+        private Point laserPlayerOffset;
 
         public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
@@ -108,6 +110,9 @@ namespace MonoJam.Controllers
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
             gameOverBackground = Content.Load<Texture2D>("Graphics/GameOver");
+            paddleBackground = Content.Load<Texture2D>("Graphics/PaddleTrack");
+            paddleGraphicFront = Content.Load<Texture2D>("Graphics/PaddleFront");
+            paddleGraphicBack = Content.Load<Texture2D>("Graphics/PaddleBack");
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -115,8 +120,8 @@ namespace MonoJam.Controllers
             hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
             hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 3);
-            paddleGraphic = new Texture2D(graphicsDevice, PaddlePlayer.WIDTH, PaddlePlayer.HEIGHT);
-            paddleBackground = new Texture2D(graphicsDevice, MonoJam.WINDOW_WIDTH, MonoJam.PADDLE_AREA_HEIGHT);
+
+            laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
 
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
@@ -142,8 +147,6 @@ namespace MonoJam.Controllers
             VaultFloor.SetData(Enumerable.Repeat(new Color(36, 17, 1), VaultFloor.Width * VaultFloor.Height).ToArray());
             hudBackground.SetData(Enumerable.Repeat(Color.Black, hudBackground.Width * hudBackground.Height).ToArray());
             hudLaserCharge.SetData(Enumerable.Repeat(Color.Red, hudLaserCharge.Width * hudLaserCharge.Height).ToArray());
-            paddleGraphic.SetData(Enumerable.Repeat(Color.White, paddleGraphic.Width * paddleGraphic.Height).ToArray());
-            paddleBackground.SetData(Enumerable.Repeat(Color.Black, paddleBackground.Width * paddleBackground.Height).ToArray());
 
             var hpBar = Enumerable.Repeat(Color.Green, hudPlayerHealth.Width * (hudPlayerHealth.Height - 1))
                 .Concat(Enumerable.Repeat(Color.DarkGreen, hudPlayerHealth.Width * 1))
@@ -288,6 +291,23 @@ namespace MonoJam.Controllers
             }
             batch.End();
 
+            // Draw falling coins.
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            {
+                foreach (var coin in gc.coins)
+                {
+                    batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
+                }
+            }
+            batch.End();
+
+            // Draw paddle background.
+            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            {
+                batch.Draw(paddleBackground, new Vector2(0, MonoJam.WINDOW_HEIGHT - MonoJam.PADDLE_AREA_HEIGHT), Color.White);
+            }
+            batch.End();
+
             // Draw enemies.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
             {
@@ -325,6 +345,13 @@ namespace MonoJam.Controllers
                 }
             }
             batch.End();
+            
+            // Draw back of paddle.
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            {
+                batch.Draw(paddleGraphicBack, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+            }
+            batch.End();
 
             // Draw money.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
@@ -348,68 +375,12 @@ namespace MonoJam.Controllers
             }
             batch.End();
 
-            // Draw player.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
-            {
-                batch.Draw(playerGraphic, gc.laserPlayer.CollisionRect.Location.ToVector2(), Color.White);
-            }
-            batch.End();
-
-            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
-            {
-                batch.Draw(paddleBackground, new Vector2(0, MonoJam.WINDOW_HEIGHT - MonoJam.PADDLE_AREA_HEIGHT), Color.White);
-            }
-            batch.End();
-
+            // Draw front of paddle.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                batch.Draw(paddleGraphic, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                batch.Draw(paddleGraphicFront, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
             }
             batch.End();
-
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
-            {
-                // Draw coins.
-                foreach (var coin in gc.coins)
-                {
-                    batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
-                }
-            }
-            batch.End();
-
-            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
-
-            // TODO: Combine both sets of data, add to texture2D, draw once.
-            if (gc.laserPlayer.FiringLaser)
-            {
-                var laserAlpha = Math.Min(gc.laserPlayer.laserCharge * 8, 1f);
-                Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
-
-                if (mousePos.X >= 0 && mousePos.Y >= 0 &&
-                    mousePos.X < MonoJam.PLAYABLE_AREA_WIDTH && mousePos.Y < MonoJam.PLAYABLE_AREA_HEIGHT)
-                {
-
-                    var startPos = gc.laserPlayer.LeftEyePos;
-                    var newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
-                    playerLasersLayer.SetData(newData);
-
-                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
-                    {
-                        batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
-                    }
-                    batch.End();
-
-                    startPos = gc.laserPlayer.RightEyePos;
-                    newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
-                    playerLasersLayer.SetData(newData);
-
-                    batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
-                    {
-                        batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
-                    }
-                    batch.End();
-                }
-            }
 
             // Draw hud.
             var laserPercentage = (int)(gc.laserPlayer.laserCharge * MonoJam.PLAYABLE_AREA_WIDTH) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
@@ -436,6 +407,42 @@ namespace MonoJam.Controllers
                     SpriteEffects.None, 0);
             }
             batch.End();
+
+            // Draw laser player (over HUD).
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
+            {
+                batch.Draw(playerGraphic, (gc.laserPlayer.CollisionRect.Location + laserPlayerOffset).ToVector2(), Color.White);
+            }
+            batch.End();
+
+            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+
+            // TODO: Combine both sets of data, add to texture2D, draw once.
+            if (gc.laserPlayer.FiringLaser)
+            {
+                var laserAlpha = Math.Min(gc.laserPlayer.laserCharge * 8, 1f);
+                Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
+
+                var startPos = gc.laserPlayer.LeftEyePos;
+                var newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
+                playerLasersLayer.SetData(newData);
+
+                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
+                {
+                    batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
+                }
+                batch.End();
+
+                startPos = gc.laserPlayer.RightEyePos;
+                newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
+                playerLasersLayer.SetData(newData);
+
+                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
+                {
+                    batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
+                }
+                batch.End();
+            }
         }
     }
 }
