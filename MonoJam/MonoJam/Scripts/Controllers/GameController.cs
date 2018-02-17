@@ -185,10 +185,14 @@ namespace MonoJam.Controllers
                 ToGameOver();
             }
 
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                ToMainMenu();
+            }
+
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine("Corpses: " + corpses.Count);
             Console.WriteLine("Current state: " + currentState);
-            Console.WriteLine("COLLIDING???: " + BoxCollisionTest.IntersectAABB(laserPlayer.CollisionRect, new Rectangle(15, 15, 5, 5)));
         }
 
         public void UpdatePlay()
@@ -267,11 +271,6 @@ namespace MonoJam.Controllers
             for (int i = 0; i < notes.Count; i++)
             {
                 notes[i].Update();
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                ToMainMenu();
             }
 
             foreach (var c in corpses)
