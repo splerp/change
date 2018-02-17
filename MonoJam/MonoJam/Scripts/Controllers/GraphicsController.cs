@@ -34,8 +34,12 @@ namespace MonoJam.Controllers
         private Texture2D vacuumBodyGraphic;
         private Texture2D vacuumHeadUpGraphic;
         private Texture2D vacuumHeadDownGraphic;
-        
-        private Texture2D noteGraphic;
+
+        private Texture2D noteGraphic5;
+        private Texture2D noteGraphic10;
+        private Texture2D noteGraphic20;
+        private Texture2D noteGraphic50;
+        private Texture2D noteGraphic100;
         private Texture2D[] enemyFireGraphics;
         private Texture2D[] noteFireGraphics;
         private Texture2D hudBackground;
@@ -60,11 +64,14 @@ namespace MonoJam.Controllers
         private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
         {
             { Note.NoteType.None, Color.White },
-            { Note.NoteType.Pink5, Color.Pink },
-            { Note.NoteType.Blue10, Color.Blue },
-            { Note.NoteType.Red20, Color.Red },
-            { Note.NoteType.Yellow50, Color.Yellow },
+            { Note.NoteType.Pink5, new Color(207, 97, 216) },
+            { Note.NoteType.Blue10, new Color(97, 151, 216) },
+            { Note.NoteType.Red20,new Color(221, 83, 81) },
+            { Note.NoteType.Yellow50, new Color(228, 152, 84) },
+            { Note.NoteType.Green100, new Color(81, 231, 97) },
         };
+
+        private Dictionary<Note.NoteType, Texture2D> noteGraphics;
 
         public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
@@ -148,7 +155,21 @@ namespace MonoJam.Controllers
             vacuumHeadUpGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadUp");
             vacuumHeadDownGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadDown");
 
-            noteGraphic = Content.Load<Texture2D>("Graphics/5Dollars");
+            noteGraphic5 = Content.Load<Texture2D>("Graphics/5Dollars");
+            noteGraphic10 = Content.Load<Texture2D>("Graphics/10Dollars");
+            noteGraphic20 = Content.Load<Texture2D>("Graphics/20Dollars");
+            noteGraphic50 = Content.Load<Texture2D>("Graphics/50Dollars");
+            noteGraphic100 = Content.Load<Texture2D>("Graphics/100Dollars");
+
+            noteGraphics = new Dictionary<Note.NoteType, Texture2D>
+            {
+                { Note.NoteType.Pink5, noteGraphic5 },
+                { Note.NoteType.Blue10, noteGraphic10 },
+                { Note.NoteType.Red20, noteGraphic20 },
+                { Note.NoteType.Yellow50, noteGraphic50 },
+                { Note.NoteType.Green100, noteGraphic100 },
+            };
+
             noteFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/FireMoney1"),
@@ -384,7 +405,7 @@ namespace MonoJam.Controllers
                 {
                     if (!note.InsideVacuum)
                     {
-                        batch.Draw(noteGraphic, note.CollisionRect.Location.ToVector2(), Color.White);
+                        batch.Draw(noteGraphics[note.Type], note.CollisionRect.Location.ToVector2(), Color.White);
                     }
                 }
             }

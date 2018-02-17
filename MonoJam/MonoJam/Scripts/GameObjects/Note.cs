@@ -1,11 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoJam.Controllers;
+using System.Collections.Generic;
 
 namespace MonoJam.GameObjects
 {
     public class Note : GameObject, ICollisionObject, IHurtable
     {
-        public enum NoteType { None, Pink5, Blue10, Red20, Yellow50 }
+        public enum NoteType { None, Pink5, Blue10, Red20, Yellow50, Green100 }
+
+        public static Dictionary<NoteType, int> noteWorths = new Dictionary<NoteType, int>
+        {
+            {NoteType.None, 0 },
+            {NoteType.Pink5, 500 },
+            {NoteType.Blue10, 1000 },
+            {NoteType.Red20, 2000 },
+            {NoteType.Yellow50, 5000 },
+            {NoteType.Green100, 10000 }
+        };
+
+        public static Dictionary<NoteType, int> noteSpawnWeights = new Dictionary<NoteType, int>
+        {
+            {NoteType.None, 0 },
+            {NoteType.Pink5, 150 },
+            {NoteType.Blue10, 15 },
+            {NoteType.Red20, 7 },
+            {NoteType.Yellow50, 5 },
+            {NoteType.Green100, 1 }
+        };
 
         public const int WIDTH = 8;
         public const int HEIGHT = 4;
@@ -30,11 +51,12 @@ namespace MonoJam.GameObjects
         public int MaxHealth => 1;
         public int CurrentHealth { get; set; }
         public bool IsDead => CurrentHealth <= 0;
-        public NoteType Type => NoteType.Pink5;
+        public NoteType Type { get; private set; }
 
-        public Note(GameController gcIn)
+        public Note(GameController gcIn, NoteType typeIn)
         {
             gc = gcIn;
+            Type = typeIn == NoteType.None ? NoteType.Pink5 : typeIn;
 
             SetX(GameController.random.Next(0, MonoJam.WINDOW_WIDTH - WIDTH));
             SetY(-HEIGHT);

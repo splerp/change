@@ -16,6 +16,8 @@ namespace MonoJam.GameObjects
 
         public bool ReadyToRemove => animationFrame >= TOTAL_FRAMES;
 
+        public Note.NoteType Type { get; private set; }
+
         // Shouldn't be here? (it's a graphics thing)
         public bool IsFlipped { get; set; }
 
@@ -23,6 +25,8 @@ namespace MonoJam.GameObjects
         {
             SetX(note.CollisionRect.X);
             SetY(note.CollisionRect.Y);
+
+            Type = note.Type;
 
             IsFlipped = GameController.random.Next(0, 2) == 0;
 

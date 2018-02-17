@@ -16,8 +16,7 @@ namespace MonoJam.Controllers
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
         public const int MAX_NOTES_MISSED = 20;
-
-        public const int PINK_NOTE_VALUE = 500;
+        
         public const int COINS_SPAWNED_PER_FRAME = 8;
 
         public const float SMALL_SHAKE_AMOUNT = 1f;
@@ -416,7 +415,7 @@ namespace MonoJam.Controllers
                 {
                     if (notes[i].CaughtByPlayer)
                     {
-                        AddCoins(PINK_NOTE_VALUE);
+                        AddCoins(Note.noteWorths[notes[i].Type]);
                         SoundController.Play(Sound.Ding);
                     }
                     else
@@ -513,7 +512,24 @@ namespace MonoJam.Controllers
 
         public void SpawnNote()
         {
-            var newNote = new Note(this);
+            
+
+            var totalWeights = Note.noteSpawnWeights.Sum(a => a.Value);
+            var idx = random.Next(0, totalWeights);
+
+            int i = 0;
+            Note.NoteType selectedType = Note.NoteType.None;
+            Note.NoteType[] allEnumValues = (Note.NoteType[])Enum.GetValues(typeof(Note.NoteType));
+            while(idx > 0)
+            {
+                idx -= Note.noteSpawnWeights[allEnumValues[i]];
+
+                selectedType = allEnumValues[i];
+                i++;
+            }
+
+            var newNote = new Note(this, selectedType);
+
             notes.Add(newNote);
         }
 

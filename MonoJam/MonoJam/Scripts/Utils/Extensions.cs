@@ -1,13 +1,4 @@
-﻿//
-// Perlin noise generator for Unity
-// Keijiro Takahashi, 2013, 2015
-// https://github.com/keijiro/PerlinNoise
-//
-// Based on the original implementation by Ken Perlin
-// http://mrl.nyu.edu/~perlin/noise/
-//
-
-using MonoJam.Controllers;
+﻿using MonoJam.Controllers;
 using System;
 using System.Collections.Generic;
 
@@ -35,6 +26,13 @@ namespace MonoJam.Utils
             }
 
             return coll[GameController.random.Next(0, coll.Count)];
+        }
+
+        public static T RandomEnumElement<T>(this T enumVal)
+            where T : struct, IConvertible, IComparable, IFormattable
+        {
+            var values = Enum.GetValues(typeof(T));
+            return (T)values.GetValue(GameController.random.Next(values.Length));
         }
     }
 }
