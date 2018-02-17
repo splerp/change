@@ -50,6 +50,8 @@ namespace MonoJam.Controllers
         private Texture2D titleCursor;
         private Texture2D gameOverBackground;
         private Texture2D paddleBackground;
+        private Texture2D scoreBackground;
+        private Dictionary<char, Texture2D> fontGraphics;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
@@ -126,7 +128,7 @@ namespace MonoJam.Controllers
 
             coinGraphic = new Texture2D(graphicsDevice, 1, 1);
             coinGraphic.SetData(new Color[] { Color.Yellow });
-            
+
             backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
@@ -134,6 +136,7 @@ namespace MonoJam.Controllers
             paddleBackground = Content.Load<Texture2D>("Graphics/PaddleTrack");
             paddleGraphicFront = Content.Load<Texture2D>("Graphics/PaddleFront");
             paddleGraphicBack = Content.Load<Texture2D>("Graphics/PaddleBack");
+            scoreBackground = Content.Load<Texture2D>("Graphics/ScoreBackground");
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -170,6 +173,21 @@ namespace MonoJam.Controllers
                 { Note.NoteType.Green100, noteGraphic100 },
             };
 
+            fontGraphics = new Dictionary<char, Texture2D>
+            {
+                { '0', Content.Load<Texture2D>("Graphics/Font/Font_0")},
+                { '1', Content.Load<Texture2D>("Graphics/Font/Font_1")},
+                { '2', Content.Load<Texture2D>("Graphics/Font/Font_2")},
+                { '3', Content.Load<Texture2D>("Graphics/Font/Font_3")},
+                { '4', Content.Load<Texture2D>("Graphics/Font/Font_4")},
+                { '5', Content.Load<Texture2D>("Graphics/Font/Font_5")},
+                { '6', Content.Load<Texture2D>("Graphics/Font/Font_6")},
+                { '7', Content.Load<Texture2D>("Graphics/Font/Font_7")},
+                { '8', Content.Load<Texture2D>("Graphics/Font/Font_8")},
+                { '9', Content.Load<Texture2D>("Graphics/Font/Font_9")},
+                { '.', Content.Load<Texture2D>("Graphics/Font/Font_Dot")},
+            };
+
             noteFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/FireMoney1"),
@@ -190,6 +208,8 @@ namespace MonoJam.Controllers
                 .ToArray();
             hudPlayerHealth.SetData(hpBar);
         }
+
+        public static int scoreLength = 32;
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
         private void UpdateCoinBGData()
@@ -418,16 +438,19 @@ namespace MonoJam.Controllers
             }
             batch.End();
 
+            var totalArea = MonoJam.PLAYABLE_AREA_WIDTH - scoreLength;
+            var totalAreaRatio = (MonoJam.PLAYABLE_AREA_WIDTH - scoreLength) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
+
             // Draw hud.
-            var laserPercentage = (int)(gc.laserPlayer.laserCharge * MonoJam.PLAYABLE_AREA_WIDTH) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
-            var healthPercentage = (GameController.MAX_NOTES_MISSED - gc.notesMissed) / (float)GameController.MAX_NOTES_MISSED;
+            var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea;
+            var healthPercentage = (GameController.MAX_NOTES_MISSED - gc.notesMissed) / (float)GameController.MAX_NOTES_MISSED * totalAreaRatio;
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
                 batch.Draw(hudBackground, Vector2.Zero, Color.White);
 
                 batch.Draw(hudLaserCharge,
-                    new Vector2(0, 3),
+                    new Vector2(scoreLength, 3),
                     null,
                     Color.White,
                     0, Vector2.Zero,
@@ -435,12 +458,14 @@ namespace MonoJam.Controllers
                     SpriteEffects.None, 0);
 
                 batch.Draw(hudPlayerHealth,
-                    new Vector2(0, 0),
+                    new Vector2(scoreLength, 0),
                     null,
                     Color.White,
                     0, Vector2.Zero,
                     new Vector2(healthPercentage, 1),
                     SpriteEffects.None, 0);
+
+                DrawScore(batch, Vector2.Zero);
             }
             batch.End();
 
@@ -478,6 +503,20 @@ namespace MonoJam.Controllers
                     batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
                 }
                 batch.End();
+            }
+        }
+
+        public void DrawScore(SpriteBatch b, Vector2 drawPos)
+        {
+            var currentScore = gc.currentCoins;
+            var scoreStr = ScoreController.StringFor(currentScore / 100f);
+
+            b.Draw(scoreBackground, drawPos, Color.White);
+
+            for (int i =0; i < scoreStr.Length; i++)
+            {
+                Vector2 offset = drawPos + new Vector2(ScoreController.OffsetOf(scoreStr, i), 1);
+                b.Draw(fontGraphics[scoreStr[i]], offset, Color.White);
             }
         }
 

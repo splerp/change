@@ -52,9 +52,9 @@ namespace MonoJam.Controllers
         Timer vacuumSpawner;
         Timer noteSpawner;
 
-        public int placedCoins;
-        public int currentCoins;
-        public int coinsToSpawn;
+        public Int64 placedCoins;
+        public Int64 currentCoins;
+        public Int64 coinsToSpawn;
         public int notesMissed;
 
         public bool coinsStartFalling;
