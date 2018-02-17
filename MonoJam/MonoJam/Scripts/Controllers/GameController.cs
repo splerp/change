@@ -443,7 +443,7 @@ namespace MonoJam.Controllers
 
             if (corpses.Any())
             {
-                mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
+                //mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
             }
         }
 
