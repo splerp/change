@@ -89,12 +89,16 @@ namespace MonoJam.GameObjects
                 NotesHeld[totalNotesHeld++] = note;
 
                 lookingUp = note.CollisionRect.Y < CollisionRect.Y;
+
+                SoundController.Play(Sound.Slurp);
             }
         }
 
         public override void OnDeath()
         {
             ReleaseNotes();
+
+            SoundController.Play(Sound.Boom);
         }
 
         public void ReleaseNotes()

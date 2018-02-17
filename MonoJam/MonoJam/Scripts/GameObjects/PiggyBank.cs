@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
 using MonoJam.Controllers;
 using System;
 
@@ -31,6 +32,8 @@ namespace MonoJam.GameObjects
             SetX(MonoJam.PLAYABLE_AREA_WIDTH - (halfAreaSize * direction + halfAreaSize));
 
             yPos = GameController.random.Next((int)sinAmp, MonoJam.PLAYABLE_AREA_HEIGHT - Size.Y - (int)sinAmp / 2);
+            
+            SoundController.Play(Sound.Oink);
         }
 
         public override void Update()
@@ -47,6 +50,9 @@ namespace MonoJam.GameObjects
             SetY(yPos + yOffset);
         }
 
-        public override void OnDeath() { }
+        public override void OnDeath()
+        {
+            SoundController.Play(Sound.PigDeath);
+        }
     }
 }
