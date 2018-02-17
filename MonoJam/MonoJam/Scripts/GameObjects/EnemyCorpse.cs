@@ -7,6 +7,8 @@ namespace MonoJam.GameObjects
         public float gravity = 0.05f;
         public Vector2 speed;
 
+        public Enemy EnemyReference;
+
         private float animationSpeed = 6;
         private float animationCount;
         public int animationFrame = 0;
@@ -15,6 +17,8 @@ namespace MonoJam.GameObjects
 
         public EnemyCorpse(Enemy enemy)
         {
+            EnemyReference = enemy;
+
             SetX(enemy.CollisionRect.X);
             SetY(enemy.CollisionRect.Y);
 

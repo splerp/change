@@ -5,6 +5,8 @@ namespace MonoJam.GameObjects
 {
     public class Note : GameObject, ICollisionObject, IHurtable
     {
+        public enum NoteType { None, Pink5, Blue10, Red20, Yellow50 }
+
         public const int WIDTH = 8;
         public const int HEIGHT = 4;
 
@@ -15,13 +17,17 @@ namespace MonoJam.GameObjects
 
         public bool InRangeForCatching => Position.Y < MonoJam.PLAYABLE_AREA_HEIGHT;
         public bool ReadyToRemove => Position.Y > MonoJam.WINDOW_HEIGHT;
-        public bool Caught;
+        public bool CaughtByPlayer;
+
+        public VacuumEnemy CaughtByVacuum;
+        public bool InsideVacuum;
 
         public float downSpeed = 0.1f;
 
         public int MaxHealth => 1;
         public int CurrentHealth { get; set; }
         public bool IsDead => CurrentHealth <= 0;
+        public NoteType Type => NoteType.Pink5;
 
         public Note(GameController gcIn)
         {
@@ -35,9 +41,7 @@ namespace MonoJam.GameObjects
 
         public void Update()
         {
-            MoveBy(new Vector2(0, downSpeed));
-
-            if(Caught)
+            if(CaughtByPlayer)
             {
                 if (Position.X < gc.paddlePlayer.CollisionRect.X + PaddlePlayer.GRAPHIC_EDGE_WIDTH)
                 {
@@ -47,12 +51,40 @@ namespace MonoJam.GameObjects
                 {
                     SetX(gc.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH - WIDTH);
                 }
+
+                MoveBy(new Vector2(0, downSpeed));
+            }
+            else if(CaughtByVacuum != null)
+            {
+                SetX(CaughtByVacuum.MouthPosX);
+
+                // Move towards the vacuum.
+                if (CollisionRect.Y < CaughtByVacuum.CollisionRect.Y)
+                {
+                    MoveBy(new Vector2(0, 1));
+                }
+                else if (CollisionRect.Y > CaughtByVacuum.CollisionRect.Y + VacuumEnemy.HEIGHT)
+                {
+                    MoveBy(new Vector2(0, -1));
+                }
+                else
+                {
+                    //Caught.
+                    InsideVacuum = true;
+                }
+            }
+            else
+            {
+                MoveBy(new Vector2(0, downSpeed));
             }
         }
 
         public void Damage(int amount)
         {
-            CurrentHealth -= amount;
+            if(!InsideVacuum)
+            {
+                CurrentHealth -= amount;
+            }
         }
     }
 }

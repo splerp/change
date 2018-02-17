@@ -18,7 +18,6 @@ namespace MonoJam.Controllers
         public const int MAX_NOTES_MISSED = 20;
 
         public const int PINK_NOTE_VALUE = 500;
-        public const int PIGGY_BANK_VALUE = 2000;
         public const int COINS_SPAWNED_PER_FRAME = 8;
 
         public const float SMALL_SHAKE_AMOUNT = 1f;
@@ -42,14 +41,16 @@ namespace MonoJam.Controllers
 
         public static Random random;
         public bool ReadyToSpawnCoins { get; set; }
-        public bool ReadyToSpawnEnemy { get; set; }
+        public bool ReadyToSpawnPiggyBank { get; set; }
+        public bool ReadyToSpawnVacuum { get; set; }
         public bool ReadyToSpawnNote { get; set; }
 
         public int[] currentLayerTrend;
         public int totalTrendCount;
 
         Timer coinSpawner;
-        Timer enemySpawner;
+        Timer piggyBankSpawner;
+        Timer vacuumSpawner;
         Timer noteSpawner;
 
         public int placedCoins;
@@ -84,10 +85,13 @@ namespace MonoJam.Controllers
             coinSpawner = new Timer(1);
             coinSpawner.Elapsed += (a, b) => ReadyToSpawnCoins = true;
 
-            enemySpawner = new Timer(1500);
-            enemySpawner.Elapsed += (a, b) => ReadyToSpawnEnemy = true;
+            piggyBankSpawner = new Timer(10000);
+            piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
-            noteSpawner = new Timer(1800);
+            vacuumSpawner = new Timer(2200);
+            vacuumSpawner.Elapsed += (a, b) => ReadyToSpawnVacuum = true;
+            
+            noteSpawner = new Timer(1000);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
             currentLayerTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
@@ -97,8 +101,9 @@ namespace MonoJam.Controllers
 
         public void StartGame()
         {
-            enemySpawner.Start();
+            piggyBankSpawner.Start();
             coinSpawner.Start();
+            vacuumSpawner.Start();
             noteSpawner.Start();
 
             ResetCoinData();
@@ -112,8 +117,9 @@ namespace MonoJam.Controllers
 
         public void ResetContent()
         {
-            enemySpawner.Stop();
+            piggyBankSpawner.Stop();
             coinSpawner.Stop();
+            vacuumSpawner.Stop();
             noteSpawner.Stop();
 
             currentCoins = 0;
@@ -213,11 +219,18 @@ namespace MonoJam.Controllers
                 }
             }
 
-            if (ReadyToSpawnEnemy)
+            if (ReadyToSpawnPiggyBank)
             {
-                SpawnEnemy();
+                SpawnPiggyBank();
 
-                ReadyToSpawnEnemy = false;
+                ReadyToSpawnPiggyBank = false;
+            }
+
+            if(ReadyToSpawnVacuum)
+            {
+                SpawnVacuum();
+
+                ReadyToSpawnVacuum = false;
             }
 
             if (ReadyToSpawnNote)
@@ -236,6 +249,19 @@ namespace MonoJam.Controllers
             for (int i = 0; i < totalEnemies; i++)
             {
                 enemies[i].Update();
+
+                if(enemies[i] is VacuumEnemy)
+                {
+                    var vEnemy = enemies[i] as VacuumEnemy;
+
+                    for(int j = notes.Count - 1; j >= 0; j--)
+                    {
+                        var note = notes[j];
+
+                        vEnemy.TryCollect(note);
+                    }
+                }
+                
             }
 
             for (int i = 0; i < notes.Count; i++)
@@ -297,10 +323,12 @@ namespace MonoJam.Controllers
                 // A "killed" enemy. Show the death sequence.
                 if (enemies[i].IsDead)
                 {
-                    AddCoins(PIGGY_BANK_VALUE);
+                    AddCoins(enemies[i].CoinsOnDeath);
 
                     var newCorpse = new EnemyCorpse(enemies[i]);
                     corpses.Add(newCorpse);
+
+                    enemies[i].OnDeath();
 
                     DestroyEnemy(enemies[i]);
                 }
@@ -331,14 +359,14 @@ namespace MonoJam.Controllers
                     notesMissed++;
                 }
                 // Otherwise, if caught, give money.
-                else if (notes[i].InRangeForCatching && !notes[i].Caught && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
+                else if (notes[i].InRangeForCatching && !notes[i].CaughtByPlayer && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
                 {
-                    notes[i].Caught = true;
+                    notes[i].CaughtByPlayer = true;
                 }
                 // Otherwise, check if ready to remove
                 else if (notes[i].ReadyToRemove)
                 {
-                    if (notes[i].Caught)
+                    if (notes[i].CaughtByPlayer)
                     {
                         AddCoins(PINK_NOTE_VALUE);
                     }
@@ -404,12 +432,26 @@ namespace MonoJam.Controllers
             notesOnFire.Clear();
         }
 
-        public void SpawnEnemy()
+        public void SpawnPiggyBank()
         {
             if (totalEnemies < MAX_ENEMIES)
             {
-                var newEnemy = new PiggyBank();
-                enemies[totalEnemies++] = newEnemy;
+                var newPig = new PiggyBank();
+                enemies[totalEnemies++] = newPig;
+            }
+            else
+            {
+                // Temporary for debugging
+                throw new Exception("Created too many enemies");
+            }
+        }
+
+        public void SpawnVacuum()
+        {
+            if (totalEnemies < MAX_ENEMIES)
+            {
+                var newVacuum = new VacuumEnemy();
+                enemies[totalEnemies++] = newVacuum;
             }
             else
             {

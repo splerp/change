@@ -130,7 +130,7 @@ namespace MonoJam.GameObjects
 
                     if (isHitting)
                     {
-                        if ((mousePos - h.CollisionRect.Center).ToVector2().Length() < 5f)
+                        if ((mousePos - h.CollisionRect.Center).ToVector2().Length() < 10f)
                         {
                             h.Damage(DAMAGE_LASER_DIRECT);
                         }

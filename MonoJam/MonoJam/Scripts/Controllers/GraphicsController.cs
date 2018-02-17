@@ -31,6 +31,10 @@ namespace MonoJam.Controllers
         private Texture2D VaultWalls;
         private Texture2D VaultFloor;
         private Texture2D piggyBankGraphic;
+        private Texture2D vacuumBodyGraphic;
+        private Texture2D vacuumHeadUpGraphic;
+        private Texture2D vacuumHeadDownGraphic;
+        
         private Texture2D noteGraphic;
         private Texture2D[] enemyFireGraphics;
         private Texture2D[] noteFireGraphics;
@@ -49,8 +53,18 @@ namespace MonoJam.Controllers
 
         private const int vaultWallWidth = 10;
         private const int vaultFloorHeight = 20;
+
         private Point gameOverOffset = new Point(0, -6);
-        private Point laserPlayerOffset;
+        private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
+
+        private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
+        {
+            { Note.NoteType.None, Color.White },
+            { Note.NoteType.Pink5, Color.Pink },
+            { Note.NoteType.Blue10, Color.Blue },
+            { Note.NoteType.Red20, Color.Red },
+            { Note.NoteType.Yellow50, Color.Yellow },
+        };
 
         public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
@@ -121,8 +135,6 @@ namespace MonoJam.Controllers
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
             hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 3);
 
-            laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
-
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
             {
@@ -131,6 +143,10 @@ namespace MonoJam.Controllers
                 Content.Load<Texture2D>("Graphics/Fire3"),
                 Content.Load<Texture2D>("Graphics/Fire1"),
             };
+
+            vacuumBodyGraphic = Content.Load<Texture2D>("Graphics/VacuumBody");
+            vacuumHeadUpGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadUp");
+            vacuumHeadDownGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadDown");
 
             noteGraphic = Content.Load<Texture2D>("Graphics/5Dollars");
             noteFireGraphics = new Texture2D[]
@@ -317,7 +333,13 @@ namespace MonoJam.Controllers
                     var enemyDiff = new Vector2(piggyBankGraphic.Width, piggyBankGraphic.Height) - oldEnemySize;
 
 
+                    bool isBackwardsVacuum = c.EnemyReference is VacuumEnemy && c.EnemyReference.direction < 0;
+
                     var fireOffset = new Vector2(-1, -5);
+                    if (isBackwardsVacuum)
+                    {
+                        fireOffset += new Vector2(5, 0);
+                    }
 
                     var effect = c.speed.X < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
                     var effectInv = c.speed.X > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
@@ -328,20 +350,11 @@ namespace MonoJam.Controllers
                         Color.White,
                         0, Vector2.Zero, 1, effect, 0);
 
-                    batch.Draw(piggyBankGraphic, c.Position.ToPoint().ToVector2(),
-                        null,
-                        Color.White,
-                        0, Vector2.Zero, 1, effectInv, 0);
+                    DrawEnemy(batch, c.EnemyReference, c.Position.ToPoint().ToVector2());
                 }
                 for (int i = 0; i < gc.totalEnemies; i++)
                 {
-                    var effect = gc.enemies[i].direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-                    var effectInv = gc.enemies[i].direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-
-                    batch.Draw(piggyBankGraphic, gc.enemies[i].CollisionRect.Location.ToVector2(),
-                        null,
-                        Color.White,
-                        0, Vector2.Zero, 1, effectInv, 0);
+                    DrawEnemy(batch, gc.enemies[i], gc.enemies[i].CollisionRect.Location.ToVector2());
                 }
             }
             batch.End();
@@ -370,7 +383,10 @@ namespace MonoJam.Controllers
                 }
                 foreach (var note in gc.notes)
                 {
-                    batch.Draw(noteGraphic, note.CollisionRect.Location.ToVector2(), Color.White);
+                    if (!note.InsideVacuum)
+                    {
+                        batch.Draw(noteGraphic, note.CollisionRect.Location.ToVector2(), Color.White);
+                    }
                 }
             }
             batch.End();
@@ -442,6 +458,53 @@ namespace MonoJam.Controllers
                     batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
                 }
                 batch.End();
+            }
+        }
+
+        public void DrawEnemy(SpriteBatch b, Enemy enemy, Vector2 drawPos)
+        {
+            var effect = enemy.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var effectInv = enemy.direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+
+            if (enemy is PiggyBank)
+            {
+                batch.Draw(piggyBankGraphic, drawPos,
+                    null,
+                    Color.White,
+                    0, Vector2.Zero, 1, effectInv, 0);
+            }
+            else if (enemy is VacuumEnemy)
+            {
+                var offsetX1 = enemy.direction > 0 ? VacuumEnemy.WIDTH_HEAD : 0;
+                var offsetX2 = enemy.direction > 0 ? 0 : VacuumEnemy.WIDTH_HEAD;
+
+                Color[] vacuumNoteData = new Color[VacuumEnemy.MAX_NOTES_HELD * 3];
+                for (int j = 0; j < VacuumEnemy.MAX_NOTES_HELD; j++)
+                {
+                    var colour = noteColours[((VacuumEnemy)enemy).NotesHeld[j]?.Type ?? Note.NoteType.None];
+
+                    vacuumNoteData[j + VacuumEnemy.MAX_NOTES_HELD * 0] = colour;
+                    vacuumNoteData[j + VacuumEnemy.MAX_NOTES_HELD * 1] = colour;
+                    vacuumNoteData[j + VacuumEnemy.MAX_NOTES_HELD * 2] = colour;
+                }
+
+                var thing = new Texture2D(graphicsDevice, VacuumEnemy.MAX_NOTES_HELD, 3);
+                thing.SetData(vacuumNoteData);
+
+                Vector2 vacuumNoteGraphicOffset = enemy.direction > 0 ? new Vector2(3, 4) : new Vector2(4, 4);
+
+                b.Draw(thing, drawPos + new Vector2(offsetX2, 0) + vacuumNoteGraphicOffset, Color.White);
+
+                var vacHead = ((VacuumEnemy)enemy).lookingUp ? vacuumHeadUpGraphic : vacuumHeadDownGraphic;
+
+                b.Draw(vacHead, drawPos + new Vector2(offsetX1, 0),
+                    null,
+                    Color.White,
+                    0, Vector2.Zero, 1, effectInv, 0);
+                b.Draw(vacuumBodyGraphic, drawPos + new Vector2(offsetX2, 0),
+                    null,
+                    Color.White,
+                    0, Vector2.Zero, 1, effectInv, 0);
             }
         }
     }

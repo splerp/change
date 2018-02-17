@@ -6,6 +6,7 @@ namespace MonoJam.GameObjects
 {
     public abstract class Enemy : GameObject, ICollisionObject, IHurtable
     {
+        public abstract int CoinsOnDeath { get; }
         public abstract Point Size { get; }
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
 
@@ -26,6 +27,7 @@ namespace MonoJam.GameObjects
             CurrentHealth = MaxHealth;
         }
 
+        public abstract void OnDeath();
         public abstract void Update();
 
         public void Damage(int amount)

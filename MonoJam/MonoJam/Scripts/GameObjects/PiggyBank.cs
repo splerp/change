@@ -11,6 +11,7 @@ namespace MonoJam.GameObjects
 
         public override Point Size => new Point(WIDTH, HEIGHT);
         public override int MaxHealth => 1000;
+        public override int CoinsOnDeath => 2000;
 
         public float yOffsetCount;
         public float yPos;
@@ -45,5 +46,7 @@ namespace MonoJam.GameObjects
             MoveBy(new Vector2(thrust, 0));
             SetY(yPos + yOffset);
         }
+
+        public override void OnDeath() { }
     }
 }
