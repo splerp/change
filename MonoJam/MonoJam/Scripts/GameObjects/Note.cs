@@ -24,6 +24,9 @@ namespace MonoJam.GameObjects
 
         public float downSpeed = 0.1f;
 
+        public int invulnCount = 100;
+        public int invulnCountdown;
+
         public int MaxHealth => 1;
         public int CurrentHealth { get; set; }
         public bool IsDead => CurrentHealth <= 0;
@@ -72,16 +75,20 @@ namespace MonoJam.GameObjects
                     //Caught.
                     InsideVacuum = true;
                 }
+
+                invulnCountdown = invulnCount;
             }
             else
             {
                 MoveBy(new Vector2(0, downSpeed));
             }
+
+            invulnCountdown--;
         }
 
         public void Damage(int amount)
         {
-            if(!InsideVacuum)
+            if(!InsideVacuum && invulnCountdown <= 0)
             {
                 CurrentHealth -= amount;
             }
