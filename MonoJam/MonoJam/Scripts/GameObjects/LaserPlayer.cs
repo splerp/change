@@ -46,8 +46,8 @@ namespace MonoJam.GameObjects
 
         public void Reset()
         {
-            SetX(0);
-            SetY(0);
+            SetX((MonoJam.PLAYABLE_AREA_WIDTH - Size.X) / 2);
+            SetY(MonoJam.PLAYABLE_AREA_HEIGHT / 2 - 20);
             speed = Vector2.Zero;
 
             laserCharge = 1f;

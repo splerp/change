@@ -31,7 +31,7 @@ namespace MonoJam.GameObjects
 
         public void Reset()
         {
-            SetX(0);
+            SetX((MonoJam.PLAYABLE_AREA_WIDTH - Size.X) / 2);
             SetY(MonoJam.PLAYABLE_AREA_HEIGHT + MonoJam.PADDLE_AREA_HEIGHT - HEIGHT);
             speed = Vector2.Zero;
         }
