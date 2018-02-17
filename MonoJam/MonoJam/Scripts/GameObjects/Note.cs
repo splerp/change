@@ -74,9 +74,8 @@ namespace MonoJam.GameObjects
                 {
                     //Caught.
                     InsideVacuum = true;
+                    invulnCountdown = invulnCount;
                 }
-
-                invulnCountdown = invulnCount;
             }
             else
             {
