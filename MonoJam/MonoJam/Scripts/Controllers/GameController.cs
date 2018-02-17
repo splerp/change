@@ -334,6 +334,17 @@ namespace MonoJam.Controllers
                 }
                 else if (enemies[i].ReadyToRemove)
                 {
+                    if (enemies[i] is VacuumEnemy)
+                    {
+                        for(int j = ((VacuumEnemy)enemies[i]).totalNotesHeld - 1; j >= 0; j--)
+                        {
+                            var note = ((VacuumEnemy)enemies[i]).NotesHeld[j];
+
+                            notes.Remove(note);
+                            notesMissed++;
+                        }
+                    }
+
                     DestroyEnemy(enemies[i]);
                 }
             }
