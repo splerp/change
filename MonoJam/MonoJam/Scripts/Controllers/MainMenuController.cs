@@ -31,15 +31,21 @@ namespace MonoJam.Controllers
             if (upPressed && !previousUp)
             {
                 selectedOption = Math.Max(0, (selectedOption - 1));
+
+                SoundController.Play(Sound.Bip1);
             }
             else if (downPressed && !previousDown)
             {
                 selectedOption = Math.Min(TOTAL_OPTIONS - 1, (selectedOption + 1));
+
+                SoundController.Play(Sound.Bip1);
             }
 
             if(selectPressed && !previousSelect)
             {
-                switch(selectedOption)
+                SoundController.Play(Sound.Bip2);
+
+                switch (selectedOption)
                 {
                     case 0:
                         gc.StartGame();
