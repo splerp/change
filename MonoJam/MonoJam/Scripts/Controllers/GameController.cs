@@ -127,6 +127,11 @@ namespace MonoJam.Controllers
             placedCoins = 0;
             notesMissed = 0;
 
+            ReadyToSpawnCoins = false;
+            ReadyToSpawnPiggyBank = false;
+            ReadyToSpawnVacuum = false;
+            ReadyToSpawnNote = false;
+       
             DestroyAllEnemies();
             DestroyAllCoins();
             DestroyAllMoney();
