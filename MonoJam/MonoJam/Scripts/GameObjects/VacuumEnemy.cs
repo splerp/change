@@ -116,5 +116,38 @@ namespace MonoJam.GameObjects
                 NotesHeld[i] = null;
             }
         }
+
+        public void RemoveNoteFromVacuum(Note note)
+        {
+            bool found = false;
+
+            for(int i = 0; i < totalNotesHeld; i++)
+            {
+                if(NotesHeld[i] == note)
+                {
+                    NotesHeld[i].CaughtByVacuum = null;
+                    NotesHeld[i].InsideVacuum = false;
+
+                    found = true;
+                }
+
+                if(found)
+                {
+                    if(i < totalNotesHeld - 1)
+                    {
+                        NotesHeld[i] = NotesHeld[i + 1];
+                    }
+                    else
+                    {
+                        NotesHeld[i] = null;
+                    }
+                }
+            }
+
+            if(found)
+            {
+                totalNotesHeld--;
+            }
+        }
     }
 }
