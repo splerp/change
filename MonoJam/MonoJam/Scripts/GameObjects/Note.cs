@@ -16,7 +16,7 @@ namespace MonoJam.GameObjects
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
 
         public bool InRangeForCatching => Position.Y < MonoJam.PLAYABLE_AREA_HEIGHT;
-        public bool ReadyToRemove => Position.Y > MonoJam.WINDOW_HEIGHT;
+        public bool ReadyToRemove => (Position.Y > MonoJam.WINDOW_HEIGHT) || (CaughtByPlayer && Position.Y > MonoJam.PLAYABLE_AREA_HEIGHT);
         public bool CaughtByPlayer;
 
         public VacuumEnemy CaughtByVacuum;
