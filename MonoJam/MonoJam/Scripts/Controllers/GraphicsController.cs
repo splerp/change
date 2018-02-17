@@ -424,7 +424,7 @@ namespace MonoJam.Controllers
                 Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
 
                 var startPos = gc.laserPlayer.LeftEyePos;
-                var newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
+                var newData = LineGraphic.CreateLineBoundsCheck(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
                 playerLasersLayer.SetData(newData);
 
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
@@ -434,7 +434,7 @@ namespace MonoJam.Controllers
                 batch.End();
 
                 startPos = gc.laserPlayer.RightEyePos;
-                newData = LineGraphic.CreateLine(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
+                newData = LineGraphic.CreateLineBoundsCheck(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
                 playerLasersLayer.SetData(newData);
 
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
