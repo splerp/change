@@ -58,6 +58,9 @@ namespace MonoJam.Controllers
         public int coinsToSpawn;
         public int notesMissed;
 
+        public bool coinsStartFalling;
+        public bool coinsStopFalling;
+
         public GameState currentState;
 
         public GameController(MonoJam mjIn)
@@ -88,7 +91,7 @@ namespace MonoJam.Controllers
             piggyBankSpawner = new Timer(10000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
-            vacuumSpawner = new Timer(2200);
+            vacuumSpawner = new Timer(5000);
             vacuumSpawner.Elapsed += (a, b) => ReadyToSpawnVacuum = true;
             
             noteSpawner = new Timer(1000);
@@ -138,6 +141,7 @@ namespace MonoJam.Controllers
             mj.grc.ResetCoinBuffers();
 
             laserPlayer.FiringLaser = false;
+            SoundController.StopAllLoops();
         }
 
         public void RestartGame()
@@ -152,6 +156,7 @@ namespace MonoJam.Controllers
             currentState = GameState.GameOver;
 
             laserPlayer.FiringLaser = false;
+            SoundController.StopAllLoops();
         }
 
         public void ToMainMenu()
@@ -205,6 +210,21 @@ namespace MonoJam.Controllers
             #region Create objects
             if (ReadyToSpawnCoins)
             {
+                if(coinsToSpawn > 0)
+                {
+                    SoundController.Play(Sound.CoinsDrop, true);
+
+                    coinsStartFalling = false;
+                    coinsStopFalling = true;
+                }
+                else
+                {
+                    SoundController.Stop(Sound.CoinsDrop);
+
+                    coinsStartFalling = true;
+                    coinsStopFalling = false;
+                }
+
                 for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
                 {
                     if (coinsToSpawn > 0)
@@ -340,7 +360,13 @@ namespace MonoJam.Controllers
                 {
                     if (enemies[i] is VacuumEnemy)
                     {
-                        for(int j = ((VacuumEnemy)enemies[i]).totalNotesHeld - 1; j >= 0; j--)
+                        // Only play sound once.
+                        if (((VacuumEnemy)enemies[i]).totalNotesHeld > 0)
+                        {
+                            SoundController.Play(Sound.FireFlare);
+                        }
+
+                        for (int j = ((VacuumEnemy)enemies[i]).totalNotesHeld - 1; j >= 0; j--)
                         {
                             var note = ((VacuumEnemy)enemies[i]).NotesHeld[j];
 
@@ -369,6 +395,13 @@ namespace MonoJam.Controllers
                     var newOnFire = new NoteOnFire(notes[i]);
                     notesOnFire.Add(newOnFire);
 
+                    if(notes[i].CaughtByVacuum != null)
+                    {
+                        notes[i].CaughtByVacuum.RemoveNoteFromVacuum(notes[i]);
+                    }
+                    
+                    SoundController.Play(Sound.FireFlare);
+
                     notes.RemoveAt(i);
 
                     notesMissed++;
@@ -384,10 +417,13 @@ namespace MonoJam.Controllers
                     if (notes[i].CaughtByPlayer)
                     {
                         AddCoins(PINK_NOTE_VALUE);
+                        SoundController.Play(Sound.Ding);
                     }
                     else
                     {
                         notesMissed++;
+
+                        SoundController.Play(Sound.FireFlare);
                     }
 
                     notes.RemoveAt(i);

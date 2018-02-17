@@ -4,6 +4,7 @@ using MonoJam.Controllers;
 using MonoJam.Utils;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MonoJam.GameObjects
 {
@@ -14,6 +15,9 @@ namespace MonoJam.GameObjects
 
         public const float LASER_FIRE_SHAKE_AMOUNT = 2f;
         public const int GRAPHIC_OUTER_WIDTH = 2;
+
+        public bool firstFrameLaserStart;
+        public bool firstFrameLaserEnd;
 
         private GameController gc;
         public ShakeController laserShake;
@@ -51,6 +55,23 @@ namespace MonoJam.GameObjects
             speed = Vector2.Zero;
 
             laserCharge = 1f;
+        }
+
+        private async void StartLaser()
+        {
+            SoundController.Stop(Sound.LaserStart);
+            SoundController.Stop(Sound.LaserLoop);
+            SoundController.Stop(Sound.LaserEnd);
+
+            SoundController.Play(Sound.LaserStart);
+
+            // Wait for LaserStart sound to play, then start looping.
+            await Task.Delay(Sound.LaserStart.data.Duration);
+
+            if (gc.currentState == GameController.GameState.Playing && Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                SoundController.Play(Sound.LaserLoop, true);
+            }
         }
 
         public void Update()
@@ -140,6 +161,27 @@ namespace MonoJam.GameObjects
                         }
                     }
                 }
+
+                if (firstFrameLaserStart)
+                {
+                    StartLaser();
+                }
+
+                firstFrameLaserStart = false;
+                firstFrameLaserEnd = true;
+            }
+            else
+            {
+                SoundController.Stop(Sound.LaserStart);
+                SoundController.Stop(Sound.LaserLoop);
+
+                if (firstFrameLaserEnd)
+                {
+                    SoundController.Play(Sound.LaserEnd);
+                }
+
+                firstFrameLaserStart = true;
+                firstFrameLaserEnd = false;
             }
 
             PrintPlayerInfo();
