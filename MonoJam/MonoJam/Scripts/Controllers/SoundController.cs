@@ -110,7 +110,7 @@ namespace MonoJam.Controllers
         public static Sound Boom2 = new Sound("Boom2");
         public static Sound Boom3 = new Sound("Boom3");
         public static Sound Boom4 = new Sound("Boom4");
-        public static Sound FireFlare = new Sound("FireFlare");
+        public static Sound FireFlare = new Sound("FireFlare", 0.7f);
         public static Sound Ding = new Sound("Ding", 0.5f);
         public static Sound Bip1 = new Sound("Bip1", 0.2f);
         public static Sound Bip2 = new Sound("Bip2", 0.2f);
