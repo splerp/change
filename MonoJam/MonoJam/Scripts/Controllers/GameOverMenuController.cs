@@ -17,7 +17,7 @@ namespace MonoJam.Controllers
         public bool previousDown;
         public bool previousSelect;
 
-        public int selectedOption = 0;
+        public int selectedOption;
 
         public GameOverMenuController(GameController gcIn)
         {
@@ -28,6 +28,8 @@ namespace MonoJam.Controllers
         {
             speed = 5;
             currentY = -MonoJam.WINDOW_HEIGHT;
+
+            selectedOption = 0;
         }
 
         public void Update()
