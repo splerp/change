@@ -171,103 +171,6 @@ namespace MonoJam.Controllers
                     gameOverMenu.Update();
                     break;
             }
-            
-            #region Remove objects
-            // Remove destroyed coins.
-            for (int i = coins.Count - 1; i >= 0; i--)
-            {
-                for(int m = 0; m < coins[i].fallBy; m++)
-                {
-                    coins[i].MoveBy(new Vector2(0, 1));
-
-                    if (coins[i].MoveAndCheckLand(coinData))
-                    {
-                        var pos = coins[i].CollisionRect.Location;
-                        int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
-
-                        coinData[arrayLoc] = 1;
-
-                        coins.RemoveAt(i);
-
-                        placedCoins++;
-                        break;
-                    }
-                }
-
-                // Move coin buffers if required.
-                if(placedCoins >= COINS_PER_LAYER)
-                {
-                    placedCoins = 0;
-                    CalculateCoinTrend();
-                    mj.grc.CreateNewCoinBuffer();
-                    ResetCoinData();
-                }
-            }
-
-            // Remove destroyed enemies.
-            for (int i = 0; i < totalEnemies; i++)
-            {
-                // A "killed" enemy. Show the death sequence.
-                if (enemies[i].IsDead)
-                {
-                    AddCoins(PIGGY_BANK_VALUE);
-
-                    var newCorpse = new EnemyCorpse(enemies[i]);
-                    corpses.Add(newCorpse);
-
-                    DestroyEnemy(enemies[i]);
-                }
-                else if (enemies[i].ReadyToRemove)
-                {
-                    DestroyEnemy(enemies[i]);
-                }
-            }
-
-            for (int i = corpses.Count - 1; i >= 0; i--)
-            {
-                if (corpses[i].ReadyToRemove)
-                {
-                    corpses.RemoveAt(i);
-                }
-            }
-
-            for (int i = notes.Count - 1; i >= 0; i--)
-            {
-                // Set on fire. No money earnt.
-                if (notes[i].IsDead)
-                {
-                    var newOnFire = new NoteOnFire(notes[i]);
-                    notesOnFire.Add(newOnFire);
-
-                    notes.RemoveAt(i);
-
-                    notesMissed++;
-                }
-                // Otherwise, if caught, give money.
-                else if (BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
-                {
-                    // TODO: Play "caught" animation
-                    AddCoins(PIGGY_BANK_VALUE);
-                    notes.RemoveAt(i);
-                }
-                // Otherwise, missed
-                else if (notes[i].ReadyToRemove)
-                {
-                    notes.RemoveAt(i);
-                    notesMissed++;
-                }
-            }
-
-            for (int i = notesOnFire.Count - 1; i >= 0; i--)
-            {
-                if (notesOnFire[i].ReadyToRemove)
-                {
-                    notesOnFire.RemoveAt(i);
-                }
-            }
-
-            // TODO: Explode the money
-            #endregion
 
             mainShaker.Update();
             
@@ -355,6 +258,109 @@ namespace MonoJam.Controllers
                 c.Update();
             }
             #endregion
+            
+            #region Remove objects
+            // Remove destroyed coins.
+            for (int i = coins.Count - 1; i >= 0; i--)
+            {
+                for (int m = 0; m < coins[i].fallBy; m++)
+                {
+                    coins[i].MoveBy(new Vector2(0, 1));
+
+                    if (coins[i].MoveAndCheckLand(coinData))
+                    {
+                        var pos = coins[i].CollisionRect.Location;
+                        int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
+
+                        coinData[arrayLoc] = 1;
+
+                        coins.RemoveAt(i);
+
+                        placedCoins++;
+                        break;
+                    }
+                }
+
+                // Move coin buffers if required.
+                if (placedCoins >= COINS_PER_LAYER)
+                {
+                    placedCoins = 0;
+                    CalculateCoinTrend();
+                    mj.grc.CreateNewCoinBuffer();
+                    ResetCoinData();
+                }
+            }
+
+            // Remove destroyed enemies.
+            for (int i = 0; i < totalEnemies; i++)
+            {
+                // A "killed" enemy. Show the death sequence.
+                if (enemies[i].IsDead)
+                {
+                    AddCoins(PIGGY_BANK_VALUE);
+
+                    var newCorpse = new EnemyCorpse(enemies[i]);
+                    corpses.Add(newCorpse);
+
+                    DestroyEnemy(enemies[i]);
+                }
+                else if (enemies[i].ReadyToRemove)
+                {
+                    DestroyEnemy(enemies[i]);
+                }
+            }
+
+            for (int i = corpses.Count - 1; i >= 0; i--)
+            {
+                if (corpses[i].ReadyToRemove)
+                {
+                    corpses.RemoveAt(i);
+                }
+            }
+
+            for (int i = notes.Count - 1; i >= 0; i--)
+            {
+                // Set on fire. No money earnt.
+                if (notes[i].IsDead)
+                {
+                    var newOnFire = new NoteOnFire(notes[i]);
+                    notesOnFire.Add(newOnFire);
+
+                    notes.RemoveAt(i);
+
+                    notesMissed++;
+                }
+                // Otherwise, if caught, give money.
+                else if (notes[i].InRangeForCatching && !notes[i].Caught && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
+                {
+                    notes[i].Caught = true;
+                }
+                // Otherwise, check if ready to remove
+                else if (notes[i].ReadyToRemove)
+                {
+                    if (notes[i].Caught)
+                    {
+                        AddCoins(PINK_NOTE_VALUE);
+                    }
+                    else
+                    {
+                        notesMissed++;
+                    }
+
+                    notes.RemoveAt(i);
+                }
+            }
+
+            for (int i = notesOnFire.Count - 1; i >= 0; i--)
+            {
+                if (notesOnFire[i].ReadyToRemove)
+                {
+                    notesOnFire.RemoveAt(i);
+                }
+            }
+
+            // TODO: Explode the money
+            #endregion
 
             if (corpses.Any())
             {
@@ -414,7 +420,7 @@ namespace MonoJam.Controllers
 
         public void SpawnNote()
         {
-            var newNote = new Note();
+            var newNote = new Note(this);
             notes.Add(newNote);
         }
 
