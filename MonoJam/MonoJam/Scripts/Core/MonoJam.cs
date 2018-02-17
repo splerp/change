@@ -21,6 +21,7 @@ namespace MonoJam
 
         public GraphicsController grc;
         GameController gc;
+        SoundController sc;
 
         public MonoJam()
         {
@@ -45,9 +46,11 @@ namespace MonoJam
         protected override void Initialize()
         {
             gc = new GameController(this);
+            sc = new SoundController(this);
             grc = new GraphicsController(gc, GraphicsDevice);
 
             grc.LoadContent(Content);
+            Sound.LoadContent(Content);
             gc.Init();
 
             base.Initialize();

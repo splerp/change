@@ -289,3 +289,105 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/VacuumBody
 
+#begin Audio/Oinks
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Oinks
+
+#begin Audio/LaserStart
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/LaserStart
+
+#begin Audio/LaserLoop
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/LaserLoop
+
+#begin Audio/LaserEnd
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/LaserEnd
+
+#begin Audio/PigDeath
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/PigDeath
+
+#begin Audio/Boom1
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Boom1
+
+#begin Audio/Boom2
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Boom2
+
+#begin Audio/Boom3
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Boom3
+
+#begin Audio/Boom4
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Boom4
+
+#begin Audio/FireFlare
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/FireFlare
+
+#begin Audio/Ding
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Ding
+
+#begin Audio/Bip1
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Bip1
+
+#begin Audio/Bip2
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Bip2
+
+#begin Audio/CoinsDrop
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/CoinsDrop
+
+#begin Audio/Slurp2
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Slurp2
+
+#begin Audio/Slurp3
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Slurp3
+
+#begin Audio/Slurp1
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/Slurp1
+

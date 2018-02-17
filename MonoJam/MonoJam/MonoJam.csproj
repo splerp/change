@@ -44,6 +44,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Scripts\Controllers\SoundController.cs" />
     <Compile Include="Scripts\Controllers\GameOverMenuController.cs" />
     <Compile Include="Scripts\GameObjects\PaddlePlayer.cs" />
     <Compile Include="Scripts\GameObjects\VacuumEnemy.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Scripts\GameObjects\Enemy.cs" />
     <Compile Include="Scripts\Controllers\MainMenuController.cs" />
     <Compile Include="Scripts\GameObjects\Note.cs" />
+    <Compile Include="Scripts\Utils\Extensions.cs" />
     <Compile Include="Scripts\Utils\Perlin.cs" />
     <Compile Include="Scripts\GameObjects\LaserPlayer.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
