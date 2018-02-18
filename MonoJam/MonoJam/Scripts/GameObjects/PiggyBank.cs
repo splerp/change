@@ -10,7 +10,7 @@ namespace MonoJam.GameObjects
         public const int HEIGHT = 12;
 
         public override Point Size => new Point(WIDTH, HEIGHT);
-        public override int MaxHealth => 10000;
+        public override int MaxHealth => 18000;
         public override int CoinsOnDeath => 5000;
 
         public float yOffsetCount;
