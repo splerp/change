@@ -55,6 +55,7 @@ namespace MonoJam.Controllers
         public Int64 placedCoins;
         public Int64 currentCoins;
         public Int64 coinsToSpawn;
+        public Int64 bestCoinScore;
         public int notesMissed;
 
         public bool coinsStartFalling;
@@ -153,6 +154,8 @@ namespace MonoJam.Controllers
         {
             gameOverMenu.Drop();
             currentState = GameState.GameOver;
+
+            bestCoinScore = Math.Max(bestCoinScore, currentCoins);
 
             laserPlayer.FiringLaser = false;
             SoundController.StopAllLoops();

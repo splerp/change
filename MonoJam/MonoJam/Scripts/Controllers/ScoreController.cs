@@ -32,12 +32,12 @@ namespace MonoJam.Controllers
             return offset;
         }
 
-        public static string StringFor(float num)
+        public static string StringFor(double num)
         {
             return num.ToString("0.00");
         }
 
-        public static int LengthOf(float num)
+        public static int LengthOf(double num)
         {
             int length = 4;
             foreach(var c in StringFor(num))

@@ -47,7 +47,9 @@ namespace MonoJam.Controllers
         private Texture2D hudPlayerHealth;
         private Texture2D backgroundGraphic;
         private Texture2D titleGraphic;
+        private Texture2D titleBorderGraphic;
         private Texture2D titleCursor;
+        private Texture2D bestScoreBackground;
         private Texture2D gameOverBackground;
         private Texture2D paddleBackground;
         private Texture2D scoreBackground;
@@ -62,6 +64,7 @@ namespace MonoJam.Controllers
 
         private Point gameOverOffset = new Point(0, -6);
         private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
+        private Point bestScoreBackgroundOffset;
 
         private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
         {
@@ -131,12 +134,16 @@ namespace MonoJam.Controllers
 
             backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
+            titleBorderGraphic = Content.Load<Texture2D>("Graphics/TitleBorder");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
             gameOverBackground = Content.Load<Texture2D>("Graphics/GameOver");
             paddleBackground = Content.Load<Texture2D>("Graphics/PaddleTrack");
             paddleGraphicFront = Content.Load<Texture2D>("Graphics/PaddleFront");
             paddleGraphicBack = Content.Load<Texture2D>("Graphics/PaddleBack");
             scoreBackground = Content.Load<Texture2D>("Graphics/ScoreBackground");
+            bestScoreBackground = Content.Load<Texture2D>("Graphics/BestScoreBackground");
+
+            bestScoreBackgroundOffset = new Point(MonoJam.WINDOW_WIDTH - 2, 2);
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -223,7 +230,7 @@ namespace MonoJam.Controllers
             switch(gc.currentState)
             {
                 case GameController.GameState.Title:
-                    DrawMenu();
+                    DrawMainMenu();
                     break;
                 case GameController.GameState.Playing:
                     DrawGame();
@@ -235,7 +242,7 @@ namespace MonoJam.Controllers
             }
         }
 
-        public void DrawMenu()
+        public void DrawMainMenu()
         {
             Vector2 coinPos = Vector2.Zero;
             switch (gc.mainMenu.selectedOption)
@@ -255,6 +262,17 @@ namespace MonoJam.Controllers
             {
                 batch.Draw(titleGraphic, Vector2.Zero, Color.White);
                 batch.Draw(titleCursor, coinPos, Color.White);
+
+                var totalScoreLength = 11 + ScoreController.LengthOf(gc.bestCoinScore / 100d);
+                var diff = bestScoreBackgroundOffset.X - totalScoreLength;
+
+                if(gc.bestCoinScore > 0)
+                {
+                    batch.Draw(bestScoreBackground, bestScoreBackgroundOffset.ToVector2() - new Vector2(totalScoreLength, 0), Color.White);
+                    DrawScore(batch, bestScoreBackgroundOffset.ToVector2() + new Vector2(11, 2) - new Vector2(totalScoreLength, 0), gc.bestCoinScore / 100d);
+                }
+
+                batch.Draw(titleBorderGraphic, Vector2.Zero, Color.White);
             }
             batch.End();
         }
@@ -465,7 +483,8 @@ namespace MonoJam.Controllers
                     new Vector2(healthPercentage, 1),
                     SpriteEffects.None, 0);
 
-                DrawScore(batch, Vector2.Zero);
+                batch.Draw(scoreBackground, Vector2.Zero, Color.White);
+                DrawScore(batch, Vector2.Zero, gc.currentCoins / 100d);
             }
             batch.End();
 
@@ -506,14 +525,11 @@ namespace MonoJam.Controllers
             }
         }
 
-        public void DrawScore(SpriteBatch b, Vector2 drawPos)
+        public void DrawScore(SpriteBatch b, Vector2 drawPos, double score)
         {
-            var currentScore = gc.currentCoins;
-            var scoreStr = ScoreController.StringFor(currentScore / 100f);
+            var scoreStr = ScoreController.StringFor(score);
 
-            b.Draw(scoreBackground, drawPos, Color.White);
-
-            for (int i =0; i < scoreStr.Length; i++)
+            for (int i = 0; i < scoreStr.Length; i++)
             {
                 Vector2 offset = drawPos + new Vector2(ScoreController.OffsetOf(scoreStr, i), 1);
                 b.Draw(fontGraphics[scoreStr[i]], offset, Color.White);
