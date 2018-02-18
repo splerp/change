@@ -39,15 +39,13 @@ namespace MonoJam.Controllers
         public byte[] coinData;
 
         public static Random random;
-        public bool ReadyToSpawnCoins { get; set; }
         public bool ReadyToSpawnPiggyBank { get; set; }
         public bool ReadyToSpawnVacuum { get; set; }
         public bool ReadyToSpawnNote { get; set; }
 
         public int[] currentLayerTrend;
         public int totalTrendCount;
-
-        Timer coinSpawner;
+        
         Timer piggyBankSpawner;
         Timer vacuumSpawner;
         Timer noteSpawner;
@@ -88,16 +86,13 @@ namespace MonoJam.Controllers
             notesOnFire = new List<NoteOnFire>();
             random = new Random();
 
-            coinSpawner = new Timer(1);
-            coinSpawner.Elapsed += (a, b) => ReadyToSpawnCoins = true;
-
-            piggyBankSpawner = new Timer(10000);
+            piggyBankSpawner = new Timer(100000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
-            vacuumSpawner = new Timer(5000);
+            vacuumSpawner = new Timer(50000);
             vacuumSpawner.Elapsed += (a, b) => ReadyToSpawnVacuum = true;
             
-            noteSpawner = new Timer(1000);
+            noteSpawner = new Timer(500);
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
             currentLayerTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
@@ -108,7 +103,6 @@ namespace MonoJam.Controllers
         public void StartGame()
         {
             piggyBankSpawner.Start();
-            coinSpawner.Start();
             vacuumSpawner.Start();
             noteSpawner.Start();
 
@@ -124,7 +118,6 @@ namespace MonoJam.Controllers
         public void ResetContent()
         {
             piggyBankSpawner.Stop();
-            coinSpawner.Stop();
             vacuumSpawner.Stop();
             noteSpawner.Stop();
 
@@ -132,8 +125,7 @@ namespace MonoJam.Controllers
             coinsToSpawn = 0;
             placedCoins = 0;
             notesMissed = 0;
-
-            ReadyToSpawnCoins = false;
+            
             ReadyToSpawnPiggyBank = false;
             ReadyToSpawnVacuum = false;
             ReadyToSpawnNote = false;
@@ -232,43 +224,38 @@ namespace MonoJam.Controllers
         public void UpdatePlay()
         {
             #region Create objects
-            if (ReadyToSpawnCoins)
+            if (coinsToSpawn > 0)
             {
-                if(coinsToSpawn > 0)
-                {
-                    SoundController.Play(Sound.CoinsDrop, true);
+                SoundController.Play(Sound.CoinsDrop, true);
 
-                    coinsStartFalling = false;
-                    coinsStopFalling = true;
-                }
-                else
-                {
-                    SoundController.Stop(Sound.CoinsDrop);
+                coinsStartFalling = false;
+                coinsStopFalling = true;
+            }
+            else
+            {
+                SoundController.Stop(Sound.CoinsDrop);
 
-                    coinsStartFalling = true;
-                    coinsStopFalling = false;
-                }
+                coinsStartFalling = true;
+                coinsStopFalling = false;
+            }
 
-                for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
+            for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
+            {
+                if (coinsToSpawn > 0)
                 {
-                    if (coinsToSpawn > 0)
+                    coinsToSpawn--;
+
+                    var randomNum = random.Next(0, totalTrendCount);
+                    int j = 0;
+                    while (randomNum > 0)
                     {
-                        coinsToSpawn--;
-
-                        var randomNum = random.Next(0, totalTrendCount);
-                        int j = 0;
-                        while(randomNum > 0)
-                        {
-                            randomNum -= currentLayerTrend[j];
-                            j++;
-                        }
-                        
-                        var newCoin = new Coin();
-                        newCoin.SetX(j);
-                        coins.Add(newCoin);
-
-                        ReadyToSpawnCoins = false;
+                        randomNum -= currentLayerTrend[j];
+                        j++;
                     }
+
+                    var newCoin = new Coin();
+                    newCoin.SetX(j);
+                    coins.Add(newCoin);
                 }
             }
 
