@@ -67,6 +67,16 @@ namespace MonoJam.Controllers
                 }
             }
         }
+
+        public static void ToggleMute()
+        {
+            SoundEffect.MasterVolume = SoundEffect.MasterVolume == 0 ? 1 : 0;
+        }
+
+        public static bool Muted()
+        {
+            return SoundEffect.MasterVolume == 0;
+        }
     }
 
     public class Sound

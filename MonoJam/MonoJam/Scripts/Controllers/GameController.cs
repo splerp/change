@@ -62,6 +62,7 @@ namespace MonoJam.Controllers
         public bool coinsStopFalling;
 
         public bool previousEsc;
+        public bool previousMute;
 
         public GameState currentState;
 
@@ -200,10 +201,9 @@ namespace MonoJam.Controllers
             }
 
             var escapeDown = Keyboard.GetState().IsKeyDown(Keys.Escape);
-
             if (escapeDown && !previousEsc)
             {
-                if(currentState == GameState.Title)
+                if (currentState == GameState.Title)
                 {
                     Exit();
                 }
@@ -212,8 +212,16 @@ namespace MonoJam.Controllers
                     ToMainMenu();
                 }
             }
-
             previousEsc = escapeDown;
+
+            var muteDown = Keyboard.GetState().IsKeyDown(Keys.M);
+            if (muteDown && !previousMute)
+            {
+                SoundController.ToggleMute();
+            }
+            previousMute = muteDown;
+
+            
 
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine($"COINS Best: {bestCoinScore}"); 

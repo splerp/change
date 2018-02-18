@@ -53,6 +53,7 @@ namespace MonoJam.Controllers
         private Texture2D gameOverBackground;
         private Texture2D paddleBackground;
         private Texture2D scoreBackground;
+        private Texture2D mutedIcon;
         private Dictionary<char, Texture2D> fontGraphics;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
@@ -64,6 +65,7 @@ namespace MonoJam.Controllers
 
         private Point gameOverOffset = new Point(0, -6);
         private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
+        private Point mutedIconOffset;
         private Point bestScoreBackgroundOffset;
 
         private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
@@ -142,8 +144,10 @@ namespace MonoJam.Controllers
             paddleGraphicBack = Content.Load<Texture2D>("Graphics/PaddleBack");
             scoreBackground = Content.Load<Texture2D>("Graphics/ScoreBackground");
             bestScoreBackground = Content.Load<Texture2D>("Graphics/BestScoreBackground");
+            mutedIcon = Content.Load<Texture2D>("Graphics/MutedIcon");
 
             bestScoreBackgroundOffset = new Point(MonoJam.WINDOW_WIDTH - 2, 2);
+            mutedIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height - 3);
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -270,6 +274,11 @@ namespace MonoJam.Controllers
                 {
                     batch.Draw(bestScoreBackground, bestScoreBackgroundOffset.ToVector2() - new Vector2(totalScoreLength, 0), Color.White);
                     DrawScore(batch, bestScoreBackgroundOffset.ToVector2() + new Vector2(11, 2) - new Vector2(totalScoreLength, 0), gc.bestCoinScore / 100d);
+                }
+
+                if (SoundController.Muted())
+                {
+                    batch.Draw(mutedIcon, mutedIconOffset.ToVector2(), Color.White);
                 }
 
                 batch.Draw(titleBorderGraphic, Vector2.Zero, Color.White);
