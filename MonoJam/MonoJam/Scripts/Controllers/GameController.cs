@@ -513,7 +513,7 @@ namespace MonoJam.Controllers
                     notesMissed++;
                 }
                 // Otherwise, if caught, give money.
-                else if (notes[i].InRangeForCatching && !notes[i].CaughtByPlayer && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
+                else if (currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled) && notes[i].InRangeForCatching && !notes[i].CaughtByPlayer && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
                 {
                     notes[i].CaughtByPlayer = true;
                 }
