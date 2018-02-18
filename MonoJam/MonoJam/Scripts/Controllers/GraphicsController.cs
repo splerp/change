@@ -45,6 +45,7 @@ namespace MonoJam.Controllers
         private Texture2D hudBackground;
         private Texture2D hudLaserCharge;
         private Texture2D hudPlayerHealth;
+        private Texture2D hudTimeRemaining;
         private Texture2D backgroundGraphic;
         private Texture2D titleGraphic;
         private Texture2D titleBorderGraphic;
@@ -165,7 +166,8 @@ namespace MonoJam.Controllers
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
             hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
             hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
-            hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 3);
+            hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
+            hudTimeRemaining = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 1);
 
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
@@ -229,9 +231,9 @@ namespace MonoJam.Controllers
                 .Concat(Enumerable.Repeat(Color.DarkGreen, hudPlayerHealth.Width * 1))
                 .ToArray();
             hudPlayerHealth.SetData(hpBar);
-        }
 
-        public static int scoreLength = 32;
+            hudTimeRemaining.SetData(Enumerable.Repeat(Color.Blue, hudTimeRemaining.Width * hudTimeRemaining.Height).ToArray());
+        }
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
         private void UpdateCoinBGData()
@@ -494,12 +496,35 @@ namespace MonoJam.Controllers
                 batch.End();
             }
 
+            var scoreLength = ScoreController.LengthOf(gc.currentCoins / 100d);
             var totalArea = MonoJam.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (MonoJam.PLAYABLE_AREA_WIDTH - scoreLength) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
 
             // Draw hud.
-            var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea;
-            var healthPercentage = (gc.currentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.currentStage.MaxNotesMissed * totalAreaRatio;
+            var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;
+
+            var healthPercentage = (gc.currentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.currentStage.MaxNotesMissed;
+            healthPercentage = (int)(healthPercentage * totalArea) / (float)totalArea * totalAreaRatio;
+
+            var totalDuration = gc.currentStage.RequiredTimePassed.TotalMilliseconds;
+            var currentDuration = (DateTime.Now - gc.currentStage.startTime).TotalMilliseconds;
+
+            float progressPercentage;
+
+            if (gc.currentStage.HasFlag(Stage.StageFlags.CompleteOnTimePassed))
+            {
+                progressPercentage = (float)(currentDuration / totalDuration);
+            }
+            else if (gc.currentStage.HasFlag(Stage.StageFlags.CompleteOnCollectCoins))
+            {
+                progressPercentage = gc.currentStage.coinsCollected / (float)gc.currentStage.RequiredCoins;
+            }
+            else
+            {
+                progressPercentage = 1f;
+            }
+
+            progressPercentage = (int)(progressPercentage * totalArea) / (float)totalArea * totalAreaRatio;
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
@@ -514,11 +539,19 @@ namespace MonoJam.Controllers
                     SpriteEffects.None, 0);
 
                 batch.Draw(hudPlayerHealth,
-                    new Vector2(scoreLength, 0),
+                    new Vector2(scoreLength, 1),
                     null,
                     Color.White,
                     0, Vector2.Zero,
                     new Vector2(healthPercentage, 1),
+                    SpriteEffects.None, 0);
+
+                batch.Draw(hudTimeRemaining,
+                    new Vector2(scoreLength, 0),
+                    null,
+                    Color.White,
+                    0, Vector2.Zero,
+                    new Vector2(progressPercentage, 1),
                     SpriteEffects.None, 0);
 
                 batch.Draw(scoreBackground, Vector2.Zero, Color.White);
