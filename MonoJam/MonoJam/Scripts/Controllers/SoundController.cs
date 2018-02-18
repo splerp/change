@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 using MonoJam.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,22 @@ namespace MonoJam.Controllers
     public class SoundController
     {
         public const int MAX_INSTANCES_PER_SOUND = 3;
+        public const float SONG_MASTER_VOLUME = 0.5f;
+        public const float SOUND_EFFECT_MASTER_VOLUME = 1f;
+
+        Song song;
 
         private MonoJam mj;
 
         public SoundController(MonoJam mjIn)
         {
             mj = mjIn;
+
+            song = mj.Content.Load<Song>("Audio/Song");
+
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(song);
+            MediaPlayer.Volume = SONG_MASTER_VOLUME;
         }
 
         public static void Play(Sound s, bool loop = false)
@@ -70,12 +81,22 @@ namespace MonoJam.Controllers
 
         public static void ToggleMute()
         {
-            SoundEffect.MasterVolume = SoundEffect.MasterVolume == 0 ? 1 : 0;
+            SoundEffect.MasterVolume = SoundEffect.MasterVolume == 0 ? SOUND_EFFECT_MASTER_VOLUME : 0;
+        }
+
+        public static void ToggleMuteMusic()
+        {
+            MediaPlayer.Volume = MediaPlayer.Volume == 0 ? SONG_MASTER_VOLUME : 0;
         }
 
         public static bool Muted()
         {
             return SoundEffect.MasterVolume == 0;
+        }
+
+        public static bool MusicMuted()
+        {
+            return MediaPlayer.Volume == 0;
         }
     }
 

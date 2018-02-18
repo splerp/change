@@ -62,6 +62,7 @@ namespace MonoJam.Controllers
 
         public bool previousEsc;
         public bool previousMute;
+        public bool previousMuteMusic;
         public bool previousSkip;
 
         public bool skipTutorial;
@@ -290,13 +291,20 @@ namespace MonoJam.Controllers
             }
             previousEsc = escapeDown;
 
-            var muteDown = Keyboard.GetState().IsKeyDown(Keys.M);
+            var muteDown = Keyboard.GetState().IsKeyDown(Keys.N);
             if (muteDown && !previousMute)
             {
                 SoundController.ToggleMute();
             }
             previousMute = muteDown;
 
+            var muteSongDown = Keyboard.GetState().IsKeyDown(Keys.M);
+            if (muteSongDown && !previousMuteMusic)
+            {
+                SoundController.ToggleMuteMusic();
+            }
+            previousMuteMusic = muteSongDown;
+            
             var skipDown = Keyboard.GetState().IsKeyDown(Keys.T);
             if (skipDown && !previousSkip)
             {
