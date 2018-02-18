@@ -213,7 +213,7 @@ namespace MonoJam.GameObjects
 
         private void PrintPlayerInfo()
         {
-            Console.WriteLine($"PLAYER. pos: {Position.ToPoint().ToString()}; speed: {speed.ToPoint().ToString()}");
+            //Console.WriteLine($"PLAYER. pos: {Position.ToPoint().ToString()}; speed: {speed.ToPoint().ToString()}");
         }
     }
 }

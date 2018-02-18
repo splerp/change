@@ -25,8 +25,7 @@ namespace MonoJam.Utils
 
             tmin = Math.Max(tmin, Math.Min(ty1, ty2));
             tmax = Math.Min(tmax, Math.Max(ty1, ty2));
-
-            Console.WriteLine($"tmin {tmin}; tmax {tmax}");
+            
             return tmax >= tmin;
         }
 

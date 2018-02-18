@@ -5,7 +5,6 @@ using MonoJam.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace MonoJam.Controllers
@@ -251,9 +250,9 @@ namespace MonoJam.Controllers
         public void Update()
         {
             // Always keep console window clear.
-            Console.Clear();
-
-            switch(currentState)
+            //Console.Clear();
+            
+            switch (currentState)
             {
                 case GameState.Title:
                     mainMenu.Update();
@@ -312,10 +311,10 @@ namespace MonoJam.Controllers
             }
             previousSkip = skipDown;
             
-            Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
-            Console.WriteLine($"COINS Best: {bestCoinScore}"); 
-            Console.WriteLine("Corpses: " + corpses.Count);
-            Console.WriteLine("Current state: " + currentState);
+            //Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
+            //Console.WriteLine($"COINS Best: {bestCoinScore}"); 
+            //Console.WriteLine("Corpses: " + corpses.Count);
+            //Console.WriteLine("Current state: " + currentState);
         }
 
         public void UpdatePlay()
