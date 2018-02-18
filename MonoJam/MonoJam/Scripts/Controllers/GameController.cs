@@ -5,13 +5,14 @@ using MonoJam.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace MonoJam.Controllers
 {
     public class GameController
     {
-        public enum GameState { Title, Playing, GameOver }
+        public enum GameState { Title, Playing, BetweenStages, GameOver }
 
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
@@ -26,6 +27,7 @@ namespace MonoJam.Controllers
         public ShakeController mainShaker;
         public MainMenuController mainMenu;
         public GameOverMenuController gameOverMenu;
+        public StageCompleteMenuController stageCompleteMenu;
 
         public LaserPlayer laserPlayer;
         public PaddlePlayer paddlePlayer;
@@ -73,6 +75,7 @@ namespace MonoJam.Controllers
         {
             mainMenu = new MainMenuController(this);
             gameOverMenu = new GameOverMenuController(this);
+            stageCompleteMenu = new StageCompleteMenuController(this);
 
             laserPlayer = new LaserPlayer(this);
             paddlePlayer = new PaddlePlayer(this);
@@ -112,11 +115,26 @@ namespace MonoJam.Controllers
             CalculateCoinTrend();
             
             currentState = GameState.Playing;
-            currentStage = Stage.AllStages.First();
+
+            if(skipTutorial)
+            {
+                currentStage = Stage.NonTutorialStages.First();
+            }
+            else
+            {
+                currentStage = Stage.AllStages.First();
+            }
+            
             SetStageVariables();
         }
 
         public void ToNextStage()
+        {
+            currentState = GameState.BetweenStages;
+            stageCompleteMenu.Drop();
+        }
+
+        public void ToNextStageFinish()
         {
             var newStage = Stage.NextStage(currentStage);
 
@@ -124,6 +142,7 @@ namespace MonoJam.Controllers
             {
                 currentStage = newStage;
                 SetStageVariables();
+                currentState = GameState.Playing;
             }
             else
             {
@@ -134,6 +153,8 @@ namespace MonoJam.Controllers
         public void SetStageVariables()
         {
             currentStage.Restart();
+
+            notesMissed = 0;
 
             piggyBankSpawner.Stop();
             if (currentStage.HasFlag(Stage.StageFlags.PigsEnabled))
@@ -226,6 +247,15 @@ namespace MonoJam.Controllers
                     break;
                 case GameState.Playing:
                     UpdatePlay();
+                    break;
+                case GameState.BetweenStages:
+                    UpdatePlay();
+                    stageCompleteMenu.Update();
+
+                    if(stageCompleteMenu.AnimationComplete)
+                    {
+                        ToNextStageFinish();
+                    }
                     break;
                 case GameState.GameOver:
                     gameOverMenu.Update();
@@ -510,7 +540,7 @@ namespace MonoJam.Controllers
                 ToGameOver();
             }
 
-            if(currentStage.IsComplete())
+            if(currentState == GameState.Playing && currentStage.IsComplete())
             {
                 ToNextStage();
             }

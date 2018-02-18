@@ -29,9 +29,14 @@ namespace MonoJam
         public Int64 coinsCollected;
         public DateTime startTime;
 
-        private Stage()
+        private Stage(bool isTutorial = false)
         {
             AllStages.Add(this);
+
+            if(!isTutorial)
+            {
+                NonTutorialStages.Add(this);
+            }
 
             Restart();
         }
@@ -86,15 +91,9 @@ namespace MonoJam
 
         #region All stages
         public static List<Stage> AllStages = new List<Stage>();
+        public static List<Stage> NonTutorialStages = new List<Stage>();
 
-        public static Stage Spacer1 = new Stage()
-        {
-            AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5 },
-            Flags = StageFlags.PaddlePlayerEnabled | StageFlags.CompleteOnTimePassed,
-            RequiredTimePassed = TimeSpan.FromSeconds(1),
-        };
-
-        public static Stage Tutorial1 = new Stage()
+        public static Stage Tutorial1 = new Stage(true)
         {
             AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5 },
             Flags = StageFlags.PaddlePlayerEnabled | StageFlags.NotesEnabled | StageFlags.CompleteOnCollectCoins,
@@ -103,13 +102,31 @@ namespace MonoJam
             MaxNotesMissed = 5
         };
 
-        public static Stage Tutorial2 = new Stage()
+        public static Stage Tutorial2 = new Stage(true)
         {
             AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5 },
-            Flags = StageFlags.PaddlePlayerEnabled | StageFlags.NotesEnabled | StageFlags.CompleteOnCollectCoins,
-            RequiredCoins = 1500,
-            NoteSpawnTime = 1,
-            VacuumSpawnTime = 0,
+            Flags = StageFlags.LaserPlayerEnabled | StageFlags.VacuumsEnabled | StageFlags.PigsEnabled | StageFlags.CompleteOnTimePassed,
+            VacuumSpawnTime = 1500,
+            RequiredTimePassed = TimeSpan.FromSeconds(35)
+        };
+
+        public static Stage Level1 = new Stage()
+        {
+            AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5, Note.NoteType.Blue10, Note.NoteType.Red20, Note.NoteType.Yellow50 },
+            Flags = StageFlags.PaddlePlayerEnabled | StageFlags.NotesEnabled | StageFlags.PigsEnabled | StageFlags.LaserPlayerEnabled | StageFlags.VacuumsEnabled | StageFlags.CompleteOnTimePassed,
+            RequiredTimePassed = TimeSpan.FromSeconds(20),
+            NoteSpawnTime = 3000,
+            VacuumSpawnTime = 5000,
+            MaxNotesMissed = 5
+        };
+
+        public static Stage Level2 = new Stage()
+        {
+            AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5, Note.NoteType.Blue10, Note.NoteType.Red20, Note.NoteType.Yellow50 },
+            Flags = StageFlags.PaddlePlayerEnabled | StageFlags.NotesEnabled | StageFlags.PigsEnabled | StageFlags.LaserPlayerEnabled | StageFlags.VacuumsEnabled | StageFlags.CompleteOnTimePassed,
+            RequiredTimePassed = TimeSpan.FromSeconds(20),
+            NoteSpawnTime = 1000,
+            VacuumSpawnTime = 3000,
             MaxNotesMissed = 5
         };
         #endregion

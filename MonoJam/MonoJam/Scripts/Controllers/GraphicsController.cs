@@ -51,6 +51,7 @@ namespace MonoJam.Controllers
         private Texture2D titleCursor;
         private Texture2D bestScoreBackground;
         private Texture2D gameOverBackground;
+        private Texture2D stageOverBackground;
         private Texture2D paddleBackground;
         private Texture2D scoreBackground;
         private Texture2D mutedIcon;
@@ -64,6 +65,7 @@ namespace MonoJam.Controllers
         private const int vaultFloorHeight = 20;
 
         private Point gameOverOffset = new Point(0, -6);
+        private Point stageCompleteOffset = new Point(0, -6);
         private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
         private Point mutedIconOffset;
         private Point bestScoreBackgroundOffset;
@@ -139,6 +141,7 @@ namespace MonoJam.Controllers
             titleBorderGraphic = Content.Load<Texture2D>("Graphics/TitleBorder");
             titleCursor = Content.Load<Texture2D>("Graphics/RoundCoin");
             gameOverBackground = Content.Load<Texture2D>("Graphics/GameOver");
+            stageOverBackground = Content.Load<Texture2D>("Graphics/StageOver");
             paddleBackground = Content.Load<Texture2D>("Graphics/PaddleTrack");
             paddleGraphicFront = Content.Load<Texture2D>("Graphics/PaddleFront");
             paddleGraphicBack = Content.Load<Texture2D>("Graphics/PaddleBack");
@@ -237,6 +240,9 @@ namespace MonoJam.Controllers
                     DrawMainMenu();
                     break;
                 case GameController.GameState.Playing:
+                    DrawGame();
+                    break;
+                case GameController.GameState.BetweenStages:
                     DrawGame();
                     break;
                 case GameController.GameState.GameOver:
@@ -541,6 +547,12 @@ namespace MonoJam.Controllers
                 }
                 batch.End();
             }
+
+            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            {
+                batch.Draw(stageOverBackground, new Vector2(0, (int)gc.stageCompleteMenu.currentY) + stageCompleteOffset.ToVector2(), Color.White);
+            }
+            batch.End();
         }
 
         public void DrawScore(SpriteBatch b, Vector2 drawPos, double score)
