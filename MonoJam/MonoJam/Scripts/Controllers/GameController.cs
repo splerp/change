@@ -62,6 +62,9 @@ namespace MonoJam.Controllers
 
         public bool previousEsc;
         public bool previousMute;
+        public bool previousSkip;
+
+        public bool skipTutorial;
 
         public GameState currentState;
 
@@ -285,8 +288,13 @@ namespace MonoJam.Controllers
             }
             previousMute = muteDown;
 
+            var skipDown = Keyboard.GetState().IsKeyDown(Keys.T);
+            if (skipDown && !previousSkip)
+            {
+                skipTutorial = !skipTutorial;
+            }
+            previousSkip = skipDown;
             
-
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             Console.WriteLine($"COINS Best: {bestCoinScore}"); 
             Console.WriteLine("Corpses: " + corpses.Count);

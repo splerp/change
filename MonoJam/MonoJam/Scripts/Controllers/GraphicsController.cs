@@ -55,6 +55,7 @@ namespace MonoJam.Controllers
         private Texture2D paddleBackground;
         private Texture2D scoreBackground;
         private Texture2D mutedIcon;
+        private Texture2D noTutorialIcon;
         private Dictionary<char, Texture2D> fontGraphics;
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
@@ -68,6 +69,7 @@ namespace MonoJam.Controllers
         private Point stageCompleteOffset = new Point(0, -6);
         private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
         private Point mutedIconOffset;
+        private Point noTutorialIconOffset;
         private Point bestScoreBackgroundOffset;
 
         private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
@@ -148,9 +150,11 @@ namespace MonoJam.Controllers
             scoreBackground = Content.Load<Texture2D>("Graphics/ScoreBackground");
             bestScoreBackground = Content.Load<Texture2D>("Graphics/BestScoreBackground");
             mutedIcon = Content.Load<Texture2D>("Graphics/MutedIcon");
+            noTutorialIcon = Content.Load<Texture2D>("Graphics/NoTutorialIcon");
 
             bestScoreBackgroundOffset = new Point(MonoJam.WINDOW_WIDTH - 2, 2);
             mutedIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height - 3);
+            noTutorialIconOffset = new Point(MonoJam.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, MonoJam.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
 
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
@@ -286,7 +290,11 @@ namespace MonoJam.Controllers
                 {
                     batch.Draw(mutedIcon, mutedIconOffset.ToVector2(), Color.White);
                 }
-
+                if (gc.skipTutorial)
+                {
+                    batch.Draw(noTutorialIcon, noTutorialIconOffset.ToVector2(), Color.White);
+                }
+                
                 batch.Draw(titleBorderGraphic, Vector2.Zero, Color.White);
             }
             batch.End();
