@@ -135,6 +135,8 @@ namespace MonoJam.Controllers
         {
             currentState = GameState.BetweenStages;
             stageCompleteMenu.Drop();
+
+            RemoveStageContent();
         }
 
         public void ToNextStageFinish()
@@ -186,24 +188,31 @@ namespace MonoJam.Controllers
             }
         }
 
-        public void ResetContent()
+        public void RemoveStageContent()
         {
             piggyBankSpawner.Stop();
             vacuumSpawner.Stop();
             noteSpawner.Stop();
 
+            notesMissed = 0;
+
+            DestroyAllEnemies();
+            DestroyAllMoney();
+        }
+
+        public void ResetContent()
+        {
+            RemoveStageContent();
+            DestroyAllCoins();
+
             currentCoins = 0;
             coinsToSpawn = 0;
             placedCoins = 0;
-            notesMissed = 0;
 
             ReadyToSpawnPiggyBank = false;
             ReadyToSpawnVacuum = false;
             ReadyToSpawnNote = false;
        
-            DestroyAllEnemies();
-            DestroyAllCoins();
-            DestroyAllMoney();
             mj.grc.ResetCoinBuffers();
 
             laserPlayer.FiringLaser = false;
