@@ -36,8 +36,8 @@ namespace MonoJam.Utils
             var boxPos = box.Center.ToVector2();
             var half = box.Size.ToVector2() / new Vector2(2);
 
-            double scaleX = 1.0 / delta.X;
-            double scaleY = 1.0 / delta.Y;
+            double scaleX = delta.X == 0 ? 0 : 1.0 / delta.X;
+            double scaleY = delta.Y == 0 ? 0 : 1.0 / delta.Y;
             double signX = Math.Sign(scaleX);
             double signY = Math.Sign(scaleY);
             double nearTimeX = (boxPos.X - signX * half.X - pos.X) * scaleX;
