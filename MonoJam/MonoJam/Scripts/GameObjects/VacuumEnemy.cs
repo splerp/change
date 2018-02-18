@@ -13,7 +13,7 @@ namespace MonoJam.GameObjects
 
         public override Point Size => new Point(WIDTH + WIDTH_HEAD, HEIGHT);
         public override int MaxHealth => 1000;
-        public override int CoinsOnDeath => 0;
+        public override int CoinsOnDeath => 125;
         public int MouthPosX => CollisionRect.X + (direction > 0 ? WIDTH + 2 : 1);
         public int CentreBodyX => CollisionRect.X + (direction > 0 ? 0 : WIDTH_HEAD);
 
