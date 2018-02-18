@@ -425,13 +425,16 @@ namespace MonoJam.Controllers
                 }
             }
             batch.End();
-            
+
             // Draw back of paddle.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            if (gc.currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
-                batch.Draw(paddleGraphicBack, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+                {
+                    batch.Draw(paddleGraphicBack, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                }
+                batch.End();
             }
-            batch.End();
 
             // Draw money.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
@@ -459,18 +462,21 @@ namespace MonoJam.Controllers
             batch.End();
 
             // Draw front of paddle.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+            if (gc.currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
-                batch.Draw(paddleGraphicFront, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
+                {
+                    batch.Draw(paddleGraphicFront, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                }
+                batch.End();
             }
-            batch.End();
 
             var totalArea = MonoJam.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (MonoJam.PLAYABLE_AREA_WIDTH - scoreLength) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
 
             // Draw hud.
             var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea;
-            var healthPercentage = (GameController.MAX_NOTES_MISSED - gc.notesMissed) / (float)GameController.MAX_NOTES_MISSED * totalAreaRatio;
+            var healthPercentage = (gc.currentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.currentStage.MaxNotesMissed * totalAreaRatio;
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
@@ -498,12 +504,15 @@ namespace MonoJam.Controllers
             batch.End();
 
             // Draw laser player (over HUD).
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
+            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
-                batch.Draw(playerGraphic, (gc.laserPlayer.CollisionRect.Location + laserPlayerOffset).ToVector2(), Color.White);
+                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
+                {
+                    batch.Draw(playerGraphic, (gc.laserPlayer.CollisionRect.Location + laserPlayerOffset).ToVector2(), Color.White);
+                }
+                batch.End();
             }
-            batch.End();
-
+            
             var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
 
             // TODO: Combine both sets of data, add to texture2D, draw once.

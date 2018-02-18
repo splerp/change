@@ -68,7 +68,7 @@ namespace MonoJam.GameObjects
             // Wait for LaserStart sound to play, then start looping.
             await Task.Delay(Sound.LaserStart.data.Duration);
 
-            if (gc.currentState == GameController.GameState.Playing && Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.currentState == GameController.GameState.Playing && Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 SoundController.Play(Sound.LaserLoop, true);
             }
@@ -83,7 +83,7 @@ namespace MonoJam.GameObjects
             var lineToMouse = (mousePos - CollisionRect.Center);
 
             laserShake.Update();
-
+            
             var laserButtonDown = ms.LeftButton == ButtonState.Pressed;
 
             if(laserButtonDown)

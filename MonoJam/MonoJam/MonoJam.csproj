@@ -47,6 +47,7 @@
     <Compile Include="Scripts\Controllers\ScoreController.cs" />
     <Compile Include="Scripts\Controllers\SoundController.cs" />
     <Compile Include="Scripts\Controllers\GameOverMenuController.cs" />
+    <Compile Include="Scripts\Stage.cs" />
     <Compile Include="Scripts\GameObjects\PaddlePlayer.cs" />
     <Compile Include="Scripts\GameObjects\VacuumEnemy.cs" />
     <Compile Include="Scripts\GameObjects\PiggyBank.cs" />

@@ -15,13 +15,12 @@ namespace MonoJam.Controllers
 
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
-        public const int MAX_NOTES_MISSED = 20;
-        
         public const int COINS_SPAWNED_PER_FRAME = 8;
-
         public const float SMALL_SHAKE_AMOUNT = 1f;
 
         public int totalEnemies;
+
+        public Stage currentStage;
 
         private MonoJam mj;
         public ShakeController mainShaker;
@@ -86,10 +85,10 @@ namespace MonoJam.Controllers
             notesOnFire = new List<NoteOnFire>();
             random = new Random();
 
-            piggyBankSpawner = new Timer(100000);
+            piggyBankSpawner = new Timer(10000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
-            vacuumSpawner = new Timer(50000);
+            vacuumSpawner = new Timer(5000);
             vacuumSpawner.Elapsed += (a, b) => ReadyToSpawnVacuum = true;
             
             noteSpawner = new Timer(500);
@@ -111,8 +110,56 @@ namespace MonoJam.Controllers
             laserPlayer.Reset();
             paddlePlayer.Reset();
             CalculateCoinTrend();
-
+            
             currentState = GameState.Playing;
+            currentStage = Stage.AllStages.First();
+            SetStageVariables();
+        }
+
+        public void ToNextStage()
+        {
+            var newStage = Stage.NextStage(currentStage);
+
+            if (newStage != null)
+            {
+                currentStage = newStage;
+                SetStageVariables();
+            }
+            else
+            {
+                ToGameOver();
+            }
+        }
+
+        public void SetStageVariables()
+        {
+            currentStage.Restart();
+
+            piggyBankSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.PigsEnabled))
+            {
+                piggyBankSpawner.Start();
+            }
+
+            vacuumSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.VacuumsEnabled))
+            {
+                vacuumSpawner.Interval = currentStage.VacuumSpawnTime;
+                vacuumSpawner.Start();
+            }
+
+            noteSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled))
+            {
+                noteSpawner.Interval = currentStage.NoteSpawnTime;
+                noteSpawner.Start();
+            }
+
+            if (!currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            {
+                laserPlayer.FiringLaser = false;
+                SoundController.StopAllLoops();
+            }
         }
 
         public void ResetContent()
@@ -125,7 +172,7 @@ namespace MonoJam.Controllers
             coinsToSpawn = 0;
             placedCoins = 0;
             notesMissed = 0;
-            
+
             ReadyToSpawnPiggyBank = false;
             ReadyToSpawnVacuum = false;
             ReadyToSpawnNote = false;
@@ -186,11 +233,6 @@ namespace MonoJam.Controllers
             }
 
             mainShaker.Update();
-            
-            if(currentState != GameState.GameOver && notesMissed >= MAX_NOTES_MISSED)
-            {
-                ToGameOver();
-            }
 
             var escapeDown = Keyboard.GetState().IsKeyDown(Keys.Escape);
             if (escapeDown && !previousEsc)
@@ -282,8 +324,15 @@ namespace MonoJam.Controllers
             #endregion
 
             #region Update objects
-            laserPlayer.Update();
-            paddlePlayer.Update();
+
+            if (currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            {
+                laserPlayer.Update();
+            }
+            if (currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            {
+                paddlePlayer.Update();
+            }
 
             // Update enemies.
             for (int i = 0; i < totalEnemies; i++)
@@ -301,7 +350,6 @@ namespace MonoJam.Controllers
                         vEnemy.TryCollect(note);
                     }
                 }
-                
             }
 
             for (int i = 0; i < notes.Count; i++)
@@ -456,6 +504,16 @@ namespace MonoJam.Controllers
             {
                 //mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
             }
+
+            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= currentStage.MaxNotesMissed)
+            {
+                ToGameOver();
+            }
+
+            if(currentStage.IsComplete())
+            {
+                ToNextStage();
+            }
         }
 
         public void CalculateCoinTrend()
@@ -474,6 +532,7 @@ namespace MonoJam.Controllers
         {
             currentCoins += coins;
             coinsToSpawn += coins;
+            currentStage.coinsCollected += coins;
         }
 
         public void ResetCoinData()
@@ -524,25 +583,22 @@ namespace MonoJam.Controllers
 
         public void SpawnNote()
         {
-            
-
-            var totalWeights = Note.noteSpawnWeights.Sum(a => a.Value);
+            var totalWeights = Note.noteSpawnWeights
+                .Where(a => currentStage.AvailableNotes.Contains(a.Key))
+                .Sum(a => a.Value);
             var idx = random.Next(0, totalWeights);
 
             int i = 0;
             Note.NoteType selectedType = Note.NoteType.None;
-            Note.NoteType[] allEnumValues = (Note.NoteType[])Enum.GetValues(typeof(Note.NoteType));
-            while(idx > 0)
+            while (idx > 0)
             {
-                idx -= Note.noteSpawnWeights[allEnumValues[i]];
+                idx -= Note.noteSpawnWeights[currentStage.AvailableNotes[i]];
 
-                selectedType = allEnumValues[i];
+                selectedType = currentStage.AvailableNotes[i];
                 i++;
             }
-
-            var newNote = new Note(this, selectedType);
-
-            notes.Add(newNote);
+            
+            notes.Add(new Note(this, selectedType));
         }
 
         public void DestroyAllEnemies()
