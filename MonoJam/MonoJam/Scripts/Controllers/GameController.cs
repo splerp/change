@@ -61,6 +61,8 @@ namespace MonoJam.Controllers
         public bool coinsStartFalling;
         public bool coinsStopFalling;
 
+        public bool previousEsc;
+
         public GameState currentState;
 
         public GameController(MonoJam mjIn)
@@ -197,12 +199,24 @@ namespace MonoJam.Controllers
                 ToGameOver();
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            var escapeDown = Keyboard.GetState().IsKeyDown(Keys.Escape);
+
+            if (escapeDown && !previousEsc)
             {
-                ToMainMenu();
+                if(currentState == GameState.Title)
+                {
+                    Exit();
+                }
+                else
+                {
+                    ToMainMenu();
+                }
             }
 
+            previousEsc = escapeDown;
+
             Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
+            Console.WriteLine($"COINS Best: {bestCoinScore}"); 
             Console.WriteLine("Corpses: " + corpses.Count);
             Console.WriteLine("Current state: " + currentState);
         }
