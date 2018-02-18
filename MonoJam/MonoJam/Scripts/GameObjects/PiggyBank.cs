@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Media;
 using MonoJam.Controllers;
 using System;
 
@@ -11,8 +10,8 @@ namespace MonoJam.GameObjects
         public const int HEIGHT = 12;
 
         public override Point Size => new Point(WIDTH, HEIGHT);
-        public override int MaxHealth => 1000;
-        public override int CoinsOnDeath => 2000;
+        public override int MaxHealth => 10000;
+        public override int CoinsOnDeath => 5000;
 
         public float yOffsetCount;
         public float yPos;

@@ -91,7 +91,7 @@ namespace MonoJam.Controllers
             notesOnFire = new List<NoteOnFire>();
             random = new Random();
 
-            piggyBankSpawner = new Timer(10000);
+            piggyBankSpawner = new Timer(30000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
             vacuumSpawner = new Timer(5000);

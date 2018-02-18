@@ -107,7 +107,7 @@ namespace MonoJam
             AvailableNotes = new Note.NoteType[] { Note.NoteType.Pink5 },
             Flags = StageFlags.LaserPlayerEnabled | StageFlags.VacuumsEnabled | StageFlags.PigsEnabled | StageFlags.CompleteOnTimePassed,
             VacuumSpawnTime = 1500,
-            RequiredTimePassed = TimeSpan.FromSeconds(35)
+            RequiredTimePassed = TimeSpan.FromSeconds(45)
         };
 
         public static Stage Level1 = new Stage()

@@ -24,7 +24,7 @@ namespace MonoJam.Controllers
             currentY = -MonoJam.WINDOW_HEIGHT;
 
             gravity = 0.2f;
-            fallFor = 100;
+            fallFor = 140;
         }
 
         public bool AnimationComplete => fallFor <= 0 && currentY < -MonoJam.WINDOW_HEIGHT;
