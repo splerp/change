@@ -294,6 +294,7 @@ namespace MonoJam.Controllers
             if (muteDown && !previousMute)
             {
                 SoundController.ToggleMute();
+                SoundController.Play(Sound.Bip2);
             }
             previousMute = muteDown;
 
@@ -301,6 +302,7 @@ namespace MonoJam.Controllers
             if (muteSongDown && !previousMuteMusic)
             {
                 SoundController.ToggleMuteMusic();
+                SoundController.Play(Sound.Bip2);
             }
             previousMuteMusic = muteSongDown;
             
@@ -308,6 +310,7 @@ namespace MonoJam.Controllers
             if (skipDown && !previousSkip)
             {
                 skipTutorial = !skipTutorial;
+                SoundController.Play(Sound.Bip2);
             }
             previousSkip = skipDown;
             
