@@ -59,11 +59,6 @@ namespace MonoJam.Controllers
         public bool coinsStartFalling;
         public bool coinsStopFalling;
 
-        public bool previousEsc;
-        public bool previousMute;
-        public bool previousMuteMusic;
-        public bool previousSkip;
-
         public bool skipTutorial;
 
         public GameState currentState;
@@ -249,77 +244,79 @@ namespace MonoJam.Controllers
 
         public void Update()
         {
-            // Always keep console window clear.
-            //Console.Clear();
-            
             switch (currentState)
             {
                 case GameState.Title:
-                    mainMenu.Update();
+                    UpdateMainMenu();
                     break;
                 case GameState.Playing:
                     UpdatePlay();
                     break;
                 case GameState.BetweenStages:
                     UpdatePlay();
-                    stageCompleteMenu.Update();
-
-                    if(stageCompleteMenu.AnimationComplete)
-                    {
-                        ToNextStageFinish();
-                    }
+                    UpdateBetweenStages();
                     break;
                 case GameState.GameOver:
-                    gameOverMenu.Update();
+                    UpdateGameOverMenu();
                     break;
             }
 
             mainShaker.Update();
-
-            var escapeDown = Keyboard.GetState().IsKeyDown(Keys.Escape);
-            if (escapeDown && !previousEsc)
-            {
-                if (currentState == GameState.Title)
-                {
-                    Exit();
-                }
-                else
-                {
-                    ToMainMenu();
-                }
-            }
-            previousEsc = escapeDown;
-
-            var muteDown = Keyboard.GetState().IsKeyDown(Keys.N);
-            if (muteDown && !previousMute)
+            
+            if (Control.MuteSound.IsJustPressed)
             {
                 SoundController.ToggleMute();
                 SoundController.Play(Sound.Bip2);
             }
-            previousMute = muteDown;
-
-            var muteSongDown = Keyboard.GetState().IsKeyDown(Keys.M);
-            if (muteSongDown && !previousMuteMusic)
+            
+            if (Control.MuteMusic.IsJustPressed)
             {
                 SoundController.ToggleMuteMusic();
                 SoundController.Play(Sound.Bip2);
             }
-            previousMuteMusic = muteSongDown;
-            
-            var skipDown = Keyboard.GetState().IsKeyDown(Keys.T);
-            if (skipDown && !previousSkip)
+
+            if (Control.SkipTutorial.IsJustPressed)
             {
                 skipTutorial = !skipTutorial;
                 SoundController.Play(Sound.Bip2);
             }
-            previousSkip = skipDown;
-            
+
             //Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
             //Console.WriteLine($"COINS Best: {bestCoinScore}"); 
             //Console.WriteLine("Corpses: " + corpses.Count);
             //Console.WriteLine("Current state: " + currentState);
         }
 
+        public void UpdateMainMenu()
+        {
+            mainMenu.Update();
+
+            if (Control.Return.IsJustPressed)
+            {
+                Exit();
+            }
+        }
+
+        public void UpdateGameOverMenu()
+        {
+            gameOverMenu.Update();
+
+            if (Control.Return.IsJustPressed)
+            {
+                ToMainMenu();
+            }
+        }
+
+        public void UpdateBetweenStages()
+        {
+            stageCompleteMenu.Update();
+
+            if (stageCompleteMenu.AnimationComplete)
+            {
+                ToNextStageFinish();
+            }
+        }
+        
         public void UpdatePlay()
         {
             #region Create objects
@@ -557,11 +554,6 @@ namespace MonoJam.Controllers
             // TODO: Explode the money
             #endregion
 
-            if (corpses.Any())
-            {
-                //mainShaker.currentAmplitude = SMALL_SHAKE_AMOUNT;
-            }
-
             if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= currentStage.MaxNotesMissed)
             {
                 ToGameOver();
@@ -570,6 +562,11 @@ namespace MonoJam.Controllers
             if(currentState == GameState.Playing && currentStage.IsComplete())
             {
                 ToNextStage();
+            }
+
+            if (Control.Return.IsJustPressed)
+            {
+                ToMainMenu();
             }
         }
 

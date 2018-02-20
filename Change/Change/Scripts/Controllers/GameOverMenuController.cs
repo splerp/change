@@ -34,26 +34,20 @@ namespace MonoJam.Controllers
 
         public void Update()
         {
-            var state = Keyboard.GetState();
-
-            bool upPressed = state.IsKeyDown(Keys.W) || state.IsKeyDown(Keys.Up);
-            bool downPressed = state.IsKeyDown(Keys.S) || state.IsKeyDown(Keys.Down);
-            bool selectPressed = state.IsKeyDown(Keys.Space) || state.IsKeyDown(Keys.Enter);
-
-            if (upPressed && !previousUp)
+            if (Control.MoveUp.IsJustPressed)
             {
                 selectedOption = Math.Max(0, (selectedOption - 1));
 
                 SoundController.Play(Sound.Bip1);
             }
-            else if (downPressed && !previousDown)
+            else if (Control.MoveDown.IsJustPressed)
             {
                 selectedOption = Math.Min(TOTAL_OPTIONS - 1, (selectedOption + 1));
 
                 SoundController.Play(Sound.Bip1);
             }
 
-            if(selectPressed && !previousSelect)
+            if(Control.Confirm.IsJustPressed)
             {
                 SoundController.Play(Sound.Bip2);
 
@@ -67,10 +61,6 @@ namespace MonoJam.Controllers
                         break;
                 }
             }
-
-            previousUp = upPressed;
-            previousDown = downPressed;
-            previousSelect = selectPressed;
 
             speed += gravity;
             currentY += speed;

@@ -68,7 +68,7 @@ namespace MonoJam.GameObjects
             // Wait for LaserStart sound to play, then start looping.
             await Task.Delay(Sound.LaserStart.data.Duration);
 
-            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.currentState == GameController.GameState.Playing && Mouse.GetState().LeftButton == ButtonState.Pressed)
+            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.currentState == GameController.GameState.Playing && Control.Attack.IsDown)
             {
                 SoundController.Play(Sound.LaserLoop, true);
             }
@@ -76,15 +76,12 @@ namespace MonoJam.GameObjects
 
         public void Update()
         {
-            var kbs = Keyboard.GetState();
-            var ms = Mouse.GetState();
-
-            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+            var mousePos = InputController.CurrentMousePosition;
             var lineToMouse = (mousePos - CollisionRect.Center);
 
             laserShake.Update();
             
-            var laserButtonDown = ms.LeftButton == ButtonState.Pressed;
+            var laserButtonDown = Control.Attack.IsDown;
 
             if(laserButtonDown)
             {
@@ -106,7 +103,7 @@ namespace MonoJam.GameObjects
             FiringLaser = laserButtonDown && laserCharge > 0;
             
             Vector2 inputVector = Vector2.Zero;
-            if (kbs.IsKeyDown(Keys.W))
+            if (Control.MoveUp.IsDown)
             {
                 var angle = Math.Atan2(lineToMouse.Y, lineToMouse.X);
 
@@ -115,7 +112,7 @@ namespace MonoJam.GameObjects
                     inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
                 }
             }
-            else if (kbs.IsKeyDown(Keys.S))
+            else if (Control.MoveDown.IsDown)
             {
                 var angle = Math.Atan2(-lineToMouse.Y, -lineToMouse.X);
 

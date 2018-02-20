@@ -31,8 +31,6 @@ namespace MonoJam.Controllers
 
         public void Update()
         {
-            var state = Keyboard.GetState();
-
             speed += gravity;
             currentY += speed;
 

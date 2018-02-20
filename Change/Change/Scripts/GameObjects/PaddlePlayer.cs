@@ -38,9 +38,8 @@ namespace MonoJam.GameObjects
 
         public void Update()
         {
-            var kbs = Keyboard.GetState();
-
-            Vector2 inputVector = new Vector2(kbs.IsKeyDown(Keys.A) ? -1 : kbs.IsKeyDown(Keys.D) ? 1 : 0, 0) * thrust;
+            int input = Control.MoveLeft.IsDown ? -1 : Control.MoveRight.IsDown ? 1 : 0;
+            Vector2 inputVector = new Vector2(input, 0) * thrust;
 
             speed += inputVector;
             speed *= friction;

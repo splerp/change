@@ -569,7 +569,7 @@ namespace MonoJam.Controllers
                 batch.End();
             }
             
-            var mousePos = Mouse.GetState().Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+            var mousePos = InputController.CurrentMousePosition;
 
             // TODO: Combine both sets of data, add to texture2D, draw once.
             if (gc.laserPlayer.FiringLaser)
