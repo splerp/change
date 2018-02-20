@@ -26,7 +26,10 @@ namespace MonoJam.Controllers
             int offset = 4;
             for(int i = 0; i < index; i++)
             {
-                offset += charLengths[numStr[i]];
+                if(charLengths.ContainsKey(numStr[i]))
+                {
+                    offset += charLengths[numStr[i]];
+                }
             }
 
             return offset;
@@ -42,7 +45,10 @@ namespace MonoJam.Controllers
             int length = 4;
             foreach(var c in StringFor(num))
             {
-                length += charLengths[c];
+                if (charLengths.ContainsKey(c))
+                {
+                    length += charLengths[c];
+                }
             }
 
             return length;

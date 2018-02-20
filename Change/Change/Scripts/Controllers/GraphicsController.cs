@@ -611,8 +611,12 @@ namespace MonoJam.Controllers
 
             for (int i = 0; i < scoreStr.Length; i++)
             {
-                Vector2 offset = drawPos + new Vector2(ScoreController.OffsetOf(scoreStr, i), 1);
-                b.Draw(fontGraphics[scoreStr[i]], offset, Color.White);
+                // Only attempt to draw character if supported.
+                if(fontGraphics.ContainsKey(scoreStr[i]))
+                {
+                    Vector2 offset = drawPos + new Vector2(ScoreController.OffsetOf(scoreStr, i), 1);
+                    b.Draw(fontGraphics[scoreStr[i]], offset, Color.White);
+                }
             }
         }
 
