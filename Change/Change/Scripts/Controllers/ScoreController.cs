@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace MonoJam.Controllers
 {
@@ -37,7 +38,7 @@ namespace MonoJam.Controllers
 
         public static string StringFor(double num)
         {
-            return num.ToString("0.00");
+            return num.ToString("0.00", CultureInfo.InvariantCulture);
         }
 
         public static int LengthOf(double num)
