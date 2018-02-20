@@ -9,9 +9,9 @@ namespace MonoJam.Controllers
         public enum ControlType { Mouse, Keyboard, GamePad }
         public enum MouseButtons { Left, Right }
 
-        private static KeyboardState currentKeyboard;
-        private static GamePadState currentGamepad;
-        private static MouseState currentMouse;
+        public static KeyboardState currentKeyboard;
+        public static GamePadState currentGamepad;
+        public static MouseState currentMouse;
 
         public static Point CurrentMousePosition => currentMouse.Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
 
@@ -23,12 +23,7 @@ namespace MonoJam.Controllers
 
             foreach (var control in Control.PlayerControls)
             {
-                switch (control.ControlType)
-                {
-                    case ControlType.Keyboard: control.UpdateControl(currentKeyboard); break;
-                    case ControlType.GamePad: control.UpdateControl(currentGamepad); break;
-                    case ControlType.Mouse: control.UpdateControl(currentMouse); break;
-                }
+                control.UpdateControl();
             }
         }
     }
@@ -39,20 +34,38 @@ namespace MonoJam.Controllers
 
         public InputController.ControlType ControlType { get; private set; }
 
-        public Keys[] KeyCodes { get; private set; }
-        public Buttons[] ButtonCodes { get; private set; }
-        public InputController.MouseButtons[] MouseButtonCodes { get; private set; }
+        public Keys[] KeyCodes { get; private set; } = new Keys[0];
+        public Buttons[] ButtonCodes { get; private set; } = new Buttons[0];
+        public InputController.MouseButtons[] MouseButtonCodes { get; private set; } = new InputController.MouseButtons[0];
         public bool IsDown { get; private set; }
         public bool IsJustPressed { get; private set; }
 
         #region Update methods
-        public void UpdateControl(KeyboardState state)
+        public void UpdateControl()
         {
             bool isPressed = false;
 
             foreach (var k in KeyCodes)
             {
-                if (state.IsKeyDown(k))
+                if (InputController.currentKeyboard.IsKeyDown(k))
+                {
+                    isPressed = true;
+                }
+            }
+            foreach (var k in ButtonCodes)
+            {
+                if (InputController.currentGamepad.IsButtonDown(k))
+                {
+                    isPressed = true;
+                }
+            }
+            foreach (var k in MouseButtonCodes)
+            {
+                if (k == InputController.MouseButtons.Left && InputController.currentMouse.LeftButton == ButtonState.Pressed)
+                {
+                    isPressed = true;
+                }
+                else if (k == InputController.MouseButtons.Right && InputController.currentMouse.RightButton == ButtonState.Pressed)
                 {
                     isPressed = true;
                 }
@@ -60,52 +73,6 @@ namespace MonoJam.Controllers
 
             IsDown = isPressed;
             IsJustPressed = isPressed && !_prevDownState;
-
-            _prevDownState = IsDown;
-        }
-
-        public void UpdateControl(GamePadState state)
-        {
-            bool isPressed = false;
-
-            foreach (var k in ButtonCodes)
-            {
-                if (state.IsButtonDown(k))
-                {
-                    isPressed = true;
-                }
-            }
-
-            IsDown = isPressed;
-            if (!_prevDownState)
-            {
-                IsJustPressed = isPressed;
-            }
-
-            _prevDownState = IsDown;
-        }
-
-        public void UpdateControl(MouseState state)
-        {
-            bool isPressed = false;
-
-            foreach (var k in MouseButtonCodes)
-            {
-                if (k == InputController.MouseButtons.Left && state.LeftButton == ButtonState.Pressed)
-                {
-                    isPressed = true;
-                }
-                else if (k == InputController.MouseButtons.Right && state.RightButton == ButtonState.Pressed)
-                {
-                    isPressed = true;
-                }
-            }
-
-            IsDown = isPressed;
-            if (!_prevDownState)
-            {
-                IsJustPressed = isPressed;
-            }
 
             _prevDownState = IsDown;
         }
@@ -143,6 +110,7 @@ namespace MonoJam.Controllers
         public static Control MoveDown = new Control(Keys.S, Keys.Down);
         public static Control MoveLeft = new Control(Keys.A, Keys.Left);
         public static Control MoveRight = new Control(Keys.D, Keys.Right);
+
         public static Control Attack = new Control(InputController.MouseButtons.Left);
         public static Control Confirm = new Control(Keys.Space, Keys.Enter);
         public static Control Return = new Control(Keys.Escape);
