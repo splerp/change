@@ -54,10 +54,10 @@ namespace MonoJam.Controllers
                 switch (selectedOption)
                 {
                     case 0:
-                        gc.RestartGame();
+                        gc.SetState(GameController.GameState.Playing);
                         break;
                     case 1:
-                        gc.ToMainMenu();
+                        gc.SetState(GameController.GameState.Title);
                         break;
                 }
             }

@@ -42,7 +42,7 @@ namespace MonoJam.Controllers
                 switch (selectedOption)
                 {
                     case 0:
-                        gc.StartGame();
+                        gc.SetState(GameController.GameState.Playing);
                         break;
                     case 1:
                         // Nothing.
