@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoJam.GameObjects;
 using MonoJam.Utils;
 using System;
@@ -11,12 +10,13 @@ namespace MonoJam.Controllers
 {
     public class GameController
     {
-        public enum GameState { Title, Playing, BetweenStages, GameOver }
-
         public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
         public const int COINS_SPAWNED_PER_FRAME = 8;
         public const float SMALL_SHAKE_AMOUNT = 1f;
+
+        public delegate void StartEnter();
+        public delegate void StageUpdate();
 
         public int totalEnemies;
 
@@ -67,6 +67,46 @@ namespace MonoJam.Controllers
         {
             mj = mjIn;
             mainShaker = new ShakeController();
+
+            #region State definitions
+            GameState.Title = new GameState("title")
+            {
+                OnEnterState = ResetContent,
+                OnStateUpdate = UpdateMainMenu
+            };
+
+            GameState.Playing = new GameState("playing")
+            {
+                OnEnterState = () =>
+                {
+                    ResetContent();
+                    OnStartPlaying();
+                },
+                OnStateUpdate = UpdatePlay
+            };
+            GameState.BetweenStages = new GameState("betweenstages")
+            {
+                OnEnterState = () => { },
+                OnStateUpdate = () =>
+                {
+                    UpdatePlay();
+                    UpdateBetweenStages();
+                }
+            };
+            GameState.GameOver = new GameState("gameover")
+            {
+                OnEnterState = () =>
+                {
+                    gameOverMenu.Drop();
+
+                    bestCoinScore = Math.Max(bestCoinScore, currentCoins);
+
+                    laserPlayer.FiringLaser = false;
+                    SoundController.StopAllLoops();
+                },
+                OnStateUpdate = UpdateGameOverMenu
+            };
+            #endregion
         }
 
         public void Init()
@@ -102,29 +142,13 @@ namespace MonoJam.Controllers
 
         public void SetState(GameState newState)
         {
-            currentState = newState;
-
-            switch (newState)
+            // HACK: sepcial case for between stages -> playing, don't reset content.
+            if (!(newState == GameState.Playing && currentState == GameState.BetweenStages))
             {
-                case GameState.Title:
-                    ResetContent();
-                    break;
-                case GameState.Playing:
-                    ResetContent();
-                    OnStartPlaying();
-                    break;
-                case GameState.BetweenStages:
-
-                    break;
-                case GameState.GameOver:
-                    gameOverMenu.Drop();
-
-                    bestCoinScore = Math.Max(bestCoinScore, currentCoins);
-
-                    laserPlayer.FiringLaser = false;
-                    SoundController.StopAllLoops();
-                    break;
+                newState.OnEnterState();
             }
+
+            currentState = newState;
         }
 
         public void OnStartPlaying()
@@ -138,8 +162,6 @@ namespace MonoJam.Controllers
             laserPlayer.Reset();
             paddlePlayer.Reset();
             CalculateCoinTrend();
-
-            currentState = GameState.Playing;
 
             if (skipTutorial)
             {
@@ -155,7 +177,7 @@ namespace MonoJam.Controllers
 
         public void ToNextStage()
         {
-            currentState = GameState.BetweenStages;
+            SetState(GameState.BetweenStages);
             stageCompleteMenu.Drop();
 
             RemoveStageContent();
@@ -169,7 +191,7 @@ namespace MonoJam.Controllers
             {
                 currentStage = newStage;
                 SetStageVariables();
-                currentState = GameState.Playing;
+                SetState(GameState.Playing);
             }
             else
             {
@@ -248,22 +270,7 @@ namespace MonoJam.Controllers
 
         public void Update()
         {
-            switch (currentState)
-            {
-                case GameState.Title:
-                    UpdateMainMenu();
-                    break;
-                case GameState.Playing:
-                    UpdatePlay();
-                    break;
-                case GameState.BetweenStages:
-                    UpdatePlay();
-                    UpdateBetweenStages();
-                    break;
-                case GameState.GameOver:
-                    UpdateGameOverMenu();
-                    break;
-            }
+            currentState.OnStateUpdate();
 
             mainShaker.Update();
 

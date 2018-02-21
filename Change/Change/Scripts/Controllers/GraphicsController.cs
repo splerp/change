@@ -15,6 +15,8 @@ namespace MonoJam.Controllers
         public const int MAX_VAULT_BG_LAYERS_VISIBLE = 10;
         public const int MAX_VAULT_BG_LAYERS = 13;
 
+        public delegate void DrawState();
+
         private GameController gc;
         private GraphicsDevice graphicsDevice;
         private SpriteBatch batch;
@@ -233,6 +235,12 @@ namespace MonoJam.Controllers
             hudPlayerHealth.SetData(hpBar);
 
             hudTimeRemaining.SetData(Enumerable.Repeat(Color.Blue, hudTimeRemaining.Width * hudTimeRemaining.Height).ToArray());
+
+            // Set draw functions on game states.
+            GameState.Title.Draw = new DrawState(this.DrawMainMenu);
+            GameState.Playing.Draw = DrawGame;
+            GameState.BetweenStages.Draw = DrawGame;
+            GameState.GameOver.Draw = DrawGameOverMenu;
         }
 
         // TODO: Just set the relevant pixels when required, not a full refresh.
@@ -244,22 +252,7 @@ namespace MonoJam.Controllers
 
         public void Draw()
         {
-            switch(gc.currentState)
-            {
-                case GameController.GameState.Title:
-                    DrawMainMenu();
-                    break;
-                case GameController.GameState.Playing:
-                    DrawGame();
-                    break;
-                case GameController.GameState.BetweenStages:
-                    DrawGame();
-                    break;
-                case GameController.GameState.GameOver:
-                    DrawGame();
-                    DrawGameOverMenu();
-                    break;
-            }
+            gc.currentState.Draw();
         }
 
         public void DrawMainMenu()
@@ -313,6 +306,8 @@ namespace MonoJam.Controllers
 
         public void DrawGameOverMenu()
         {
+            DrawGame();
+
             Vector2 coinPos = Vector2.Zero;
             switch (gc.gameOverMenu.selectedOption)
             {
