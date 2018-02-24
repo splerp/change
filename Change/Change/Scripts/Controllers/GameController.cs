@@ -83,11 +83,7 @@ namespace MonoJam.Controllers
             };
             GameState.Playing = new GameState("playing")
             {
-                OnEnterState = () =>
-                {
-                    ResetContent();
-                    OnStartPlaying();
-                },
+                OnEnterState = OnStartPlaying,
                 OnStateUpdate = UpdatePlay
             };
             GameState.BetweenStages = new GameState("betweenstages")
@@ -159,6 +155,8 @@ namespace MonoJam.Controllers
 
         public void OnStartPlaying()
         {
+            ResetContent();
+
             piggyBankSpawner.Start();
             vacuumSpawner.Start();
             noteSpawner.Start();
