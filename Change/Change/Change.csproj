@@ -77,13 +77,13 @@
     <Compile Include="Scripts\GameObjects\PiggyBank.cs" />
     <Compile Include="Scripts\GameObjects\NoteOnFire.cs" />
     <Compile Include="Scripts\GameObjects\EnemyCorpse.cs" />
-    <Compile Include="Scripts\IHurtable.cs" />
+    <Compile Include="Scripts\Interfaces\IHurtable.cs" />
     <Compile Include="Scripts\Utils\BoxCollisionTest.cs" />
     <Compile Include="Scripts\Utils\LineCollisionTest.cs" />
     <Compile Include="Scripts\GameObjects\Coin.cs" />
     <Compile Include="Scripts\Graphics\CoinBackgroundLayer.cs" />
     <Compile Include="Scripts\Graphics\LineGraphic.cs" />
-    <Compile Include="Scripts\ICollisionObject.cs" />
+    <Compile Include="Scripts\Interfaces\ICollisionObject.cs" />
     <Compile Include="Scripts\Core\MonoJam.cs" />
     <Compile Include="Scripts\Controllers\GameController.cs" />
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
