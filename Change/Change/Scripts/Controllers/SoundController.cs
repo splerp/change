@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework.Audio;
+﻿#define MUTED
+
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using MonoJam.Utils;
@@ -26,6 +28,11 @@ namespace MonoJam.Controllers
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(song);
             MediaPlayer.Volume = SONG_MASTER_VOLUME;
+
+#if MUTED
+            SoundEffect.MasterVolume = 0;
+            MediaPlayer.Volume = 0;
+#endif
         }
 
         public static void Play(Sound s, bool loop = false)
