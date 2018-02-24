@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class MainMenuController
     {
         public const int TOTAL_OPTIONS = 3;
 
-        private MonoJam mj;
+        private ChangeGame cg;
         private GameController gc;
 
         public bool previousUp;
@@ -15,9 +15,9 @@ namespace MonoJam.Controllers
 
         public int selectedOption = 0;
 
-        public MainMenuController(MonoJam mjIn, GameController gcIn)
+        public MainMenuController(ChangeGame cgIn, GameController gcIn)
         {
-            mj = mjIn;
+            cg = cgIn;
             gc = gcIn;
         }
 
@@ -49,7 +49,7 @@ namespace MonoJam.Controllers
                         gc.SetState(GameState.MapControls);
                         break;
                     case 2:
-                        mj.Exit();
+                        cg.Exit();
                         break;
                 }
             }

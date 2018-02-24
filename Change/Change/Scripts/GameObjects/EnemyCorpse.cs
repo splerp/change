@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class EnemyCorpse : GameObject
     {
@@ -13,7 +13,7 @@ namespace MonoJam.GameObjects
         private float animationCount;
         public int animationFrame = 0;
 
-        public bool ReadyToRemove => Position.Y - 5 > MonoJam.WINDOW_HEIGHT;
+        public bool ReadyToRemove => Position.Y - 5 > ChangeGame.WINDOW_HEIGHT;
 
         public EnemyCorpse(Enemy enemy)
         {

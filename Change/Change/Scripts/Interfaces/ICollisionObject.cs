@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace MonoJam
+namespace Splerp.Change
 {
     interface ICollisionObject
     {

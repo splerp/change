@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Utils;
+using Splerp.Change.Utils;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class ShakeController
     {

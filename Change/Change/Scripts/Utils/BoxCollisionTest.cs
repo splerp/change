@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace MonoJam.Utils
+namespace Splerp.Change.Utils
 {
     public sealed class BoxCollisionTest
     {

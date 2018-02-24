@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 using System;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class VacuumEnemy : Enemy
     {
@@ -36,15 +36,15 @@ namespace MonoJam.GameObjects
             direction = GameController.random.Next(1, 3) == 1 ? 1 : -1;
             thrust *= direction;
 
-            int halfAreaSize = (MonoJam.PLAYABLE_AREA_WIDTH + Size.X) / 2;
-            SetX(MonoJam.PLAYABLE_AREA_WIDTH - (halfAreaSize * direction + halfAreaSize));
+            int halfAreaSize = (ChangeGame.PLAYABLE_AREA_WIDTH + Size.X) / 2;
+            SetX(ChangeGame.PLAYABLE_AREA_WIDTH - (halfAreaSize * direction + halfAreaSize));
 
             for(int i = 0; i < MAX_NOTES_HELD; i++)
             {
                 NotesHeld[i] = null;
             }
 
-            yPos = GameController.random.Next((int)sinAmp, MonoJam.PLAYABLE_AREA_HEIGHT - Size.Y - (int)sinAmp / 2);
+            yPos = GameController.random.Next((int)sinAmp, ChangeGame.PLAYABLE_AREA_HEIGHT - Size.Y - (int)sinAmp / 2);
         }
 
         public override void Update()

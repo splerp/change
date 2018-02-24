@@ -1,4 +1,4 @@
-﻿namespace MonoJam
+﻿namespace Splerp.Change
 {
     interface IHurtable : ICollisionObject
     {

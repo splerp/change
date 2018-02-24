@@ -1,11 +1,11 @@
-﻿using MonoJam.GameObjects;
-using MonoJam.Utils;
+﻿using Splerp.Change.GameObjects;
+using Splerp.Change.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class GameController : IDisposable
     {
@@ -15,7 +15,7 @@ namespace MonoJam.Controllers
         #endregion
 
         // Unsorted
-        private MonoJam mj;
+        private ChangeGame cg;
         private GraphicsController grc;
         private InputController ic;
         public CoinBackgroundController coinBackgroundController;
@@ -61,10 +61,10 @@ namespace MonoJam.Controllers
         public Int64 bestCoinScore;
         #endregion
 
-        public GameController(MonoJam mjIn, GraphicsController grcIn, InputController icIn)
+        public GameController(ChangeGame cgIn, GraphicsController grcIn, InputController icIn)
         {
             // Set references.
-            mj = mjIn;
+            cg = cgIn;
             grc = grcIn;
             ic = icIn;
 
@@ -113,7 +113,7 @@ namespace MonoJam.Controllers
             #endregion
 
             // Set up controllers.
-            mainMenu = new MainMenuController(mj, this);
+            mainMenu = new MainMenuController(cg, this);
             gameOverMenu = new GameOverMenuController(this);
             stageCompleteMenu = new StageCompleteMenuController(this);
             coinBackgroundController = new CoinBackgroundController();
@@ -402,7 +402,7 @@ namespace MonoJam.Controllers
 
             if (Control.Return.IsJustPressed)
             {
-                mj.Exit();
+                cg.Exit();
             }
         }
 

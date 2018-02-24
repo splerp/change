@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 using System.Collections.Generic;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class Note : GameObject, ICollisionObject, IHurtable
     {
@@ -36,8 +36,8 @@ namespace MonoJam.GameObjects
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
 
-        public bool InRangeForCatching => Position.Y < MonoJam.PLAYABLE_AREA_HEIGHT;
-        public bool ReadyToRemove => (Position.Y > MonoJam.PLAYABLE_AREA_HEIGHT + MonoJam.PADDLE_AREA_HEIGHT) || (CaughtByPlayer && Position.Y > MonoJam.PLAYABLE_AREA_HEIGHT);
+        public bool InRangeForCatching => Position.Y < ChangeGame.PLAYABLE_AREA_HEIGHT;
+        public bool ReadyToRemove => (Position.Y > ChangeGame.PLAYABLE_AREA_HEIGHT + ChangeGame.PADDLE_AREA_HEIGHT) || (CaughtByPlayer && Position.Y > ChangeGame.PLAYABLE_AREA_HEIGHT);
         public bool CaughtByPlayer;
 
         public VacuumEnemy CaughtByVacuum;
@@ -58,7 +58,7 @@ namespace MonoJam.GameObjects
             gc = gcIn;
             Type = typeIn == NoteType.None ? NoteType.Pink5 : typeIn;
 
-            SetX(GameController.random.Next(0, MonoJam.WINDOW_WIDTH - WIDTH));
+            SetX(GameController.random.Next(0, ChangeGame.WINDOW_WIDTH - WIDTH));
             SetY(-HEIGHT);
 
             CurrentHealth = MaxHealth;

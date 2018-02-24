@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     // TODO Do not use static?
     public static class ScoreController

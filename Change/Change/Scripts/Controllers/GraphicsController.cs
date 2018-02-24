@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoJam.GameObjects;
-using MonoJam.Graphics;
+using Splerp.Change.GameObjects;
+using Splerp.Change.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class GraphicsController : IDisposable
     {
@@ -16,7 +16,7 @@ namespace MonoJam.Controllers
 
         public delegate void DrawState();
 
-        private MonoJam mj;
+        private ChangeGame cg;
         private InputController ic;
         private GameController gc;
         
@@ -97,9 +97,9 @@ namespace MonoJam.Controllers
 
         private Dictionary<Note.NoteType, Texture2D> noteGraphics;
 
-        public GraphicsController(MonoJam mjIn, InputController icIn, GraphicsDevice graphicsDeviceIn)
+        public GraphicsController(ChangeGame cgIn, InputController icIn, GraphicsDevice graphicsDeviceIn)
         {
-            mj = mjIn;
+            cg = cgIn;
             ic = icIn;
 
             CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
@@ -111,9 +111,9 @@ namespace MonoJam.Controllers
             batch = new SpriteBatch(graphicsDevice);
             samplerState = new SamplerState() { Filter = TextureFilter.Point };
 
-            baseScaleMatrix = Matrix.CreateScale(MonoJam.SCALE);
+            baseScaleMatrix = Matrix.CreateScale(ChangeGame.SCALE);
             baseMatrix =
-                  Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0)
+                  Matrix.CreateTranslation(0, ChangeGame.PLAYABLE_AREA_Y, 0)
                 * baseScaleMatrix;
         }
 
@@ -130,11 +130,11 @@ namespace MonoJam.Controllers
 
         public void CreateNewCoinBuffer(object sender, EventArgs e)
         {
-            Color[] theCurrentData = new Color[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
+            Color[] theCurrentData = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
 
             var NewCoinBackground = new CoinBackgroundLayer
             {
-                graphic = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT)
+                graphic = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT)
             };
             
             // Put data into background.
@@ -159,7 +159,7 @@ namespace MonoJam.Controllers
         public void LoadContent(ContentManager Content)
         {
             playerGraphic = Content.Load<Texture2D>("Graphics/Player");
-            playerLasersLayer = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
+            playerLasersLayer = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT);
 
             coinGraphic = new Texture2D(graphicsDevice, 1, 1);
             coinGraphic.SetData(new Color[] { Color.Yellow });
@@ -185,18 +185,18 @@ namespace MonoJam.Controllers
             changeControlsLeft = Content.Load<Texture2D>("Graphics/ChangeControlsLeft");
             changeControlsRight = Content.Load<Texture2D>("Graphics/ChangeControlsRight");
 
-            bestScoreBackgroundOffset = new Point(MonoJam.WINDOW_WIDTH - 2, 2);
-            mutedIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height - 3);
-            mutedMusicIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height * 2 - 3 - 2);
-            noTutorialIconOffset = new Point(MonoJam.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, MonoJam.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
+            bestScoreBackgroundOffset = new Point(ChangeGame.WINDOW_WIDTH - 2, 2);
+            mutedIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height - 3);
+            mutedMusicIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height * 2 - 3 - 2);
+            noTutorialIconOffset = new Point(ChangeGame.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, ChangeGame.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
             
-            currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
-            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
-            VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
-            hudBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.HUD_HEIGHT);
-            hudLaserCharge = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
-            hudPlayerHealth = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 2);
-            hudTimeRemaining = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, 1);
+            currentCoinBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT);
+            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, ChangeGame.PLAYABLE_AREA_HEIGHT);
+            VaultFloor = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
+            hudBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.HUD_HEIGHT);
+            hudLaserCharge = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
+            hudPlayerHealth = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
+            hudTimeRemaining = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 1);
 
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
@@ -419,12 +419,12 @@ namespace MonoJam.Controllers
 
                 // Create matrix for coin backgrounds.
                 Matrix coinBackgroundMatrix =
-                      Matrix.CreateTranslation(-MonoJam.WINDOW_WIDTH / 2, -MonoJam.PLAYABLE_AREA_HEIGHT, 0)
+                      Matrix.CreateTranslation(-ChangeGame.WINDOW_WIDTH / 2, -ChangeGame.PLAYABLE_AREA_HEIGHT, 0)
                     * baseMatrix
                     * Matrix.CreateScale(coinBackground.currentScale)
                     * Matrix.CreateTranslation(
-                        MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.SCALE / 2,
-                        MonoJam.PLAYABLE_AREA_HEIGHT * MonoJam.SCALE - coinBackground.currentTranslate,
+                        ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.SCALE / 2,
+                        ChangeGame.PLAYABLE_AREA_HEIGHT * ChangeGame.SCALE - coinBackground.currentTranslate,
                         0);
 
                 // Draw buffer coin background.
@@ -435,9 +435,9 @@ namespace MonoJam.Controllers
                 {
                     batch.Draw(coinBackground.graphic, new Vector2(0, 0), drawColour);
                     batch.Draw(VaultWalls, new Vector2(-vaultWallWidth, 0), drawColour);
-                    batch.Draw(VaultWalls, new Vector2(MonoJam.PLAYABLE_AREA_WIDTH, 0), drawColour);
+                    batch.Draw(VaultWalls, new Vector2(ChangeGame.PLAYABLE_AREA_WIDTH, 0), drawColour);
                     batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, -vaultFloorHeight), drawColour);
-                    batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT), drawColour);
+                    batch.Draw(VaultFloor, new Vector2(-vaultWallWidth, ChangeGame.PLAYABLE_AREA_HEIGHT), drawColour);
                 }
                 batch.End();
             }
@@ -461,7 +461,7 @@ namespace MonoJam.Controllers
             // Draw paddle background.
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
-                batch.Draw(paddleBackground, new Vector2(0, MonoJam.WINDOW_HEIGHT - MonoJam.PADDLE_AREA_HEIGHT), Color.White);
+                batch.Draw(paddleBackground, new Vector2(0, ChangeGame.WINDOW_HEIGHT - ChangeGame.PADDLE_AREA_HEIGHT), Color.White);
             }
             batch.End();
 
@@ -545,8 +545,8 @@ namespace MonoJam.Controllers
             }
 
             var scoreLength = ScoreController.LengthOf(gc.currentCoinScore / 100d);
-            var totalArea = MonoJam.PLAYABLE_AREA_WIDTH - scoreLength;
-            var totalAreaRatio = (MonoJam.PLAYABLE_AREA_WIDTH - scoreLength) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
+            var totalArea = ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength;
+            var totalAreaRatio = (ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength) / (float)ChangeGame.PLAYABLE_AREA_WIDTH;
 
             // Draw hud.
             var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class GameOverMenuController
     {
@@ -26,7 +26,7 @@ namespace MonoJam.Controllers
         public void Drop()
         {
             speed = 5;
-            currentY = -MonoJam.WINDOW_HEIGHT;
+            currentY = -ChangeGame.WINDOW_HEIGHT;
 
             selectedOption = 0;
         }

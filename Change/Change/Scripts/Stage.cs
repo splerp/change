@@ -1,8 +1,8 @@
-﻿using MonoJam.GameObjects;
+﻿using Splerp.Change.GameObjects;
 using System;
 using System.Collections.Generic;
 
-namespace MonoJam
+namespace Splerp.Change
 {
     public sealed class Stage
     {

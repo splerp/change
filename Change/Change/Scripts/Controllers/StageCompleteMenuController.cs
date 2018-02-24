@@ -1,4 +1,4 @@
-﻿namespace MonoJam.Controllers
+﻿namespace Splerp.Change.Controllers
 {
     public sealed class StageCompleteMenuController
     {
@@ -19,13 +19,13 @@
         public void Drop()
         {
             speed = 5;
-            currentY = -MonoJam.WINDOW_HEIGHT;
+            currentY = -ChangeGame.WINDOW_HEIGHT;
 
             gravity = 0.2f;
             fallFor = 140;
         }
 
-        public bool AnimationComplete => fallFor <= 0 && currentY < -MonoJam.WINDOW_HEIGHT;
+        public bool AnimationComplete => fallFor <= 0 && currentY < -ChangeGame.WINDOW_HEIGHT;
 
         public void Update()
         {

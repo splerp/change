@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class NoteOnFire : GameObject
     {

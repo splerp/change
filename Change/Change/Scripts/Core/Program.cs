@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonoJam
+namespace Splerp.Change
 {
 #if WINDOWS || LINUX
     public static class Program
@@ -8,7 +8,7 @@ namespace MonoJam
         [STAThread]
         static void Main()
         {
-            using (var game = new MonoJam())
+            using (var game = new ChangeGame())
                 game.Run();
         }
     }

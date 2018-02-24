@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 
-namespace MonoJam
+namespace Splerp.Change
 {
-    public sealed class MonoJam : Game
+    public sealed class ChangeGame : Game
     {
         public const int SCALE = 8;
         
@@ -24,7 +24,7 @@ namespace MonoJam
         private GameController gc;
         private SoundController sc;
 
-        public MonoJam()
+        public ChangeGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";

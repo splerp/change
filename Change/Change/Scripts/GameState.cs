@@ -1,7 +1,7 @@
-﻿using MonoJam.Controllers;
+﻿using Splerp.Change.Controllers;
 using System;
 
-namespace MonoJam
+namespace Splerp.Change
 {
     public sealed class GameState : IEquatable<GameState>
     {

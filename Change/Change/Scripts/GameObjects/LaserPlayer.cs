@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
-using MonoJam.Utils;
+using Splerp.Change.Controllers;
+using Splerp.Change.Utils;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class LaserPlayer : GameObject, ICollisionObject
     {
@@ -49,8 +49,8 @@ namespace MonoJam.GameObjects
 
         public void Reset()
         {
-            SetX((MonoJam.PLAYABLE_AREA_WIDTH - Size.X) / 2);
-            SetY(MonoJam.PLAYABLE_AREA_HEIGHT / 2 - 20);
+            SetX((ChangeGame.PLAYABLE_AREA_WIDTH - Size.X) / 2);
+            SetY(ChangeGame.PLAYABLE_AREA_HEIGHT / 2 - 20);
             speed = Vector2.Zero;
 
             laserCharge = 1f;
@@ -190,9 +190,9 @@ namespace MonoJam.GameObjects
                 SetX(0);
                 speed.X *= -1;
             }
-            else if (Position.X + Size.X > MonoJam.PLAYABLE_AREA_WIDTH)
+            else if (Position.X + Size.X > ChangeGame.PLAYABLE_AREA_WIDTH)
             {
-                SetX(MonoJam.PLAYABLE_AREA_WIDTH - Size.X);
+                SetX(ChangeGame.PLAYABLE_AREA_WIDTH - Size.X);
                 speed.X *= -1;
             }
             if (Position.Y < 0)
@@ -200,9 +200,9 @@ namespace MonoJam.GameObjects
                 SetY(0);
                 speed.Y *= -1;
             }
-            else if (Position.Y + Size.Y > MonoJam.PLAYABLE_AREA_HEIGHT)
+            else if (Position.Y + Size.Y > ChangeGame.PLAYABLE_AREA_HEIGHT)
             {
-                SetY(MonoJam.PLAYABLE_AREA_HEIGHT - Size.Y);
+                SetY(ChangeGame.PLAYABLE_AREA_HEIGHT - Size.Y);
                 speed.Y *= -1;
             }
         }

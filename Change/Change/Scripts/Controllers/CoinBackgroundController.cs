@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.GameObjects;
-using MonoJam.Utils;
+using Splerp.Change.GameObjects;
+using Splerp.Change.Utils;
 using System;
 using System.Collections.Generic;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class CoinBackgroundController
     {
@@ -25,10 +25,10 @@ namespace MonoJam.Controllers
 
         public CoinBackgroundController()
         {
-            currentLayerCoinTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
+            currentLayerCoinTrend = new int[ChangeGame.PLAYABLE_AREA_WIDTH];
 
             coins = new List<Coin>();
-            coinDataBuffer = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
+            coinDataBuffer = new byte[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
         }
         
         public void Reset()
@@ -44,7 +44,7 @@ namespace MonoJam.Controllers
 
         public void ClearCoinDataBuffer()
         {
-            Array.Clear(coinDataBuffer, 0, MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT);
+            Array.Clear(coinDataBuffer, 0, ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT);
             CurrentCoinBufferUpdated(this, EventArgs.Empty);
         }
 
@@ -91,7 +91,7 @@ namespace MonoJam.Controllers
                     {
 
                         var pos = coins[i].CollisionRect.Location;
-                        int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
+                        int arrayLoc = pos.Y * ChangeGame.PLAYABLE_AREA_WIDTH + pos.X;
 
                         coinDataBuffer[arrayLoc] = 1;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class Coin : GameObject
     {
@@ -18,11 +18,11 @@ namespace MonoJam.GameObjects
         public bool MoveAndCheckLand(byte[] coinData)
         {
             Point coinPos = CollisionRect.Location;
-            int arrayLoc = coinPos.Y * MonoJam.PLAYABLE_AREA_WIDTH + coinPos.X;
-            int finalIndex = MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT;
+            int arrayLoc = coinPos.Y * ChangeGame.PLAYABLE_AREA_WIDTH + coinPos.X;
+            int finalIndex = ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT;
 
             // Start exactly one line below.
-            var startCheck = arrayLoc + MonoJam.PLAYABLE_AREA_WIDTH;
+            var startCheck = arrayLoc + ChangeGame.PLAYABLE_AREA_WIDTH;
 
             if (startCheck >= finalIndex)
             {
@@ -52,7 +52,7 @@ namespace MonoJam.GameObjects
                         return true;
                     case MOVE_RIGHT:
                         // Move to the left?
-                        if (coinPos.X < MonoJam.PLAYABLE_AREA_WIDTH - 1)
+                        if (coinPos.X < ChangeGame.PLAYABLE_AREA_WIDTH - 1)
                         {
                             if (coinData[startCheck + 1] == 0)
                             {

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class InputController
     {
@@ -14,7 +14,7 @@ namespace MonoJam.Controllers
         public static GamePadState currentGamepad;
         public static MouseState currentMouse;
         public static Point CurrentMousePosition =>
-            currentMouse.Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+            currentMouse.Position / new Point(ChangeGame.SCALE) - new Point(0, ChangeGame.PLAYABLE_AREA_Y);
         
         #region Remapping variables
         public Control[] MappingOrder = new Control[] {

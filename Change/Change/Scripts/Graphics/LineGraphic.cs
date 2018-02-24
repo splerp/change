@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace MonoJam.Graphics
+namespace Splerp.Change.Graphics
 {
     public sealed class LineGraphic
     {
@@ -10,7 +10,7 @@ namespace MonoJam.Graphics
         public static Color[] CreateLine(int x, int y, int x2, int y2, Color lineColour)
         {
             Color[] lineData = Enumerable.Repeat(Color.Transparent,
-                MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT).ToArray();
+                ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT).ToArray();
 
             int w = x2 - x;
             int h = y2 - y;
@@ -30,7 +30,7 @@ namespace MonoJam.Graphics
             int numerator = longest >> 1;
             for (int i = 0; i <= longest; i++)
             {
-                lineData[x + y * MonoJam.WINDOW_WIDTH] = lineColour;
+                lineData[x + y * ChangeGame.WINDOW_WIDTH] = lineColour;
                 numerator += shortest;
                 if (!(numerator < longest))
                 {
@@ -51,7 +51,7 @@ namespace MonoJam.Graphics
         public static Color[] CreateLineBoundsCheck(int x, int y, int x2, int y2, Color lineColour)
         {
             Color[] lineData = Enumerable.Repeat(Color.Transparent,
-                MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT).ToArray();
+                ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT).ToArray();
 
             int w = x2 - x;
             int h = y2 - y;
@@ -72,9 +72,9 @@ namespace MonoJam.Graphics
             for (int i = 0; i <= longest; i++)
             {
                 // This if check is the only difference from the above.
-                if(x >= 0 && x < MonoJam.PLAYABLE_AREA_WIDTH && y >= 0 && y < MonoJam.PLAYABLE_AREA_HEIGHT)
+                if(x >= 0 && x < ChangeGame.PLAYABLE_AREA_WIDTH && y >= 0 && y < ChangeGame.PLAYABLE_AREA_HEIGHT)
                 {
-                    lineData[x + y * MonoJam.PLAYABLE_AREA_WIDTH] = lineColour;
+                    lineData[x + y * ChangeGame.PLAYABLE_AREA_WIDTH] = lineColour;
                 }
                 
                 numerator += shortest;

@@ -3,11 +3,11 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
-using MonoJam.Utils;
+using Splerp.Change.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MonoJam.Controllers
+namespace Splerp.Change.Controllers
 {
     public sealed class SoundController
     {
@@ -17,13 +17,13 @@ namespace MonoJam.Controllers
 
         Song song;
 
-        private MonoJam mj;
+        private ChangeGame cg;
 
-        public SoundController(MonoJam mjIn)
+        public SoundController(ChangeGame cgIn)
         {
-            mj = mjIn;
+            cg = cgIn;
 
-            song = mj.Content.Load<Song>("Audio/Song");
+            song = cg.Content.Load<Song>("Audio/Song");
 
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(song);

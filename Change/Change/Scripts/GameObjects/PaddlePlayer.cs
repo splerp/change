@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
+using Splerp.Change.Controllers;
 using System;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public sealed class PaddlePlayer : GameObject, ICollisionObject
     {
@@ -30,8 +30,8 @@ namespace MonoJam.GameObjects
 
         public void Reset()
         {
-            SetX((MonoJam.PLAYABLE_AREA_WIDTH - Size.X) / 2);
-            SetY(MonoJam.PLAYABLE_AREA_HEIGHT + MonoJam.PADDLE_AREA_HEIGHT - HEIGHT);
+            SetX((ChangeGame.PLAYABLE_AREA_WIDTH - Size.X) / 2);
+            SetY(ChangeGame.PLAYABLE_AREA_HEIGHT + ChangeGame.PADDLE_AREA_HEIGHT - HEIGHT);
             speed = Vector2.Zero;
         }
 
@@ -58,9 +58,9 @@ namespace MonoJam.GameObjects
                 SetX(0);
                 speed.X *= -1;
             }
-            else if (Position.X + Size.X > MonoJam.PLAYABLE_AREA_WIDTH)
+            else if (Position.X + Size.X > ChangeGame.PLAYABLE_AREA_WIDTH)
             {
-                SetX(MonoJam.PLAYABLE_AREA_WIDTH - Size.X);
+                SetX(ChangeGame.PLAYABLE_AREA_WIDTH - Size.X);
                 speed.X *= -1;
             }
         }

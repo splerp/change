@@ -1,8 +1,8 @@
-﻿using MonoJam.Controllers;
+﻿using Splerp.Change.Controllers;
 using System;
 using System.Collections.Generic;
 
-namespace MonoJam.Utils
+namespace Splerp.Change.Utils
 {
     public static class CollectionExtensions
     {

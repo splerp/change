@@ -9,8 +9,8 @@
     <ProjectGuid>{43EAD111-3555-404A-9CCB-7ED319E0DCB5}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Change</RootNamespace>
-    <AssemblyName>Change</AssemblyName>
+    <RootNamespace>Splerp.Change</RootNamespace>
+    <AssemblyName>Splerp.Change</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>

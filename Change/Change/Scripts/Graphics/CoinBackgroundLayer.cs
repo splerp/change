@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 
-namespace MonoJam.Graphics
+namespace Splerp.Change.Graphics
 {
     public sealed class CoinBackgroundLayer
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace MonoJam.GameObjects
+namespace Splerp.Change.GameObjects
 {
     public abstract class Enemy : GameObject, ICollisionObject, IHurtable
     {
@@ -8,7 +8,7 @@ namespace MonoJam.GameObjects
         public abstract Point Size { get; }
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
 
-        public bool ReadyToRemove => Position.X + Size.X < 0 || Position.X > MonoJam.PLAYABLE_AREA_WIDTH;
+        public bool ReadyToRemove => Position.X + Size.X < 0 || Position.X > ChangeGame.PLAYABLE_AREA_WIDTH;
 
         // TODO probably don't want in base Enemy class.
         public float thrust = 0.5f;

@@ -9,7 +9,7 @@
 
 using System;
 
-namespace MonoJam.Utils
+namespace Splerp.Change.Utils
 {
     public static class Perlin
     {
