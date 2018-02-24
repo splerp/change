@@ -21,6 +21,7 @@ namespace MonoJam
         }
 
         public static GameState Title;
+        public static GameState MapControls;
         public static GameState Playing;
         public static GameState BetweenStages;
         public static GameState GameOver;

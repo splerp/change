@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MonoJam.Controllers
 {
@@ -14,6 +15,34 @@ namespace MonoJam.Controllers
         public static MouseState currentMouse;
 
         public static Point CurrentMousePosition => currentMouse.Position / new Point(MonoJam.SCALE) - new Point(0, MonoJam.PLAYABLE_AREA_Y);
+
+        public Control[] MappingOrder = new Control[] {
+            Control.MoveUp, Control.MoveDown, Control.MoveLeft, Control.MoveRight
+        };
+        public int currentRemapIndex;
+        public bool FinishedRemapping => currentRemapIndex >= MappingOrder.Length;
+        public Control CurrentRemappingControl => MappingOrder[currentRemapIndex];
+
+        public void StartRemapping()
+        {
+            currentRemapIndex = 0;
+        }
+
+        public void RemapControl(Keys[] newKeys)
+        {
+            // If escape was pressed, do not map this key.
+            if(!newKeys.Any(k => k == Keys.Escape))
+            {
+                CurrentRemappingControl.KeyCodes = newKeys;
+                SoundController.Play(Sound.Bip2);
+            }
+            else
+            {
+                SoundController.Play(Sound.Bip1);
+            }
+            
+            currentRemapIndex++;
+        }
 
         public void UpdateControlStates()
         {

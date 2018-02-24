@@ -45,7 +45,7 @@ namespace MonoJam.Controllers
                         gc.SetState(GameState.Playing);
                         break;
                     case 1:
-                        // Nothing.
+                        gc.SetState(GameState.MapControls);
                         break;
                     case 2:
                         gc.Exit();

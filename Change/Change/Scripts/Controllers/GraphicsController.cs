@@ -249,7 +249,8 @@ namespace MonoJam.Controllers
             hudTimeRemaining.SetData(Enumerable.Repeat(Color.Blue, hudTimeRemaining.Width * hudTimeRemaining.Height).ToArray());
 
             // Set draw functions on game states.
-            GameState.Title.Draw = new DrawState(this.DrawMainMenu);
+            GameState.Title.Draw = DrawMainMenu;
+            GameState.MapControls.Draw = DrawChangeControlsMenu;
             GameState.Playing.Draw = DrawGame;
             GameState.BetweenStages.Draw = DrawGame;
             GameState.GameOver.Draw = DrawGameOverMenu;

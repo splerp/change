@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoJam.GameObjects;
 using MonoJam.Utils;
 using System;
@@ -62,6 +63,7 @@ namespace MonoJam.Controllers
         public bool skipTutorial;
 
         public GameState currentState;
+        public bool pressingKeysLastFrame;
 
         public GameController(MonoJam mjIn)
         {
@@ -74,7 +76,11 @@ namespace MonoJam.Controllers
                 OnEnterState = ResetContent,
                 OnStateUpdate = UpdateMainMenu
             };
-
+            GameState.MapControls = new GameState("mapcontrols")
+            {
+                OnEnterState = StartMappingControls,
+                OnStateUpdate = UpdateMapControls
+            };
             GameState.Playing = new GameState("playing")
             {
                 OnEnterState = () =>
@@ -263,6 +269,32 @@ namespace MonoJam.Controllers
             SoundController.StopAllLoops();
         }
 
+        public void StartMappingControls()
+        {
+            mj.ic.StartRemapping();
+        }
+
+        public void UpdateMapControls()
+        {
+            if(mj.ic.FinishedRemapping)
+            {
+                SetState(GameState.Title);
+            }
+            else
+            {
+                // Should properly support all supported modes (mouse, gamepad), not just keyboard.
+                // Keep track of current control to override and listen for input.
+                var pressedKeys = Keyboard.GetState().GetPressedKeys();
+
+                var pressingKeyboard = pressedKeys.Length > 0;
+
+                if (pressingKeyboard && !pressingKeysLastFrame)
+                {
+                    mj.ic.RemapControl(pressedKeys);
+                }
+            }
+        }
+
         public void Exit()
         {
             mj.Exit();
@@ -296,6 +328,9 @@ namespace MonoJam.Controllers
             //Console.WriteLine($"COINS Best: {bestCoinScore}"); 
             //Console.WriteLine("Corpses: " + corpses.Count);
             //Console.WriteLine("Current state: " + currentState);
+
+            var pressedKeys = Keyboard.GetState().GetPressedKeys();
+            pressingKeysLastFrame = pressedKeys.Length > 0;
         }
 
         public void UpdateMainMenu()
