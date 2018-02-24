@@ -137,7 +137,7 @@ namespace MonoJam.GameObjects
                 var lineToMouse2 = mousePos - laserStartPos2;
 
                 var allHurtables = gc.enemies
-                    .Take(gc.totalEnemies)
+                    .Take(gc.enemies.Count)
                     .Cast<IHurtable>()
                     .Concat(gc.notes);
 

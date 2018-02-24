@@ -11,15 +11,12 @@ namespace MonoJam.Controllers
 {
     public class GameController
     {
-        public const int MAX_ENEMIES = 20;
         public const int COINS_PER_LAYER = 5000;
         public const int COINS_SPAWNED_PER_FRAME = 8;
         public const float SMALL_SHAKE_AMOUNT = 1f;
 
         public delegate void StartEnter();
         public delegate void StageUpdate();
-
-        public int totalEnemies;
 
         public Stage currentStage;
 
@@ -31,7 +28,7 @@ namespace MonoJam.Controllers
 
         public LaserPlayer laserPlayer;
         public PaddlePlayer paddlePlayer;
-        public Enemy[] enemies;
+        public List<Enemy> enemies;
         public List<Coin> coins;
         public List<EnemyCorpse> corpses;
         public List<Note> notes;
@@ -120,8 +117,7 @@ namespace MonoJam.Controllers
             laserPlayer = new LaserPlayer(this);
             paddlePlayer = new PaddlePlayer(this);
 
-            enemies = new Enemy[MAX_ENEMIES];
-
+            enemies = new List<Enemy>();
             coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
             notes = new List<Note>();
@@ -433,7 +429,7 @@ namespace MonoJam.Controllers
             }
 
             // Update enemies.
-            for (int i = 0; i < totalEnemies; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
                 enemies[i].Update();
 
@@ -499,7 +495,7 @@ namespace MonoJam.Controllers
             }
 
             // Remove destroyed enemies.
-            for (int i = 0; i < totalEnemies; i++)
+            for (int i = 0; i < enemies.Count; i++)
             {
                 // A "killed" enemy. Show the death sequence.
                 if (enemies[i].IsDead)
@@ -653,30 +649,14 @@ namespace MonoJam.Controllers
 
         public void SpawnPiggyBank()
         {
-            if (totalEnemies < MAX_ENEMIES)
-            {
-                var newPig = new PiggyBank();
-                enemies[totalEnemies++] = newPig;
-            }
-            else
-            {
-                // Temporary for debugging
-                throw new Exception("Created too many enemies");
-            }
+            var newPig = new PiggyBank();
+            enemies.Add(newPig);
         }
 
         public void SpawnVacuum()
         {
-            if (totalEnemies < MAX_ENEMIES)
-            {
-                var newVacuum = new VacuumEnemy();
-                enemies[totalEnemies++] = newVacuum;
-            }
-            else
-            {
-                // Temporary for debugging
-                throw new Exception("Created too many enemies");
-            }
+            var newVacuum = new VacuumEnemy();
+            enemies.Add(newVacuum);
         }
 
         public void SpawnNote()
@@ -701,7 +681,7 @@ namespace MonoJam.Controllers
 
         public void DestroyAllEnemies()
         {
-            for (int i = totalEnemies - 1; i >= 0; i--)
+            for (int i = enemies.Count - 1; i >= 0; i--)
             {
                 DestroyEnemy(enemies[i]);
             }
@@ -712,33 +692,7 @@ namespace MonoJam.Controllers
 
         public void DestroyEnemy(Enemy e)
         {
-            bool foundEnemy = false;
-
-            for (int i = 0; i < totalEnemies; i++)
-            {
-                if (enemies[i] == e)
-                {
-                    foundEnemy = true;
-                }
-
-                // Shift remaining enemies down the array.
-                if (foundEnemy)
-                {
-                    if (i + 1 < totalEnemies)
-                    {
-                        enemies[i] = enemies[i + 1];
-                    }
-                    else
-                    {
-                        enemies[i] = null;
-                    }
-                }
-            }
-
-            if (foundEnemy)
-            {
-                totalEnemies--;
-            }
+            enemies.Remove(e);
         }
     }
 }

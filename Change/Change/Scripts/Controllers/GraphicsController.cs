@@ -490,7 +490,7 @@ namespace MonoJam.Controllers
 
                     DrawEnemy(batch, c.EnemyReference, c.Position.ToPoint().ToVector2());
                 }
-                for (int i = 0; i < gc.totalEnemies; i++)
+                for (int i = 0; i < gc.enemies.Count; i++)
                 {
                     DrawEnemy(batch, gc.enemies[i], gc.enemies[i].CollisionRect.Location.ToVector2());
                 }
