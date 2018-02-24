@@ -66,10 +66,12 @@
   <ItemGroup>
     <Compile Include="Scripts\Controllers\CoinBackgroundController.cs" />
     <Compile Include="Scripts\Controllers\InputController.cs" />
-    <Compile Include="Scripts\Controllers\StageCompleteMenuController.cs" />
+    <Compile Include="Scripts\Control.cs" />
+    <Compile Include="Scripts\Menus\Menu.cs" />
+    <Compile Include="Scripts\Menus\StageCompleteMenu.cs" />
     <Compile Include="Scripts\Controllers\ScoreController.cs" />
     <Compile Include="Scripts\Controllers\SoundController.cs" />
-    <Compile Include="Scripts\Controllers\GameOverMenuController.cs" />
+    <Compile Include="Scripts\Menus\GameOverMenu.cs" />
     <Compile Include="Scripts\Events\CoinBufferUpdatedArgs.cs" />
     <Compile Include="Scripts\GameState.cs" />
     <Compile Include="Scripts\Stage.cs" />
@@ -90,7 +92,7 @@
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
     <Compile Include="Scripts\GameObject.cs" />
     <Compile Include="Scripts\GameObjects\Enemy.cs" />
-    <Compile Include="Scripts\Controllers\MainMenuController.cs" />
+    <Compile Include="Scripts\Menus\MainMenu.cs" />
     <Compile Include="Scripts\GameObjects\Note.cs" />
     <Compile Include="Scripts\Utils\Extensions.cs" />
     <Compile Include="Scripts\Utils\Perlin.cs" />

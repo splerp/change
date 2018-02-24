@@ -67,7 +67,7 @@ namespace Splerp.Change.GameObjects
             // Wait for LaserStart sound to play, then start looping.
             await Task.Delay(Sound.LaserStart.data.Duration);
 
-            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.currentState == GameState.Playing && Control.Attack.IsDown)
+            if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.CurrentState == GameState.Playing && Control.Attack.IsDown)
             {
                 SoundController.Play(Sound.LaserLoop, true);
             }

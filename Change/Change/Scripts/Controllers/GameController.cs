@@ -1,4 +1,5 @@
 ﻿using Splerp.Change.GameObjects;
+using Splerp.Change.Menus;
 using Splerp.Change.Utils;
 using System;
 using System.Collections.Generic;
@@ -14,24 +15,55 @@ namespace Splerp.Change.Controllers
         public delegate void StageUpdate();
         #endregion
 
-        // Unsorted
-        private ChangeGame cg;
-        private GraphicsController grc;
-        private InputController ic;
-        public CoinBackgroundController coinBackgroundController;
-        public Stage currentStage;
-        public GameState currentState;
-
-        public int notesMissed;
-        public bool skipTutorial;
-
-        // Menu controllers.
-        public MainMenuController mainMenu;
-        public GameOverMenuController gameOverMenu;
-        public StageCompleteMenuController stageCompleteMenu;
-        
         // Random object used everywhere.
         public static Random random = new Random();
+
+        private ChangeGame cg;
+
+        // Controllers.
+        private GraphicsController grc;
+        private InputController ic;
+        private CoinBackgroundController coinBackgroundController;
+
+        // Menu references.
+        private MainMenu mainMenu;
+        private GameOverMenu gameOverMenu;
+        private StageCompleteMenu stageCompleteMenu;
+
+        // The stage the player is currently on.
+        public Stage CurrentStage { get; private set; }
+
+        // The state the game is currently in.
+        public GameState CurrentState { get; private set; }
+
+        // Pass-through helpers, for classes that only need to access certain features.
+        public List<Coin> FallingCoins => coinBackgroundController.coins;
+        public Menu CurrentMenu
+        {
+            get
+            {
+                if (CurrentState == GameState.Title)
+                {
+                    return mainMenu;
+                }
+                else if (CurrentState == GameState.GameOver)
+                {
+                    return gameOverMenu;
+                }
+                else if (CurrentState == GameState.BetweenStages)
+                {
+                    return stageCompleteMenu;
+                }
+                else 
+                {
+                    return null;
+                }
+            }
+        }
+
+        // Unsorted
+        public int notesMissed;
+        public bool skipTutorial;
 
         #region Game Objects
         // Reference to laser controller.
@@ -113,10 +145,12 @@ namespace Splerp.Change.Controllers
             #endregion
 
             // Set up controllers.
-            mainMenu = new MainMenuController(cg, this);
-            gameOverMenu = new GameOverMenuController(this);
-            stageCompleteMenu = new StageCompleteMenuController(this);
             coinBackgroundController = new CoinBackgroundController();
+
+            // Set up menus.
+            mainMenu = new MainMenu(cg, this);
+            gameOverMenu = new GameOverMenu(this);
+            stageCompleteMenu = new StageCompleteMenu();
 
             // Set up players.
             laserPlayer = new LaserPlayer(this);
@@ -142,7 +176,10 @@ namespace Splerp.Change.Controllers
         public void Update()
         {
             // Do state-specific update logic.
-            currentState.OnStateUpdate();
+            CurrentState.OnStateUpdate();
+
+            // Update current menu.
+            CurrentMenu?.Update();
 
             #region Global input handling
             if (Control.MuteSound.IsJustPressed)
@@ -169,12 +206,12 @@ namespace Splerp.Change.Controllers
         public void SetState(GameState newState)
         {
             // HACK: special case for between stages -> playing, don't reset content.
-            if (!(newState == GameState.Playing && currentState == GameState.BetweenStages))
+            if (!(newState == GameState.Playing && CurrentState == GameState.BetweenStages))
             {
                 newState.OnEnterState();
             }
 
-            currentState = newState;
+            CurrentState = newState;
         }
 
         #region State "On Start" methods
@@ -191,11 +228,11 @@ namespace Splerp.Change.Controllers
 
             if (skipTutorial)
             {
-                currentStage = Stage.NonTutorialStages.First();
+                CurrentStage = Stage.NonTutorialStages.First();
             }
             else
             {
-                currentStage = Stage.AllStages.First();
+                CurrentStage = Stage.AllStages.First();
             }
 
             SetStageVariables();
@@ -234,11 +271,11 @@ namespace Splerp.Change.Controllers
             #endregion
 
             #region Update objects
-            if (currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            if (CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
                 laserPlayer.Update();
             }
-            if (currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            if (CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
                 paddlePlayer.Update();
             }
@@ -346,7 +383,7 @@ namespace Splerp.Change.Controllers
                     notesMissed++;
                 }
                 // Otherwise, if caught, give money.
-                else if (currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled) && notes[i].InRangeForCatching && !notes[i].CaughtByPlayer && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
+                else if (CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled) && notes[i].InRangeForCatching && !notes[i].CaughtByPlayer && BoxCollisionTest.IntersectAABB(paddlePlayer.CollisionRect, notes[i].CollisionRect))
                 {
                     notes[i].CaughtByPlayer = true;
                 }
@@ -380,12 +417,12 @@ namespace Splerp.Change.Controllers
             // TODO: Explode the money
             #endregion
 
-            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= currentStage.MaxNotesMissed)
+            if (CurrentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= CurrentStage.MaxNotesMissed)
             {
                 SetState(GameState.GameOver);
             }
 
-            if (currentState == GameState.Playing && currentStage.IsComplete())
+            if (CurrentState == GameState.Playing && CurrentStage.IsComplete())
             {
                 ToNextStage();
             }
@@ -398,8 +435,6 @@ namespace Splerp.Change.Controllers
 
         public void UpdateMainMenu()
         {
-            mainMenu.Update();
-
             if (Control.Return.IsJustPressed)
             {
                 cg.Exit();
@@ -408,8 +443,6 @@ namespace Splerp.Change.Controllers
 
         public void UpdateGameOverMenu()
         {
-            gameOverMenu.Update();
-
             if (Control.Return.IsJustPressed)
             {
                 SetState(GameState.Title);
@@ -418,8 +451,6 @@ namespace Splerp.Change.Controllers
 
         public void UpdateBetweenStages()
         {
-            stageCompleteMenu.Update();
-
             if (stageCompleteMenu.AnimationComplete)
             {
                 ToNextStageFinish();
@@ -444,11 +475,11 @@ namespace Splerp.Change.Controllers
 
         public void ToNextStageFinish()
         {
-            var newStage = Stage.NextStage(currentStage);
+            var newStage = Stage.NextStage(CurrentStage);
 
             if (newStage != null)
             {
-                currentStage = newStage;
+                CurrentStage = newStage;
                 SetStageVariables();
                 SetState(GameState.Playing);
             }
@@ -460,31 +491,31 @@ namespace Splerp.Change.Controllers
 
         public void SetStageVariables()
         {
-            currentStage.Restart();
+            CurrentStage.Restart();
 
             notesMissed = 0;
 
             piggyBankSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.PigsEnabled))
+            if (CurrentStage.HasFlag(Stage.StageFlags.PigsEnabled))
             {
                 piggyBankSpawner.Start();
             }
 
             vacuumSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.VacuumsEnabled))
+            if (CurrentStage.HasFlag(Stage.StageFlags.VacuumsEnabled))
             {
-                vacuumSpawner.Interval = currentStage.VacuumSpawnTime;
+                vacuumSpawner.Interval = CurrentStage.VacuumSpawnTime;
                 vacuumSpawner.Start();
             }
 
             noteSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled))
+            if (CurrentStage.HasFlag(Stage.StageFlags.NotesEnabled))
             {
-                noteSpawner.Interval = currentStage.NoteSpawnTime;
+                noteSpawner.Interval = CurrentStage.NoteSpawnTime;
                 noteSpawner.Start();
             }
 
-            if (!currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            if (!CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
                 laserPlayer.FiringLaser = false;
                 SoundController.StopAllLoops();
@@ -496,7 +527,7 @@ namespace Splerp.Change.Controllers
         {
             currentCoinScore += coins;
             coinBackgroundController.coinsToSpawn += coins;
-            currentStage.coinsCollected += coins;
+            CurrentStage.coinsCollected += coins;
         }
 
         #region Spawner methods
@@ -517,7 +548,7 @@ namespace Splerp.Change.Controllers
         public void SpawnNote()
         {
             var totalWeights = Note.noteSpawnWeights
-                .Where(a => currentStage.AvailableNotes.Contains(a.Key))
+                .Where(a => CurrentStage.AvailableNotes.Contains(a.Key))
                 .Sum(a => a.Value);
             var idx = random.Next(0, totalWeights);
 
@@ -525,9 +556,9 @@ namespace Splerp.Change.Controllers
             Note.NoteType selectedType = Note.NoteType.None;
             while (idx > 0)
             {
-                idx -= Note.noteSpawnWeights[currentStage.AvailableNotes[i]];
+                idx -= Note.noteSpawnWeights[CurrentStage.AvailableNotes[i]];
 
-                selectedType = currentStage.AvailableNotes[i];
+                selectedType = CurrentStage.AvailableNotes[i];
                 i++;
             }
 

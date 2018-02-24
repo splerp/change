@@ -274,14 +274,14 @@ namespace Splerp.Change.Controllers
 
         public void Draw()
         {
-            gc.currentState.Draw();
+            gc.CurrentState.Draw();
         }
 
         #region State "Draw" methods.
         public void DrawMainMenu()
         {
             Vector2 coinPos = Vector2.Zero;
-            switch (gc.mainMenu.selectedOption)
+            switch (gc.CurrentMenu.SelectedOption)
             {
                 case 0:
                     coinPos = new Vector2(9, 7);
@@ -369,7 +369,7 @@ namespace Splerp.Change.Controllers
             DrawGame();
 
             Vector2 coinPos = Vector2.Zero;
-            switch (gc.gameOverMenu.selectedOption)
+            switch (gc.CurrentMenu.SelectedOption)
             {
                 case 0:
                     coinPos = new Vector2(33, 30);
@@ -379,7 +379,7 @@ namespace Splerp.Change.Controllers
                     break;
             }
 
-            var menuPos = (gameOverOffset + new Point(0, (int)gc.gameOverMenu.currentY)).ToVector2();
+            var menuPos = (gameOverOffset + gc.CurrentMenu.MenuOffset.ToPoint()).ToVector2();
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
@@ -452,7 +452,7 @@ namespace Splerp.Change.Controllers
             // Draw falling coins.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                foreach (var coin in gc.coinBackgroundController.coins)
+                foreach (var coin in gc.FallingCoins)
                 {
                     batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
                 }
@@ -501,7 +501,7 @@ namespace Splerp.Change.Controllers
             batch.End();
 
             // Draw back of paddle.
-            if (gc.currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            if (gc.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
                 {
@@ -536,7 +536,7 @@ namespace Splerp.Change.Controllers
             batch.End();
 
             // Draw front of paddle.
-            if (gc.currentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            if (gc.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
                 {
@@ -552,21 +552,21 @@ namespace Splerp.Change.Controllers
             // Draw hud.
             var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;
 
-            var healthPercentage = (gc.currentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.currentStage.MaxNotesMissed;
+            var healthPercentage = (gc.CurrentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.CurrentStage.MaxNotesMissed;
             healthPercentage = (int)(healthPercentage * totalArea) / (float)totalArea * totalAreaRatio;
 
-            var totalDuration = gc.currentStage.RequiredTimePassed.TotalMilliseconds;
-            var currentDuration = (DateTime.Now - gc.currentStage.startTime).TotalMilliseconds;
+            var totalDuration = gc.CurrentStage.RequiredTimePassed.TotalMilliseconds;
+            var currentDuration = (DateTime.Now - gc.CurrentStage.startTime).TotalMilliseconds;
 
             float progressPercentage;
 
-            if (gc.currentStage.HasFlag(Stage.StageFlags.CompleteOnTimePassed))
+            if (gc.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnTimePassed))
             {
                 progressPercentage = (float)(currentDuration / totalDuration);
             }
-            else if (gc.currentStage.HasFlag(Stage.StageFlags.CompleteOnCollectCoins))
+            else if (gc.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnCollectCoins))
             {
-                progressPercentage = gc.currentStage.coinsCollected / (float)gc.currentStage.RequiredCoins;
+                progressPercentage = gc.CurrentStage.coinsCollected / (float)gc.CurrentStage.RequiredCoins;
             }
             else
             {
@@ -609,7 +609,7 @@ namespace Splerp.Change.Controllers
             batch.End();
 
             // Draw laser player (over HUD).
-            if (gc.currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
                 {
@@ -647,11 +647,14 @@ namespace Splerp.Change.Controllers
                 batch.End();
             }
 
-            batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+            if(gc.CurrentMenu != null)
             {
-                batch.Draw(stageOverBackground, new Vector2(0, (int)gc.stageCompleteMenu.currentY) + stageCompleteOffset.ToVector2(), Color.White);
+                batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+                {
+                    batch.Draw(stageOverBackground, gc.CurrentMenu.MenuOffset.ToPoint().ToVector2() + stageCompleteOffset.ToVector2(), Color.White);
+                }
+                batch.End();
             }
-            batch.End();
         }
         #endregion
 
