@@ -32,11 +32,9 @@ namespace MonoJam.Controllers
     {
         private bool _prevDownState;
 
-        public InputController.ControlType ControlType { get; private set; }
-
-        public Keys[] KeyCodes { get; private set; } = new Keys[0];
-        public Buttons[] ButtonCodes { get; private set; } = new Buttons[0];
-        public InputController.MouseButtons[] MouseButtonCodes { get; private set; } = new InputController.MouseButtons[0];
+        public Keys[] KeyCodes { get; set; } = new Keys[0];
+        public Buttons[] ButtonCodes { get; set; } = new Buttons[0];
+        public InputController.MouseButtons[] MouseButtonCodes { get; set; } = new InputController.MouseButtons[0];
         public bool IsDown { get; private set; }
         public bool IsJustPressed { get; private set; }
 
@@ -82,7 +80,6 @@ namespace MonoJam.Controllers
         private Control(params Keys[] defaultKeys)
         {
             KeyCodes = defaultKeys;
-            ControlType = InputController.ControlType.Keyboard;
 
             PlayerControls.Add(this);
         }
@@ -90,7 +87,6 @@ namespace MonoJam.Controllers
         private Control(params Buttons[] defaultKeys)
         {
             ButtonCodes = defaultKeys;
-            ControlType = InputController.ControlType.GamePad;
 
             PlayerControls.Add(this);
         }
@@ -98,7 +94,6 @@ namespace MonoJam.Controllers
         private Control(params InputController.MouseButtons[] defaultKeys)
         {
             MouseButtonCodes = defaultKeys;
-            ControlType = InputController.ControlType.Mouse;
 
             PlayerControls.Add(this);
         }
