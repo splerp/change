@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoJam.GameObjects;
 using MonoJam.Utils;
 using System;
@@ -9,7 +8,7 @@ using System.Timers;
 
 namespace MonoJam.Controllers
 {
-    public class GameController
+    public sealed class GameController : IDisposable
     {
         #region Delegates
         public delegate void StartEnter();
@@ -505,12 +504,14 @@ namespace MonoJam.Controllers
         public void SpawnPiggyBank()
         {
             var newPig = new PiggyBank();
+            newPig.Init();
             enemies.Add(newPig);
         }
 
         public void SpawnVacuum()
         {
             var newVacuum = new VacuumEnemy();
+            newVacuum.Init();
             enemies.Add(newVacuum);
         }
 
@@ -587,6 +588,29 @@ namespace MonoJam.Controllers
         public void DestroyEnemy(Enemy e)
         {
             enemies.Remove(e);
+        }
+        #endregion
+
+        #region Disposal handling
+        ~GameController()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if(disposing)
+            {
+                piggyBankSpawner.Dispose();
+                vacuumSpawner.Dispose();
+                noteSpawner.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

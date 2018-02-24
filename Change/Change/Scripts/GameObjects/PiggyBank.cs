@@ -4,7 +4,7 @@ using System;
 
 namespace MonoJam.GameObjects
 {
-    public class PiggyBank : Enemy
+    public sealed class PiggyBank : Enemy
     {
         public const int WIDTH = 18;
         public const int HEIGHT = 12;

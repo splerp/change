@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MonoJam.Controllers
 {
-    public class GraphicsController
+    public sealed class GraphicsController : IDisposable
     {
         public const int MAX_VAULT_BG_LAYERS_VISIBLE = 10;
         public const int MAX_VAULT_BG_LAYERS = 13;
@@ -189,7 +189,7 @@ namespace MonoJam.Controllers
             mutedIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height - 3);
             mutedMusicIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height * 2 - 3 - 2);
             noTutorialIconOffset = new Point(MonoJam.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, MonoJam.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
-
+            
             currentCoinBackground = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, MonoJam.PLAYABLE_AREA_HEIGHT);
             VaultFloor = new Texture2D(graphicsDevice, MonoJam.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
@@ -715,6 +715,38 @@ namespace MonoJam.Controllers
                     Color.White,
                     0, Vector2.Zero, 1, effectInv, 0);
             }
+        }
+        #endregion
+        
+        #region Disposal handling
+        ~GraphicsController()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                batch.Dispose();
+
+                // Dispose of all Texture2D references that were constructed here.
+                coinGraphic.Dispose();
+                playerLasersLayer.Dispose();
+                currentCoinBackground.Dispose();
+                VaultWalls.Dispose();
+                VaultFloor.Dispose();
+                hudBackground.Dispose();
+                hudLaserCharge.Dispose();
+                hudPlayerHealth.Dispose();
+                hudTimeRemaining.Dispose();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

@@ -4,7 +4,7 @@ using System;
 
 namespace MonoJam.GameObjects
 {
-    public class VacuumEnemy : Enemy
+    public sealed class VacuumEnemy : Enemy
     {
         public const int WIDTH = 12;
         public const int HEIGHT = 11;

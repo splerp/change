@@ -22,7 +22,7 @@ namespace MonoJam.GameObjects
         public int CurrentHealth { get; set; }
         public bool IsDead => CurrentHealth <= 0;
 
-        public Enemy()
+        public void Init()
         {
             CurrentHealth = MaxHealth;
         }
