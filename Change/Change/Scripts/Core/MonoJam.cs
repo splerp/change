@@ -19,8 +19,8 @@ namespace MonoJam
 
         GraphicsDeviceManager graphics;
 
-        public GraphicsController grc;
-        public InputController ic;
+        private GraphicsController grc;
+        private InputController ic;
         private GameController gc;
         private SoundController sc;
 
@@ -46,16 +46,21 @@ namespace MonoJam
         
         protected override void Initialize()
         {
-            gc = new GameController(this);
-            sc = new SoundController(this);
             ic = new InputController();
-            grc = new GraphicsController(this, gc, GraphicsDevice);
-
-            grc.LoadContent(Content);
-            Sound.LoadContent(Content);
-            gc.Init();
+            grc = new GraphicsController(this, ic, GraphicsDevice);
+            sc = new SoundController(this);
+            gc = new GameController(this, grc, ic);
 
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            // Load graphics.
+            grc.LoadContent(Content);
+
+            // Load audio.
+            sc.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)

@@ -35,6 +35,14 @@ namespace MonoJam.Controllers
 #endif
         }
 
+        public void LoadContent(ContentManager cm)
+        {
+            foreach (var sound in Sound.AllSounds)
+            {
+                sound.data = cm.Load<SoundEffect>("Audio/" + sound.audioName);
+            }
+        }
+
         public static void Play(Sound s, bool loop = false)
         {
             // Remove any that are no longer playing.
@@ -127,14 +135,6 @@ namespace MonoJam.Controllers
             }
 
             AllSounds.Add(this);
-        }
-
-        public static void LoadContent(ContentManager cm)
-        {
-            foreach (var sound in AllSounds)
-            {
-                sound.data = cm.Load<SoundEffect>("Audio/" + sound.audioName);
-            }
         }
 
         public static List<Sound> AllSounds;

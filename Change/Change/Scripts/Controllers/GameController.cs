@@ -15,58 +15,74 @@ namespace MonoJam.Controllers
         public const int COINS_SPAWNED_PER_FRAME = 8;
         public const float SMALL_SHAKE_AMOUNT = 1f;
 
+        #region Delegates
         public delegate void StartEnter();
         public delegate void StageUpdate();
+        #endregion
 
-        public Stage currentStage;
-
+        // Unsorted
         private MonoJam mj;
-        public ShakeController mainShaker;
+        private GraphicsController grc;
+        private InputController ic;
+        public Stage currentStage;
+        public GameState currentState;
+
+        public byte[] coinData;
+        public int notesMissed;
+        public bool skipTutorial;
+        public int[] currentLayerCoinTrend;
+        public int totalTrendCount;
+
+        // References to other controllers.
         public MainMenuController mainMenu;
         public GameOverMenuController gameOverMenu;
         public StageCompleteMenuController stageCompleteMenu;
 
+        // Random object used everywhere.
+        public static Random random = new Random();
+
+        #region Game Objects
+        // Reference to laser controller.
         public LaserPlayer laserPlayer;
+
+        // Reference to paddle controller
         public PaddlePlayer paddlePlayer;
+
+        // All game object collections.
         public List<Enemy> enemies;
         public List<Coin> coins;
         public List<EnemyCorpse> corpses;
         public List<Note> notes;
         public List<NoteOnFire> notesOnFire;
+        #endregion
 
-        public byte[] coinData;
+        #region Timer variables
+        private Timer piggyBankSpawner;
+        private Timer vacuumSpawner;
+        private Timer noteSpawner;
+        private bool ReadyToSpawnPiggyBank { get; set; }
+        private bool ReadyToSpawnVacuum { get; set; }
+        private bool ReadyToSpawnNote { get; set; }
+        #endregion
 
-        public static Random random;
-        public bool ReadyToSpawnPiggyBank { get; set; }
-        public bool ReadyToSpawnVacuum { get; set; }
-        public bool ReadyToSpawnNote { get; set; }
-
-        public int[] currentLayerTrend;
-        public int totalTrendCount;
-
-        Timer piggyBankSpawner;
-        Timer vacuumSpawner;
-        Timer noteSpawner;
-
+        #region Coin Counting
         public Int64 placedCoins;
         public Int64 currentCoins;
         public Int64 coinsToSpawn;
         public Int64 bestCoinScore;
-        public int notesMissed;
+        #endregion
 
-        public bool coinsStartFalling;
-        public bool coinsStopFalling;
-
-        public bool skipTutorial;
-
-        public GameState currentState;
-        public bool pressingKeysLastFrame;
-
-        public GameController(MonoJam mjIn)
+        public GameController(MonoJam mjIn, GraphicsController grcIn, InputController icIn)
         {
+            // Set references.
             mj = mjIn;
-            mainShaker = new ShakeController();
+            grc = grcIn;
+            ic = icIn;
 
+            // Add reference to graphics controller.
+            grc.SetGameControllerReference(this);
+
+            // Define state definitions (with references to this GameController instance's content).
             #region State definitions
             GameState.Title = new GameState("title")
             {
@@ -106,41 +122,70 @@ namespace MonoJam.Controllers
                 OnStateUpdate = UpdateGameOverMenu
             };
             #endregion
-        }
 
-        public void Init()
-        {
-            mainMenu = new MainMenuController(this);
+            // Set up controllers.
+            mainMenu = new MainMenuController(mj, this);
             gameOverMenu = new GameOverMenuController(this);
             stageCompleteMenu = new StageCompleteMenuController(this);
 
+            // Set up players.
             laserPlayer = new LaserPlayer(this);
             paddlePlayer = new PaddlePlayer(this);
 
+            // Define collections.
             enemies = new List<Enemy>();
             coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
             notes = new List<Note>();
             notesOnFire = new List<NoteOnFire>();
-            random = new Random();
 
+            // Define timers.
             piggyBankSpawner = new Timer(30000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
-            vacuumSpawner = new Timer(5000);
+            vacuumSpawner = new Timer();
             vacuumSpawner.Elapsed += (a, b) => ReadyToSpawnVacuum = true;
 
-            noteSpawner = new Timer(500);
+            noteSpawner = new Timer();
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
 
-            currentLayerTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
+            // TODO Move to coin layer controller.
+            currentLayerCoinTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
 
+            // Set initial state to the main menu.
             SetState(GameState.Title);
         }
+        
+        public void Update()
+        {
+            // Do state-specific update logic.
+            currentState.OnStateUpdate();
 
+            #region Global input handling
+            if (Control.MuteSound.IsJustPressed)
+            {
+                SoundController.ToggleMute();
+                SoundController.Play(Sound.Bip2);
+            }
+
+            if (Control.MuteMusic.IsJustPressed)
+            {
+                SoundController.ToggleMuteMusic();
+                SoundController.Play(Sound.Bip2);
+            }
+
+            if (Control.SkipTutorial.IsJustPressed)
+            {
+                skipTutorial = !skipTutorial;
+                SoundController.Play(Sound.Bip2);
+            }
+            #endregion
+        }
+
+        #region State methods
         public void SetState(GameState newState)
         {
-            // HACK: sepcial case for between stages -> playing, don't reset content.
+            // HACK: special case for between stages -> playing, don't reset content.
             if (!(newState == GameState.Playing && currentState == GameState.BetweenStages))
             {
                 newState.OnEnterState();
@@ -149,6 +194,7 @@ namespace MonoJam.Controllers
             currentState = newState;
         }
 
+        #region State "On Start" methods
         public void OnStartPlaying()
         {
             ResetContent();
@@ -175,204 +221,23 @@ namespace MonoJam.Controllers
             SetStageVariables();
         }
 
-        public void ToNextStage()
-        {
-            SetState(GameState.BetweenStages);
-            stageCompleteMenu.Drop();
-
-            RemoveStageContent();
-        }
-
-        public void ToNextStageFinish()
-        {
-            var newStage = Stage.NextStage(currentStage);
-
-            if (newStage != null)
-            {
-                currentStage = newStage;
-                SetStageVariables();
-                SetState(GameState.Playing);
-            }
-            else
-            {
-                SetState(GameState.GameOver);
-            }
-        }
-
-        public void SetStageVariables()
-        {
-            currentStage.Restart();
-
-            notesMissed = 0;
-
-            piggyBankSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.PigsEnabled))
-            {
-                piggyBankSpawner.Start();
-            }
-
-            vacuumSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.VacuumsEnabled))
-            {
-                vacuumSpawner.Interval = currentStage.VacuumSpawnTime;
-                vacuumSpawner.Start();
-            }
-
-            noteSpawner.Stop();
-            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled))
-            {
-                noteSpawner.Interval = currentStage.NoteSpawnTime;
-                noteSpawner.Start();
-            }
-
-            if (!currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
-            {
-                laserPlayer.FiringLaser = false;
-                SoundController.StopAllLoops();
-            }
-        }
-
-        public void RemoveStageContent()
-        {
-            piggyBankSpawner.Stop();
-            vacuumSpawner.Stop();
-            noteSpawner.Stop();
-
-            notesMissed = 0;
-
-            DestroyAllEnemies();
-            DestroyAllMoney();
-        }
-
-        public void ResetContent()
-        {
-            RemoveStageContent();
-            DestroyAllCoins();
-
-            currentCoins = 0;
-            coinsToSpawn = 0;
-            placedCoins = 0;
-
-            ReadyToSpawnPiggyBank = false;
-            ReadyToSpawnVacuum = false;
-            ReadyToSpawnNote = false;
-
-            mj.grc.ResetCoinBuffers();
-
-            laserPlayer.FiringLaser = false;
-            SoundController.StopAllLoops();
-        }
-
         public void StartMappingControls()
         {
-            mj.ic.StartRemapping();
+            ic.StartRemapping();
         }
+        #endregion
 
-        public void UpdateMapControls()
-        {
-            if(mj.ic.FinishedRemapping)
-            {
-                SetState(GameState.Title);
-            }
-            else
-            {
-                // Should properly support all supported modes (mouse, gamepad), not just keyboard.
-                // Keep track of current control to override and listen for input.
-                var pressedKeys = Keyboard.GetState().GetPressedKeys();
-
-                var pressingKeyboard = pressedKeys.Length > 0;
-
-                if (pressingKeyboard && !pressingKeysLastFrame)
-                {
-                    mj.ic.RemapControl(pressedKeys);
-                }
-            }
-        }
-
-        public void Exit()
-        {
-            mj.Exit();
-        }
-
-        public void Update()
-        {
-            currentState.OnStateUpdate();
-
-            mainShaker.Update();
-
-            if (Control.MuteSound.IsJustPressed)
-            {
-                SoundController.ToggleMute();
-                SoundController.Play(Sound.Bip2);
-            }
-
-            if (Control.MuteMusic.IsJustPressed)
-            {
-                SoundController.ToggleMuteMusic();
-                SoundController.Play(Sound.Bip2);
-            }
-
-            if (Control.SkipTutorial.IsJustPressed)
-            {
-                skipTutorial = !skipTutorial;
-                SoundController.Play(Sound.Bip2);
-            }
-
-            //Console.WriteLine($"COINS: {currentCoins}; to spawn: {coinsToSpawn} (on screen: {coins.Count})");
-            //Console.WriteLine($"COINS Best: {bestCoinScore}"); 
-            //Console.WriteLine("Corpses: " + corpses.Count);
-            //Console.WriteLine("Current state: " + currentState);
-
-            var pressedKeys = Keyboard.GetState().GetPressedKeys();
-            pressingKeysLastFrame = pressedKeys.Length > 0;
-        }
-
-        public void UpdateMainMenu()
-        {
-            mainMenu.Update();
-
-            if (Control.Return.IsJustPressed)
-            {
-                Exit();
-            }
-        }
-
-        public void UpdateGameOverMenu()
-        {
-            gameOverMenu.Update();
-
-            if (Control.Return.IsJustPressed)
-            {
-                SetState(GameState.Title);
-            }
-        }
-
-        public void UpdateBetweenStages()
-        {
-            stageCompleteMenu.Update();
-
-            if (stageCompleteMenu.AnimationComplete)
-            {
-                ToNextStageFinish();
-            }
-        }
-
+        #region State "Update" methods
         public void UpdatePlay()
         {
             #region Create objects
             if (coinsToSpawn > 0)
             {
                 SoundController.Play(Sound.CoinsDrop, true);
-
-                coinsStartFalling = false;
-                coinsStopFalling = true;
             }
             else
             {
                 SoundController.Stop(Sound.CoinsDrop);
-
-                coinsStartFalling = true;
-                coinsStopFalling = false;
             }
 
             for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
@@ -385,7 +250,7 @@ namespace MonoJam.Controllers
                     int j = 0;
                     while (randomNum > 0)
                     {
-                        randomNum -= currentLayerTrend[j];
+                        randomNum -= currentLayerCoinTrend[j];
                         j++;
                     }
 
@@ -418,7 +283,6 @@ namespace MonoJam.Controllers
             #endregion
 
             #region Update objects
-
             if (currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
                 laserPlayer.Update();
@@ -489,7 +353,7 @@ namespace MonoJam.Controllers
                 {
                     placedCoins = 0;
                     CalculateCoinTrend();
-                    mj.grc.CreateNewCoinBuffer();
+                    grc.CreateNewCoinBuffer();
                     ResetCoinData();
                 }
             }
@@ -610,14 +474,111 @@ namespace MonoJam.Controllers
             }
         }
 
+        public void UpdateMainMenu()
+        {
+            mainMenu.Update();
+
+            if (Control.Return.IsJustPressed)
+            {
+                mj.Exit();
+            }
+        }
+
+        public void UpdateGameOverMenu()
+        {
+            gameOverMenu.Update();
+
+            if (Control.Return.IsJustPressed)
+            {
+                SetState(GameState.Title);
+            }
+        }
+
+        public void UpdateBetweenStages()
+        {
+            stageCompleteMenu.Update();
+
+            if (stageCompleteMenu.AnimationComplete)
+            {
+                ToNextStageFinish();
+            }
+        }
+
+        public void UpdateMapControls()
+        {
+            ic.UpdateMapControls(this);
+        }
+        #endregion
+        #endregion
+
+        #region Stage methods
+        public void ToNextStage()
+        {
+            SetState(GameState.BetweenStages);
+            stageCompleteMenu.Drop();
+
+            RemoveStageContent();
+        }
+
+        public void ToNextStageFinish()
+        {
+            var newStage = Stage.NextStage(currentStage);
+
+            if (newStage != null)
+            {
+                currentStage = newStage;
+                SetStageVariables();
+                SetState(GameState.Playing);
+            }
+            else
+            {
+                SetState(GameState.GameOver);
+            }
+        }
+
+        public void SetStageVariables()
+        {
+            currentStage.Restart();
+
+            notesMissed = 0;
+
+            piggyBankSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.PigsEnabled))
+            {
+                piggyBankSpawner.Start();
+            }
+
+            vacuumSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.VacuumsEnabled))
+            {
+                vacuumSpawner.Interval = currentStage.VacuumSpawnTime;
+                vacuumSpawner.Start();
+            }
+
+            noteSpawner.Stop();
+            if (currentStage.HasFlag(Stage.StageFlags.NotesEnabled))
+            {
+                noteSpawner.Interval = currentStage.NoteSpawnTime;
+                noteSpawner.Start();
+            }
+
+            if (!currentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            {
+                laserPlayer.FiringLaser = false;
+                SoundController.StopAllLoops();
+            }
+        }
+        #endregion
+        
+        // TODO move to coin controller
         public void CalculateCoinTrend()
         {
             float randomStartPos = random.Next(0, 100) / 100f;
             totalTrendCount = 0;
-            for (int i = 0; i < currentLayerTrend.Length; i++)
+            for (int i = 0; i < currentLayerCoinTrend.Length; i++)
             {
                 float newVal = 5 + (Perlin.Noise(0, i * 0.05f + randomStartPos) * 5) + 1;
-                currentLayerTrend[i] = (int)newVal;
+                currentLayerCoinTrend[i] = (int)newVal;
                 totalTrendCount += (int)newVal;
             }
         }
@@ -629,24 +590,7 @@ namespace MonoJam.Controllers
             currentStage.coinsCollected += coins;
         }
 
-        public void ResetCoinData()
-        {
-            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
-        }
-
-        public void DestroyAllCoins()
-        {
-            coins.Clear();
-
-            ResetCoinData();
-        }
-
-        public void DestroyAllMoney()
-        {
-            notes.Clear();
-            notesOnFire.Clear();
-        }
-
+        #region Spawner methods
         public void SpawnPiggyBank()
         {
             var newPig = new PiggyBank();
@@ -678,6 +622,60 @@ namespace MonoJam.Controllers
 
             notes.Add(new Note(this, selectedType));
         }
+        #endregion
+
+        #region Cleanup methods
+        // Completely clears the level (ready to play from scratch).
+        public void ResetContent()
+        {
+            RemoveStageContent();
+            DestroyAllCoins();
+
+            currentCoins = 0;
+            coinsToSpawn = 0;
+            placedCoins = 0;
+
+            ReadyToSpawnPiggyBank = false;
+            ReadyToSpawnVacuum = false;
+            ReadyToSpawnNote = false;
+
+            grc.ResetCoinBuffers();
+
+            laserPlayer.FiringLaser = false;
+            SoundController.StopAllLoops();
+        }
+
+        // Clears all content between stages.
+        public void RemoveStageContent()
+        {
+            piggyBankSpawner.Stop();
+            vacuumSpawner.Stop();
+            noteSpawner.Stop();
+
+            notesMissed = 0;
+
+            DestroyAllEnemies();
+            DestroyAllMoney();
+        }
+
+        // TODO move elsewhere
+        public void ResetCoinData()
+        {
+            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
+        }
+
+        public void DestroyAllCoins()
+        {
+            coins.Clear();
+
+            ResetCoinData();
+        }
+
+        public void DestroyAllMoney()
+        {
+            notes.Clear();
+            notesOnFire.Clear();
+        }
 
         public void DestroyAllEnemies()
         {
@@ -694,5 +692,6 @@ namespace MonoJam.Controllers
         {
             enemies.Remove(e);
         }
+        #endregion
     }
 }

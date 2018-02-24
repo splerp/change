@@ -17,7 +17,9 @@ namespace MonoJam.Controllers
         public delegate void DrawState();
 
         private MonoJam mj;
+        private InputController ic;
         private GameController gc;
+        
         private GraphicsDevice graphicsDevice;
         private SpriteBatch batch;
         private SamplerState samplerState;
@@ -95,10 +97,11 @@ namespace MonoJam.Controllers
 
         private Dictionary<Note.NoteType, Texture2D> noteGraphics;
 
-        public GraphicsController(MonoJam mjIn, GameController gcIn, GraphicsDevice graphicsDeviceIn)
+        public GraphicsController(MonoJam mjIn, InputController icIn, GraphicsDevice graphicsDeviceIn)
         {
             mj = mjIn;
-            gc = gcIn;
+            ic = icIn;
+
             graphicsDevice = graphicsDeviceIn;
             coinBackgroundLayers = new List<CoinBackgroundLayer>();
 
@@ -109,6 +112,11 @@ namespace MonoJam.Controllers
             baseMatrix =
                   Matrix.CreateTranslation(0, MonoJam.PLAYABLE_AREA_Y, 0)
                 * baseScaleMatrix;
+        }
+
+        public void SetGameControllerReference(GameController gcIn)
+        {
+            gc = gcIn;
         }
 
         public void ResetCoinBuffers()
@@ -321,9 +329,9 @@ namespace MonoJam.Controllers
 
         public void DrawChangeControlsMenu()
         {
-            if(!mj.ic.FinishedRemapping)
+            if(!ic.FinishedRemapping)
             {
-                var currentControl = mj.ic.CurrentRemappingControl;
+                var currentControl = ic.CurrentRemappingControl;
                 Texture2D controlDirective = null;
                 if (currentControl == Control.MoveUp)
                 {
@@ -382,13 +390,9 @@ namespace MonoJam.Controllers
 
         public void DrawGame()
         {
-            var baseMatrixWithMainShake =
-                Matrix.CreateTranslation(new Vector3(gc.mainShaker.CurrentShake, 0))
-                * baseMatrix;
-
             var baseMatrixWithLaserShake = Matrix.CreateTranslation(
                 new Vector3(gc.laserPlayer.laserShake.CurrentShake, 0))
-                * baseMatrixWithMainShake;
+                * baseMatrix;
 
             graphicsDevice.Clear(Color.Black);
 
@@ -416,7 +420,7 @@ namespace MonoJam.Controllers
                 // Create matrix for coin backgrounds.
                 Matrix coinBackgroundMatrix =
                       Matrix.CreateTranslation(-MonoJam.WINDOW_WIDTH / 2, -MonoJam.PLAYABLE_AREA_HEIGHT, 0)
-                    * baseMatrixWithMainShake
+                    * baseMatrix
                     * Matrix.CreateScale(coinBackground.currentScale)
                     * Matrix.CreateTranslation(
                         MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.SCALE / 2,
@@ -440,14 +444,14 @@ namespace MonoJam.Controllers
 
             // Update current coin data.
             UpdateCoinBGData();
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 batch.Draw(currentCoinBackground, new Vector2(0, 0), Color.White);
             }
             batch.End();
 
             // Draw falling coins.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 foreach (var coin in gc.coins)
                 {
@@ -464,7 +468,7 @@ namespace MonoJam.Controllers
             batch.End();
 
             // Draw enemies.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 foreach (var c in gc.corpses)
                 {
@@ -508,7 +512,7 @@ namespace MonoJam.Controllers
             }
 
             // Draw money.
-            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithMainShake);
+            batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 foreach (var c in gc.notesOnFire)
                 {

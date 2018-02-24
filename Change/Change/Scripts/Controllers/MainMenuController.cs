@@ -7,6 +7,7 @@ namespace MonoJam.Controllers
     {
         public const int TOTAL_OPTIONS = 3;
 
+        private MonoJam mj;
         private GameController gc;
 
         public bool previousUp;
@@ -15,8 +16,9 @@ namespace MonoJam.Controllers
 
         public int selectedOption = 0;
 
-        public MainMenuController(GameController gcIn)
+        public MainMenuController(MonoJam mjIn, GameController gcIn)
         {
+            mj = mjIn;
             gc = gcIn;
         }
 
@@ -48,7 +50,7 @@ namespace MonoJam.Controllers
                         gc.SetState(GameState.MapControls);
                         break;
                     case 2:
-                        gc.Exit();
+                        mj.Exit();
                         break;
                 }
             }
