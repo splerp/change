@@ -64,6 +64,12 @@ namespace MonoJam.Controllers
 
         private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
+
+        private Texture2D changeControlsBackground;
+        private Texture2D changeControlsForward;
+        private Texture2D changeControlsBack;
+        private Texture2D changeControlsLeft;
+        private Texture2D changeControlsRight;
         #endregion
 
         private const int vaultWallWidth = 10;
@@ -157,6 +163,12 @@ namespace MonoJam.Controllers
             mutedIcon = Content.Load<Texture2D>("Graphics/MutedIcon");
             mutedMusicIcon = Content.Load<Texture2D>("Graphics/MutedMusicIcon");
             noTutorialIcon = Content.Load<Texture2D>("Graphics/NoTutorialIcon");
+
+            changeControlsBackground = Content.Load<Texture2D>("Graphics/ChangeControlsBackground");
+            changeControlsForward = Content.Load<Texture2D>("Graphics/ChangeControlsForward");
+            changeControlsBack = Content.Load<Texture2D>("Graphics/ChangeControlsBack");
+            changeControlsLeft = Content.Load<Texture2D>("Graphics/ChangeControlsLeft");
+            changeControlsRight = Content.Load<Texture2D>("Graphics/ChangeControlsRight");
 
             bestScoreBackgroundOffset = new Point(MonoJam.WINDOW_WIDTH - 2, 2);
             mutedIconOffset = new Point(MonoJam.WINDOW_WIDTH - mutedIcon.Width - 3, MonoJam.WINDOW_HEIGHT - mutedIcon.Height - 3);
