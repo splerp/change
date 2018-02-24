@@ -102,6 +102,9 @@ namespace MonoJam.Controllers
             mj = mjIn;
             ic = icIn;
 
+            CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
+            CoinBackgroundController.CurrentCoinBufferUpdated += OnCoinBufferUpdated;
+
             graphicsDevice = graphicsDeviceIn;
             coinBackgroundLayers = new List<CoinBackgroundLayer>();
 
@@ -125,11 +128,8 @@ namespace MonoJam.Controllers
             coinBackgroundLayers.Add(new CoinBackgroundLayer() { graphic = backgroundGraphic });
         }
 
-        public void CreateNewCoinBuffer()
+        public void CreateNewCoinBuffer(object sender, EventArgs e)
         {
-            // First ensure graphic is up to date.
-            UpdateCoinBGData();
-            
             Color[] theCurrentData = new Color[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
 
             var NewCoinBackground = new CoinBackgroundLayer
@@ -148,6 +148,12 @@ namespace MonoJam.Controllers
             {
                 coinBackgroundLayers.RemoveAt(MAX_VAULT_BG_LAYERS);
             }
+        }
+
+        public void OnCoinBufferUpdated(object sender, EventArgs e)
+        {
+            // Update current coin data.
+            currentCoinBackground.SetData(gc.coinBackgroundController.coinDataBuffer.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray());
         }
 
         public void LoadContent(ContentManager Content)
@@ -265,18 +271,12 @@ namespace MonoJam.Controllers
             GameState.GameOver.Draw = DrawGameOverMenu;
         }
 
-        // TODO: Just set the relevant pixels when required, not a full refresh.
-        private void UpdateCoinBGData()
-        {
-            var data = gc.coinData.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray();
-            currentCoinBackground.SetData(data);
-        }
-
         public void Draw()
         {
             gc.currentState.Draw();
         }
 
+        #region State "Draw" methods.
         public void DrawMainMenu()
         {
             Vector2 coinPos = Vector2.Zero;
@@ -442,8 +442,6 @@ namespace MonoJam.Controllers
                 batch.End();
             }
 
-            // Update current coin data.
-            UpdateCoinBGData();
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 batch.Draw(currentCoinBackground, new Vector2(0, 0), Color.White);
@@ -453,7 +451,7 @@ namespace MonoJam.Controllers
             // Draw falling coins.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                foreach (var coin in gc.coins)
+                foreach (var coin in gc.coinBackgroundController.coins)
                 {
                     batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
                 }
@@ -546,7 +544,7 @@ namespace MonoJam.Controllers
                 batch.End();
             }
 
-            var scoreLength = ScoreController.LengthOf(gc.currentCoins / 100d);
+            var scoreLength = ScoreController.LengthOf(gc.currentCoinScore / 100d);
             var totalArea = MonoJam.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (MonoJam.PLAYABLE_AREA_WIDTH - scoreLength) / (float)MonoJam.PLAYABLE_AREA_WIDTH;
 
@@ -605,7 +603,7 @@ namespace MonoJam.Controllers
                     SpriteEffects.None, 0);
 
                 batch.Draw(scoreBackground, Vector2.Zero, Color.White);
-                DrawScore(batch, Vector2.Zero, gc.currentCoins / 100d);
+                DrawScore(batch, Vector2.Zero, gc.currentCoinScore / 100d);
             }
             batch.End();
 
@@ -654,7 +652,9 @@ namespace MonoJam.Controllers
             }
             batch.End();
         }
+        #endregion
 
+        #region Other draw methods
         public void DrawScore(SpriteBatch b, Vector2 drawPos, double score)
         {
             var scoreStr = ScoreController.StringFor(score);
@@ -697,13 +697,13 @@ namespace MonoJam.Controllers
                     vacuumNoteData[j + VacuumEnemy.MAX_NOTES_HELD * 2] = colour;
                 }
 
-                var thing = new Texture2D(graphicsDevice, VacuumEnemy.MAX_NOTES_HELD, 3);
-                thing.SetData(vacuumNoteData);
+                var vacuumNotesDisplay = new Texture2D(graphicsDevice, VacuumEnemy.MAX_NOTES_HELD, 3);
+                vacuumNotesDisplay.SetData(vacuumNoteData);
 
                 Vector2 vacuumNoteGraphicOffset = enemy.direction > 0 ? new Vector2(3, 4) : new Vector2(4, 4);
 
-                b.Draw(thing, drawPos + new Vector2(offsetX2, 0) + vacuumNoteGraphicOffset, Color.White);
-
+                b.Draw(vacuumNotesDisplay, drawPos + new Vector2(offsetX2, 0) + vacuumNoteGraphicOffset, Color.White);
+                
                 var vacHead = ((VacuumEnemy)enemy).lookingUp ? vacuumHeadUpGraphic : vacuumHeadDownGraphic;
 
                 b.Draw(vacHead, drawPos + new Vector2(offsetX1, 0),
@@ -716,5 +716,6 @@ namespace MonoJam.Controllers
                     0, Vector2.Zero, 1, effectInv, 0);
             }
         }
+        #endregion
     }
 }

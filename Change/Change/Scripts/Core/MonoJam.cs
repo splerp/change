@@ -52,6 +52,9 @@ namespace MonoJam
             gc = new GameController(this, grc, ic);
 
             base.Initialize();
+
+            // Set initial state to the main menu.
+            gc.SetState(GameState.Title);
         }
 
         protected override void LoadContent()

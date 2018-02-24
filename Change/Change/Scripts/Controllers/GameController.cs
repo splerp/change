@@ -11,10 +11,6 @@ namespace MonoJam.Controllers
 {
     public class GameController
     {
-        public const int COINS_PER_LAYER = 5000;
-        public const int COINS_SPAWNED_PER_FRAME = 8;
-        public const float SMALL_SHAKE_AMOUNT = 1f;
-
         #region Delegates
         public delegate void StartEnter();
         public delegate void StageUpdate();
@@ -24,20 +20,18 @@ namespace MonoJam.Controllers
         private MonoJam mj;
         private GraphicsController grc;
         private InputController ic;
+        public CoinBackgroundController coinBackgroundController;
         public Stage currentStage;
         public GameState currentState;
 
-        public byte[] coinData;
         public int notesMissed;
         public bool skipTutorial;
-        public int[] currentLayerCoinTrend;
-        public int totalTrendCount;
 
-        // References to other controllers.
+        // Menu controllers.
         public MainMenuController mainMenu;
         public GameOverMenuController gameOverMenu;
         public StageCompleteMenuController stageCompleteMenu;
-
+        
         // Random object used everywhere.
         public static Random random = new Random();
 
@@ -50,7 +44,6 @@ namespace MonoJam.Controllers
 
         // All game object collections.
         public List<Enemy> enemies;
-        public List<Coin> coins;
         public List<EnemyCorpse> corpses;
         public List<Note> notes;
         public List<NoteOnFire> notesOnFire;
@@ -66,9 +59,7 @@ namespace MonoJam.Controllers
         #endregion
 
         #region Coin Counting
-        public Int64 placedCoins;
-        public Int64 currentCoins;
-        public Int64 coinsToSpawn;
+        public Int64 currentCoinScore;
         public Int64 bestCoinScore;
         #endregion
 
@@ -114,7 +105,7 @@ namespace MonoJam.Controllers
                 {
                     gameOverMenu.Drop();
 
-                    bestCoinScore = Math.Max(bestCoinScore, currentCoins);
+                    bestCoinScore = Math.Max(bestCoinScore, currentCoinScore);
 
                     laserPlayer.FiringLaser = false;
                     SoundController.StopAllLoops();
@@ -127,6 +118,7 @@ namespace MonoJam.Controllers
             mainMenu = new MainMenuController(mj, this);
             gameOverMenu = new GameOverMenuController(this);
             stageCompleteMenu = new StageCompleteMenuController(this);
+            coinBackgroundController = new CoinBackgroundController();
 
             // Set up players.
             laserPlayer = new LaserPlayer(this);
@@ -134,7 +126,6 @@ namespace MonoJam.Controllers
 
             // Define collections.
             enemies = new List<Enemy>();
-            coins = new List<Coin>();
             corpses = new List<EnemyCorpse>();
             notes = new List<Note>();
             notesOnFire = new List<NoteOnFire>();
@@ -148,12 +139,6 @@ namespace MonoJam.Controllers
 
             noteSpawner = new Timer();
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
-
-            // TODO Move to coin layer controller.
-            currentLayerCoinTrend = new int[MonoJam.PLAYABLE_AREA_WIDTH];
-
-            // Set initial state to the main menu.
-            SetState(GameState.Title);
         }
         
         public void Update()
@@ -203,11 +188,8 @@ namespace MonoJam.Controllers
             vacuumSpawner.Start();
             noteSpawner.Start();
 
-            ResetCoinData();
-
             laserPlayer.Reset();
             paddlePlayer.Reset();
-            CalculateCoinTrend();
 
             if (skipTutorial)
             {
@@ -231,35 +213,6 @@ namespace MonoJam.Controllers
         public void UpdatePlay()
         {
             #region Create objects
-            if (coinsToSpawn > 0)
-            {
-                SoundController.Play(Sound.CoinsDrop, true);
-            }
-            else
-            {
-                SoundController.Stop(Sound.CoinsDrop);
-            }
-
-            for (int i = 0; i < COINS_SPAWNED_PER_FRAME; i++)
-            {
-                if (coinsToSpawn > 0)
-                {
-                    coinsToSpawn--;
-
-                    var randomNum = random.Next(0, totalTrendCount);
-                    int j = 0;
-                    while (randomNum > 0)
-                    {
-                        randomNum -= currentLayerCoinTrend[j];
-                        j++;
-                    }
-
-                    var newCoin = new Coin();
-                    newCoin.SetX(j);
-                    coins.Add(newCoin);
-                }
-            }
-
             if (ReadyToSpawnPiggyBank)
             {
                 SpawnPiggyBank();
@@ -291,6 +244,8 @@ namespace MonoJam.Controllers
             {
                 paddlePlayer.Update();
             }
+
+            coinBackgroundController.Update();
 
             // Update enemies.
             for (int i = 0; i < enemies.Count; i++)
@@ -327,37 +282,6 @@ namespace MonoJam.Controllers
             #endregion
 
             #region Remove objects
-            // Remove destroyed coins.
-            for (int i = coins.Count - 1; i >= 0; i--)
-            {
-                for (int m = 0; m < coins[i].fallBy; m++)
-                {
-                    coins[i].MoveBy(new Vector2(0, 1));
-
-                    if (coins[i].MoveAndCheckLand(coinData))
-                    {
-                        var pos = coins[i].CollisionRect.Location;
-                        int arrayLoc = pos.Y * MonoJam.PLAYABLE_AREA_WIDTH + pos.X;
-
-                        coinData[arrayLoc] = 1;
-
-                        coins.RemoveAt(i);
-
-                        placedCoins++;
-                        break;
-                    }
-                }
-
-                // Move coin buffers if required.
-                if (placedCoins >= COINS_PER_LAYER)
-                {
-                    placedCoins = 0;
-                    CalculateCoinTrend();
-                    grc.CreateNewCoinBuffer();
-                    ResetCoinData();
-                }
-            }
-
             // Remove destroyed enemies.
             for (int i = 0; i < enemies.Count; i++)
             {
@@ -569,24 +493,11 @@ namespace MonoJam.Controllers
             }
         }
         #endregion
-        
-        // TODO move to coin controller
-        public void CalculateCoinTrend()
-        {
-            float randomStartPos = random.Next(0, 100) / 100f;
-            totalTrendCount = 0;
-            for (int i = 0; i < currentLayerCoinTrend.Length; i++)
-            {
-                float newVal = 5 + (Perlin.Noise(0, i * 0.05f + randomStartPos) * 5) + 1;
-                currentLayerCoinTrend[i] = (int)newVal;
-                totalTrendCount += (int)newVal;
-            }
-        }
 
         public void AddCoins(int coins)
         {
-            currentCoins += coins;
-            coinsToSpawn += coins;
+            currentCoinScore += coins;
+            coinBackgroundController.coinsToSpawn += coins;
             currentStage.coinsCollected += coins;
         }
 
@@ -629,16 +540,14 @@ namespace MonoJam.Controllers
         public void ResetContent()
         {
             RemoveStageContent();
-            DestroyAllCoins();
 
-            currentCoins = 0;
-            coinsToSpawn = 0;
-            placedCoins = 0;
+            currentCoinScore = 0;
 
             ReadyToSpawnPiggyBank = false;
             ReadyToSpawnVacuum = false;
             ReadyToSpawnNote = false;
 
+            coinBackgroundController.Reset();
             grc.ResetCoinBuffers();
 
             laserPlayer.FiringLaser = false;
@@ -656,19 +565,6 @@ namespace MonoJam.Controllers
 
             DestroyAllEnemies();
             DestroyAllMoney();
-        }
-
-        // TODO move elsewhere
-        public void ResetCoinData()
-        {
-            coinData = new byte[MonoJam.PLAYABLE_AREA_WIDTH * MonoJam.PLAYABLE_AREA_HEIGHT];
-        }
-
-        public void DestroyAllCoins()
-        {
-            coins.Clear();
-
-            ResetCoinData();
         }
 
         public void DestroyAllMoney()
