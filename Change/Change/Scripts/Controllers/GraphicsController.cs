@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Splerp.Change.Events;
 using Splerp.Change.GameObjects;
 using Splerp.Change.Graphics;
 using System;
@@ -150,10 +151,10 @@ namespace Splerp.Change.Controllers
             }
         }
 
-        public void OnCoinBufferUpdated(object sender, EventArgs e)
+        public void OnCoinBufferUpdated(object sender, CoinBufferUpdatedArgs e)
         {
             // Update current coin data.
-            currentCoinBackground.SetData(gc.coinBackgroundController.coinDataBuffer.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray());
+            currentCoinBackground.SetData(e.updatedBuffer.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray());
         }
 
         public void LoadContent(ContentManager Content)
