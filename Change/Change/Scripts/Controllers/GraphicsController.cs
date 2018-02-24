@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoJam.GameObjects;
 using MonoJam.Graphics;
 using System;
@@ -17,6 +16,7 @@ namespace MonoJam.Controllers
 
         public delegate void DrawState();
 
+        private MonoJam mj;
         private GameController gc;
         private GraphicsDevice graphicsDevice;
         private SpriteBatch batch;
@@ -95,8 +95,9 @@ namespace MonoJam.Controllers
 
         private Dictionary<Note.NoteType, Texture2D> noteGraphics;
 
-        public GraphicsController(GameController gcIn, GraphicsDevice graphicsDeviceIn)
+        public GraphicsController(MonoJam mjIn, GameController gcIn, GraphicsDevice graphicsDeviceIn)
         {
+            mj = mjIn;
             gc = gcIn;
             graphicsDevice = graphicsDeviceIn;
             coinBackgroundLayers = new List<CoinBackgroundLayer>();
@@ -307,6 +308,7 @@ namespace MonoJam.Controllers
                 {
                     batch.Draw(mutedMusicIcon, mutedMusicIconOffset.ToVector2(), Color.White);
                 }
+
                 if (gc.skipTutorial)
                 {
                     batch.Draw(noTutorialIcon, noTutorialIconOffset.ToVector2(), Color.White);
@@ -315,6 +317,42 @@ namespace MonoJam.Controllers
                 batch.Draw(titleBorderGraphic, Vector2.Zero, Color.White);
             }
             batch.End();
+        }
+
+        public void DrawChangeControlsMenu()
+        {
+            if(!mj.ic.FinishedRemapping)
+            {
+                var currentControl = mj.ic.CurrentRemappingControl;
+                Texture2D controlDirective = null;
+                if (currentControl == Control.MoveUp)
+                {
+                    controlDirective = changeControlsForward;
+                }
+                else if (currentControl == Control.MoveDown)
+                {
+                    controlDirective = changeControlsBack;
+                }
+                else if (currentControl == Control.MoveLeft)
+                {
+                    controlDirective = changeControlsLeft;
+                }
+                else if (currentControl == Control.MoveRight)
+                {
+                    controlDirective = changeControlsRight;
+                }
+
+                batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
+                {
+                    batch.Draw(changeControlsBackground, Vector2.Zero, Color.White);
+
+                    if (controlDirective != null)
+                    {
+                        batch.Draw(controlDirective, Vector2.Zero, Color.White);
+                    }
+                }
+                batch.End();
+            }
         }
 
         public void DrawGameOverMenu()

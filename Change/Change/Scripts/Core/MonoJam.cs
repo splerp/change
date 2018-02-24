@@ -20,9 +20,9 @@ namespace MonoJam
         GraphicsDeviceManager graphics;
 
         public GraphicsController grc;
+        public InputController ic;
         private GameController gc;
         private SoundController sc;
-        private InputController ic;
 
         public MonoJam()
         {
@@ -49,7 +49,7 @@ namespace MonoJam
             gc = new GameController(this);
             sc = new SoundController(this);
             ic = new InputController();
-            grc = new GraphicsController(gc, GraphicsDevice);
+            grc = new GraphicsController(this, gc, GraphicsDevice);
 
             grc.LoadContent(Content);
             Sound.LoadContent(Content);
