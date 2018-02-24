@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MonoJam.Controllers;
-using System;
 
 namespace MonoJam.GameObjects
 {

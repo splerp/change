@@ -2,7 +2,7 @@
 
 namespace MonoJam.Graphics
 {
-    public class CoinBackgroundLayer
+    public sealed class CoinBackgroundLayer
     {
         public Texture2D graphic;
 

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoJam.Controllers;
-using System;
 
 namespace MonoJam.GameObjects
 {
-    public class Coin : GameObject
+    public sealed class Coin : GameObject
     {
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), new Point(1, 1));
 

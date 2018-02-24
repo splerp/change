@@ -3,7 +3,7 @@ using System;
 
 namespace MonoJam.Utils
 {
-    public class LineCollisionTest
+    public sealed class LineCollisionTest
     {
         // https://tavianator.com/fast-branchless-raybounding-box-intersections/
         public static bool IntersectRay(Rectangle r, Point rayStart, Point rayEnd)

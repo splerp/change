@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MonoJam.Controllers
 {
-    public class CoinBackgroundController
+    public sealed class CoinBackgroundController
     {
         public const int COINS_PER_LAYER = 5000;
         public const int COINS_SPAWNED_PER_FRAME = 8;

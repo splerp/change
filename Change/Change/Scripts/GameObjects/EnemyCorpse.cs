@@ -2,7 +2,7 @@
 
 namespace MonoJam.GameObjects
 {
-    public class EnemyCorpse : GameObject
+    public sealed class EnemyCorpse : GameObject
     {
         public float gravity = 0.05f;
         public Vector2 speed;

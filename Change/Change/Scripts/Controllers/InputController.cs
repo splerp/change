@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MonoJam.Controllers
 {
-    public class InputController
+    public sealed class InputController
     {
         public enum ControlType { Mouse, Keyboard, GamePad }
         public enum MouseButtons { Left, Right }

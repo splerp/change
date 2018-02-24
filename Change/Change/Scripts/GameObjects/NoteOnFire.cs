@@ -3,7 +3,7 @@ using MonoJam.Controllers;
 
 namespace MonoJam.GameObjects
 {
-    public class NoteOnFire : GameObject
+    public sealed class NoteOnFire : GameObject
     {
         public float upSpeed = -0.33f;
 

@@ -2,7 +2,7 @@
 
 namespace MonoJam
 {
-    public class GameObject
+    public abstract class GameObject
     {
         public Vector2 Position { get; private set; }
 

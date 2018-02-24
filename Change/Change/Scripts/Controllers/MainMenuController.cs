@@ -1,9 +1,8 @@
-﻿using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 
 namespace MonoJam.Controllers
 {
-    public class MainMenuController
+    public sealed class MainMenuController
     {
         public const int TOTAL_OPTIONS = 3;
 

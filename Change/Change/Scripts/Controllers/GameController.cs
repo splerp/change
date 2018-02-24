@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using MonoJam.GameObjects;
+﻿using MonoJam.GameObjects;
 using MonoJam.Utils;
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MonoJam
 {
-    public class Stage
+    public sealed class Stage
     {
         [Flags]
         public enum StageFlags

@@ -3,6 +3,7 @@ using System.Globalization;
 
 namespace MonoJam.Controllers
 {
+    // TODO Do not use static?
     public static class ScoreController
     {
         // Lengths in pixels.

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MonoJam.Controllers
 {
-    public class SoundController
+    public sealed class SoundController
     {
         public const int MAX_INSTANCES_PER_SOUND = 3;
         public const float SONG_MASTER_VOLUME = 0.5f;
@@ -115,7 +115,7 @@ namespace MonoJam.Controllers
         }
     }
 
-    public class Sound
+    public sealed class Sound
     {
         public string audioName;
         public float volume;

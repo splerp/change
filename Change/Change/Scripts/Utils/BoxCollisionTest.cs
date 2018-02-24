@@ -3,7 +3,7 @@ using System;
 
 namespace MonoJam.Utils
 {
-    public class BoxCollisionTest
+    public sealed class BoxCollisionTest
     {
         public static bool IntersectAABB(Rectangle r1, Rectangle r2)
         {

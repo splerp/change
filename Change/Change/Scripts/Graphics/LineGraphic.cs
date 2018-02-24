@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MonoJam.Graphics
 {
-    public class LineGraphic
+    public sealed class LineGraphic
     {
         // https://stackoverflow.com/a/11683720
         public static Color[] CreateLine(int x, int y, int x2, int y2, Color lineColour)

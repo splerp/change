@@ -3,7 +3,7 @@ using MonoJam.Utils;
 
 namespace MonoJam.Controllers
 {
-    public class ShakeController
+    public sealed class ShakeController
     {
         public float currentAmplitude;
         public float pos;

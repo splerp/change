@@ -3,7 +3,7 @@ using System;
 
 namespace MonoJam
 {
-    public class GameState : IEquatable<GameState>
+    public sealed class GameState : IEquatable<GameState>
     {
         public string Key { get; set; }
         public GameController.StartEnter OnEnterState { get; set; }

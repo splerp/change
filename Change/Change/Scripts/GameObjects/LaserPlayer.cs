@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoJam.Controllers;
 using MonoJam.Utils;
 using System;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MonoJam.GameObjects
 {
-    public class LaserPlayer : GameObject, ICollisionObject
+    public sealed class LaserPlayer : GameObject, ICollisionObject
     {
         public const int DAMAGE_LASER_DIRECT = 100;
         public const int DAMAGE_LASER_INDIRECT = 20;

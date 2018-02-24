@@ -3,7 +3,7 @@ using MonoJam.Controllers;
 
 namespace MonoJam
 {
-    public class MonoJam : Game
+    public sealed class MonoJam : Game
     {
         public const int SCALE = 8;
         

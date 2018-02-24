@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MonoJam.GameObjects
 {
-    public class Note : GameObject, ICollisionObject, IHurtable
+    public sealed class Note : GameObject, ICollisionObject, IHurtable
     {
         public enum NoteType { None, Pink5, Blue10, Red20, Yellow50, Green100 }
 

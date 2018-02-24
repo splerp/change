@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
-
-namespace MonoJam.Controllers
+﻿namespace MonoJam.Controllers
 {
-    public class StageCompleteMenuController
+    public sealed class StageCompleteMenuController
     {
         public float currentY;
         private float speed;

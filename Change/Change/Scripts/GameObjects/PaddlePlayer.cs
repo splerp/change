@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoJam.Controllers;
 using System;
 
 namespace MonoJam.GameObjects
 {
-    public class PaddlePlayer : GameObject, ICollisionObject
+    public sealed class PaddlePlayer : GameObject, ICollisionObject
     {
         private GameController gc;
 
