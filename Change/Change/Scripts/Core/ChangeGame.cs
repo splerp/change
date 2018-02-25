@@ -76,6 +76,7 @@ namespace Splerp.Change
         {
             ic.UpdateControlStates();
             gc.Update(gameTime);
+            grc.Update(gameTime);
 
             base.Update(gameTime);
         }

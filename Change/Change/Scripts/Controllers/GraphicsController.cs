@@ -410,6 +410,26 @@ namespace Splerp.Change.Controllers
             batch.End();
         }
 
+        public void Update(GameTime gameTime)
+        {
+            for (int i = coinBackgroundLayers.Count - 1; i >= 0; i--)
+            {
+                var coinBackground = coinBackgroundLayers[i];
+
+                // Set to values immediately when start of the game (no smoothing should be applied).
+                var lerpSpeed = coinBackgroundLayers.Count == 1 ? 1f : (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                float targetScale = 1 * (float)Math.Pow(0.9f, (i + 1));
+                float targetTranslate = 300 - (300 * (float)Math.Pow(0.9f, (i + 1)));
+                float targetAlpha = 0.75f - ((i / (float)MAX_VAULT_BG_LAYERS_VISIBLE) * 0.75f);
+
+                // Move each background layer towards target values.
+                coinBackground.currentScale = MathHelper.Lerp(coinBackground.currentScale, targetScale, lerpSpeed);
+                coinBackground.currentTranslate = MathHelper.Lerp(coinBackground.currentTranslate, targetTranslate, lerpSpeed);
+                coinBackground.currentAlpha = MathHelper.Lerp(coinBackground.currentAlpha, targetAlpha, lerpSpeed);
+            }
+        }
+
         public void DrawGame()
         {
             var baseMatrixWithLaserShake = Matrix.CreateTranslation(
@@ -423,18 +443,6 @@ namespace Splerp.Change.Controllers
             for (int i = coinBackgroundLayers.Count - 1; i >= 0; i--)
             {
                 var coinBackground = coinBackgroundLayers[i];
-
-                // Set to values immediately when start of the game (no smoothing should be applied).
-                var lerpSpeed = coinBackgroundLayers.Count == 1 ? 1f : 0.01f;
-
-                float targetScale = 1 * (float)Math.Pow(0.9f, (i + 1));
-                float targetTranslate = 300 - (300 * (float)Math.Pow(0.9f, (i + 1)));
-                float targetAlpha = 0.75f - ((i / (float)MAX_VAULT_BG_LAYERS_VISIBLE) * 0.75f);
-
-                // Move each background layer towards target values.
-                coinBackground.currentScale = MathHelper.Lerp(coinBackground.currentScale, targetScale, lerpSpeed);
-                coinBackground.currentTranslate = MathHelper.Lerp(coinBackground.currentTranslate, targetTranslate, lerpSpeed);
-                coinBackground.currentAlpha = MathHelper.Lerp(coinBackground.currentAlpha, targetAlpha, lerpSpeed);
                 
                 var drawColour = new Color(
                     coinBackground.currentAlpha,
