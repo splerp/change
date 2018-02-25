@@ -20,10 +20,10 @@ namespace Splerp.Change
 
         GraphicsDeviceManager graphics;
 
-        private GraphicsController grc;
-        private InputController ic;
-        private GameController gc;
-        private SoundController sc;
+        private GraphicsController graphicsController;
+        private InputController inputController;
+        private GameController gameController;
+        private SoundController soundController;
 
         public ChangeGame()
         {
@@ -52,38 +52,38 @@ namespace Splerp.Change
         
         protected override void Initialize()
         {
-            ic = new InputController();
-            sc = new SoundController();
-            grc = new GraphicsController(this, ic, GraphicsDevice);
-            gc = new GameController(this, grc, ic);
+            inputController = new InputController();
+            soundController = new SoundController();
+            graphicsController = new GraphicsController(this, inputController, GraphicsDevice);
+            gameController = new GameController(this, graphicsController, inputController);
 
             base.Initialize();
 
             // Set initial state to the main menu.
-            gc.SetState(GameState.Title);
+            gameController.SetState(GameState.Title);
         }
 
         protected override void LoadContent()
         {
             // Load graphics.
-            grc.LoadContent(Content);
+            graphicsController.LoadContent(Content);
 
             // Load audio.
-            sc.LoadContent(Content);
+            soundController.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            ic.UpdateControlStates();
-            gc.Update(gameTime);
-            grc.Update(gameTime);
+            inputController.UpdateControlStates();
+            gameController.Update(gameTime);
+            graphicsController.Update(gameTime);
 
             base.Update(gameTime);
         }
         
         protected override void Draw(GameTime gameTime)
         {
-            grc.Draw();
+            graphicsController.Draw();
 
             base.Draw(gameTime);
         }

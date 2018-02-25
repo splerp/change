@@ -53,7 +53,7 @@ namespace Splerp.Change.Controllers
         }
 
         // Keep track of current control to override and listen for input.
-        public void UpdateMapControls(GameController gc)
+        public void UpdateMapControls(GameController gameController)
         {
             // Should properly support all supported modes (mouse, gamepad), not just keyboard.
             var pressedKeys = Keyboard.GetState().GetPressedKeys();
@@ -61,7 +61,7 @@ namespace Splerp.Change.Controllers
 
             if (FinishedRemapping)
             {
-                gc.SetState(GameState.Title);
+                gameController.SetState(GameState.Title);
             }
             else
             {

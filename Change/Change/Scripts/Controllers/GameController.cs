@@ -19,11 +19,11 @@ namespace Splerp.Change.Controllers
         // Random object used everywhere.
         public static Random random = new Random();
 
-        private ChangeGame cg;
+        private ChangeGame game;
 
         // Controllers.
-        private GraphicsController grc;
-        private InputController ic;
+        private GraphicsController graphicsController;
+        private InputController inputController;
         private CoinBackgroundController coinBackgroundController;
 
         // Menu references.
@@ -94,15 +94,15 @@ namespace Splerp.Change.Controllers
         public Int64 bestCoinScore;
         #endregion
 
-        public GameController(ChangeGame cgIn, GraphicsController grcIn, InputController icIn)
+        public GameController(ChangeGame gameIn, GraphicsController graphicsControllerIn, InputController inputControllerIn)
         {
             // Set references.
-            cg = cgIn;
-            grc = grcIn;
-            ic = icIn;
+            game = gameIn;
+            graphicsController = graphicsControllerIn;
+            inputController = inputControllerIn;
 
             // Add reference to graphics controller.
-            grc.SetGameControllerReference(this);
+            graphicsController.SetGameControllerReference(this);
 
             // Define state definitions (with references to this GameController instance's content).
             #region State definitions
@@ -149,7 +149,7 @@ namespace Splerp.Change.Controllers
             coinBackgroundController = new CoinBackgroundController();
 
             // Set up menus.
-            mainMenu = new MainMenu(cg, this);
+            mainMenu = new MainMenu(game, this);
             gameOverMenu = new GameOverMenu(this);
             stageCompleteMenu = new StageCompleteMenu();
 
@@ -241,7 +241,7 @@ namespace Splerp.Change.Controllers
 
         public void StartMappingControls()
         {
-            ic.StartRemapping();
+            inputController.StartRemapping();
         }
         #endregion
 
@@ -441,7 +441,7 @@ namespace Splerp.Change.Controllers
         {
             if (Control.Return.IsJustPressed)
             {
-                cg.Exit();
+                game.Exit();
             }
         }
 
@@ -463,7 +463,7 @@ namespace Splerp.Change.Controllers
 
         public void UpdateMapControls(GameTime gameTime)
         {
-            ic.UpdateMapControls(this);
+            inputController.UpdateMapControls(this);
         }
         #endregion
         #endregion
@@ -583,7 +583,7 @@ namespace Splerp.Change.Controllers
             ReadyToSpawnNote = false;
 
             coinBackgroundController.Reset();
-            grc.ResetCoinBuffers();
+            graphicsController.ResetCoinBuffers();
 
             laserPlayer.FiringLaser = false;
             SoundController.StopAllLoops();

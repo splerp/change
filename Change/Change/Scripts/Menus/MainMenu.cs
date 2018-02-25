@@ -5,15 +5,15 @@ namespace Splerp.Change.Menus
 {
     public sealed class MainMenu : Menu
     {
-        private ChangeGame cg;
-        private GameController gc;
+        private ChangeGame game;
+        private GameController gameController;
 
         public override int TotalOptions => 3;
 
-        public MainMenu(ChangeGame cgIn, GameController gcIn)
+        public MainMenu(ChangeGame gameIn, GameController gameControllerIn)
         {
-            cg = cgIn;
-            gc = gcIn;
+            game = gameIn;
+            gameController = gameControllerIn;
         }
 
         public override void OnUpdate(GameTime gameTime) { }
@@ -24,15 +24,15 @@ namespace Splerp.Change.Menus
             {
                 case 0:
                     // Start playing.
-                    gc.SetState(GameState.Playing);
+                    gameController.SetState(GameState.Playing);
                     break;
                 case 1:
                     // Remap the controls.
-                    gc.SetState(GameState.MapControls);
+                    gameController.SetState(GameState.MapControls);
                     break;
                 case 2:
                     // Exit the game.
-                    cg.Exit();
+                    game.Exit();
                     break;
             }
         }

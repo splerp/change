@@ -21,7 +21,7 @@ namespace Splerp.Change.GameObjects
         // True for the first frame in which the laser has stopped firing.
         public bool firstFrameLaserEnd;
 
-        private GameController gc;
+        private GameController gameController;
         public Shaker laserShake;
 
         // Set ICollisionObject-related properties.
@@ -46,9 +46,9 @@ namespace Splerp.Change.GameObjects
         public Point LeftEyePos => CollisionRect.Location + new Point(2, 2);
         public Point RightEyePos => CollisionRect.Location + new Point(5, 2);
         
-        public LaserPlayer(GameController gcIn)
+        public LaserPlayer(GameController gameControllerIn)
         {
-            gc = gcIn;
+            gameController = gameControllerIn;
             laserShake = new Shaker();
 
             Reset();
@@ -77,7 +77,7 @@ namespace Splerp.Change.GameObjects
 
             // We need extra checks because certain assumptions may
             // no longer be true after the Task.Delay.
-            if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.CurrentState == GameState.Playing && Control.Attack.IsDown)
+            if (gameController.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gameController.CurrentState == GameState.Playing && Control.Attack.IsDown)
             {
                 SoundController.Play(Sound.LaserLoop, true);
             }
@@ -150,10 +150,10 @@ namespace Splerp.Change.GameObjects
                 var lineToMouse1 = mousePos - laserStartPos1;
                 var lineToMouse2 = mousePos - laserStartPos2;
 
-                var allHurtables = gc.enemies
-                    .Take(gc.enemies.Count)
+                var allHurtables = gameController.enemies
+                    .Take(gameController.enemies.Count)
                     .Cast<IHurtable>()
-                    .Concat(gc.notes);
+                    .Concat(gameController.notes);
 
                 foreach(var h in allHurtables)
                 {

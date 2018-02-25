@@ -33,7 +33,7 @@ namespace Splerp.Change.GameObjects
         public const int WIDTH = 8;
         public const int HEIGHT = 4;
 
-        private GameController gc;
+        private GameController gameController;
 
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), Size);
@@ -62,9 +62,9 @@ namespace Splerp.Change.GameObjects
 
         public NoteType Type { get; private set; }
 
-        public Note(GameController gcIn, NoteType typeIn)
+        public Note(GameController gameControllerIn, NoteType typeIn)
         {
-            gc = gcIn;
+            gameController = gameControllerIn;
             Type = typeIn == NoteType.None ? NoteType.Pink5 : typeIn;
 
             // Pick a random spawn point.
@@ -78,13 +78,13 @@ namespace Splerp.Change.GameObjects
         {
             if(CaughtByPlayer)
             {
-                if (Position.X < gc.paddlePlayer.CollisionRect.X + PaddlePlayer.GRAPHIC_EDGE_WIDTH)
+                if (Position.X < gameController.paddlePlayer.CollisionRect.X + PaddlePlayer.GRAPHIC_EDGE_WIDTH)
                 {
-                    SetX(gc.paddlePlayer.CollisionRect.X + PaddlePlayer.GRAPHIC_EDGE_WIDTH);
+                    SetX(gameController.paddlePlayer.CollisionRect.X + PaddlePlayer.GRAPHIC_EDGE_WIDTH);
                 }
-                else if (Position.X + WIDTH > gc.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH)
+                else if (Position.X + WIDTH > gameController.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH)
                 {
-                    SetX(gc.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH - WIDTH);
+                    SetX(gameController.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH - WIDTH);
                 }
 
                 MoveBy(new Vector2(0, downSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));

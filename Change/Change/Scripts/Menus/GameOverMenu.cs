@@ -10,11 +10,11 @@ namespace Splerp.Change.Menus
 
         public override int TotalOptions => 2;
 
-        private GameController gc;
+        private GameController gameController;
 
-        public GameOverMenu(GameController gcIn)
+        public GameOverMenu(GameController gameControllerIn)
         {
-            gc = gcIn;
+            gameController = gameControllerIn;
             Drop();
         }
 
@@ -49,11 +49,11 @@ namespace Splerp.Change.Menus
             {
                 case 0:
                     // Start game.
-                    gc.SetState(GameState.Playing);
+                    gameController.SetState(GameState.Playing);
                     break;
                 case 1:
                     // Back to title.
-                    gc.SetState(GameState.Title);
+                    gameController.SetState(GameState.Title);
                     break;
             }
         }

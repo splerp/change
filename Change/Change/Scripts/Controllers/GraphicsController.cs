@@ -18,9 +18,9 @@ namespace Splerp.Change.Controllers
 
         public delegate void DrawState();
 
-        private ChangeGame cg;
-        private InputController ic;
-        private GameController gc;
+        private ChangeGame game;
+        private InputController inputController;
+        private GameController gameController;
         
         private GraphicsDevice graphicsDevice;
         private SpriteBatch batch;
@@ -106,10 +106,10 @@ namespace Splerp.Change.Controllers
             { Note.NoteType.Green100, new Color(81, 231, 97) },
         };
 
-        public GraphicsController(ChangeGame cgIn, InputController icIn, GraphicsDevice graphicsDeviceIn)
+        public GraphicsController(ChangeGame gameIn, InputController inputControllerIn, GraphicsDevice graphicsDeviceIn)
         {
-            cg = cgIn;
-            ic = icIn;
+            game = gameIn;
+            inputController = inputControllerIn;
 
             // Subscribe to coin background events.
             CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
@@ -127,9 +127,9 @@ namespace Splerp.Change.Controllers
                 * baseScaleMatrix;
         }
 
-        public void SetGameControllerReference(GameController gcIn)
+        public void SetGameControllerReference(GameController gameControllerIn)
         {
-            gc = gcIn;
+            gameController = gameControllerIn;
         }
 
         // Remove all background layers. Add the initial end-of-room background.
@@ -288,7 +288,7 @@ namespace Splerp.Change.Controllers
 
         public void Draw()
         {
-            gc.CurrentState.Draw();
+            gameController.CurrentState.Draw();
         }
 
         #region State "Draw" methods.
@@ -296,7 +296,7 @@ namespace Splerp.Change.Controllers
         {
             // Set "cursor" position on menu.
             Vector2 coinPos = Vector2.Zero;
-            switch (gc.CurrentMenu.SelectedOption)
+            switch (gameController.CurrentMenu.SelectedOption)
             {
                 case 0:
                     coinPos = new Vector2(9, 7);
@@ -314,14 +314,14 @@ namespace Splerp.Change.Controllers
                 batch.Draw(titleGraphic, Vector2.Zero, Color.White);
                 batch.Draw(titleCursor, coinPos, Color.White);
 
-                var totalScoreLength = 11 + ScoreRenderer.LengthOf(gc.bestCoinScore / 100d);
+                var totalScoreLength = 11 + ScoreRenderer.LengthOf(gameController.bestCoinScore / 100d);
                 var diff = bestScoreBackgroundOffset.X - totalScoreLength;
 
                 // Draw "best score" section.
-                if(gc.bestCoinScore > 0)
+                if(gameController.bestCoinScore > 0)
                 {
                     batch.Draw(bestScoreBackground, bestScoreBackgroundOffset.ToVector2() - new Vector2(totalScoreLength, 0), Color.White);
-                    DrawScore(batch, bestScoreBackgroundOffset.ToVector2() + new Vector2(11, 2) - new Vector2(totalScoreLength, 0), gc.bestCoinScore / 100d);
+                    DrawScore(batch, bestScoreBackgroundOffset.ToVector2() + new Vector2(11, 2) - new Vector2(totalScoreLength, 0), gameController.bestCoinScore / 100d);
                 }
 
                 #region Main menu icons
@@ -335,7 +335,7 @@ namespace Splerp.Change.Controllers
                     batch.Draw(mutedMusicIcon, mutedMusicIconOffset.ToVector2(), Color.White);
                 }
 
-                if (gc.skipTutorial)
+                if (gameController.skipTutorial)
                 {
                     batch.Draw(noTutorialIcon, noTutorialIconOffset.ToVector2(), Color.White);
                 }
@@ -349,10 +349,10 @@ namespace Splerp.Change.Controllers
 
         public void DrawChangeControlsMenu()
         {
-            if(!ic.FinishedRemapping)
+            if(!inputController.FinishedRemapping)
             {
                 // Choose which controlDirective to display.
-                var currentControl = ic.CurrentRemappingControl;
+                var currentControl = inputController.CurrentRemappingControl;
                 Texture2D controlDirective = null;
                 if (currentControl == Control.MoveUp)
                 {
@@ -390,7 +390,7 @@ namespace Splerp.Change.Controllers
 
             // Set "cursor" position on menu.
             Vector2 coinPos = Vector2.Zero;
-            switch (gc.CurrentMenu.SelectedOption)
+            switch (gameController.CurrentMenu.SelectedOption)
             {
                 case 0:
                     coinPos = new Vector2(33, 30);
@@ -400,7 +400,7 @@ namespace Splerp.Change.Controllers
                     break;
             }
 
-            var menuPos = (gameOverOffset + gc.CurrentMenu.MenuOffset.ToPoint()).ToVector2();
+            var menuPos = (gameOverOffset + gameController.CurrentMenu.MenuOffset.ToPoint()).ToVector2();
 
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
@@ -433,7 +433,7 @@ namespace Splerp.Change.Controllers
         public void DrawGame()
         {
             var baseMatrixWithLaserShake = Matrix.CreateTranslation(
-                new Vector3(gc.laserPlayer.laserShake.CurrentShake, 0))
+                new Vector3(gameController.laserPlayer.laserShake.CurrentShake, 0))
                 * baseMatrix;
 
             var mousePos = InputController.CurrentMousePosition;
@@ -484,7 +484,7 @@ namespace Splerp.Change.Controllers
             // Draw falling coins.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                foreach (var coin in gc.FallingCoins)
+                foreach (var coin in gameController.FallingCoins)
                 {
                     batch.Draw(coinGraphic, coin.CollisionRect.Location.ToVector2(), Color.White);
                 }
@@ -501,7 +501,7 @@ namespace Splerp.Change.Controllers
             // Draw enemies.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                foreach (var c in gc.corpses)
+                foreach (var c in gameController.corpses)
                 {
                     var oldEnemySize = new Vector2(10, 10);
                     var enemyDiff = new Vector2(piggyBankGraphic.Width, piggyBankGraphic.Height) - oldEnemySize;
@@ -525,19 +525,19 @@ namespace Splerp.Change.Controllers
 
                     DrawEnemy(batch, c.EnemyReference, c.Position.ToPoint().ToVector2());
                 }
-                for (int i = 0; i < gc.enemies.Count; i++)
+                for (int i = 0; i < gameController.enemies.Count; i++)
                 {
-                    DrawEnemy(batch, gc.enemies[i], gc.enemies[i].CollisionRect.Location.ToVector2());
+                    DrawEnemy(batch, gameController.enemies[i], gameController.enemies[i].CollisionRect.Location.ToVector2());
                 }
             }
             batch.End();
 
             // Draw back of paddle.
-            if (gc.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            if (gameController.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
                 {
-                    batch.Draw(paddleGraphicBack, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                    batch.Draw(paddleGraphicBack, gameController.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
                 }
                 batch.End();
             }
@@ -545,7 +545,7 @@ namespace Splerp.Change.Controllers
             // Draw money.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
-                foreach (var c in gc.notesOnFire)
+                foreach (var c in gameController.notesOnFire)
                 {
                     var fireOffset = new Vector2(-1, -(NoteOnFire.HEIGHT - Note.HEIGHT));
 
@@ -557,7 +557,7 @@ namespace Splerp.Change.Controllers
                         Color.White,
                         0, Vector2.Zero, 1, effect, 0);
                 }
-                foreach (var note in gc.notes)
+                foreach (var note in gameController.notes)
                 {
                     if (!note.InsideVacuum)
                     {
@@ -568,38 +568,38 @@ namespace Splerp.Change.Controllers
             batch.End();
 
             // Draw front of paddle.
-            if (gc.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
+            if (gameController.CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
                 {
-                    batch.Draw(paddleGraphicFront, gc.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
+                    batch.Draw(paddleGraphicFront, gameController.paddlePlayer.CollisionRect.Location.ToVector2(), Color.White);
                 }
                 batch.End();
             }
 
-            var scoreLength = ScoreRenderer.LengthOf(gc.currentCoinScore / 100d);
+            var scoreLength = ScoreRenderer.LengthOf(gameController.currentCoinScore / 100d);
             var totalArea = ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength) / (float)ChangeGame.PLAYABLE_AREA_WIDTH;
 
             #region Draw hud
             // Calculate values for drawing the hud.
-            var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;
+            var laserPercentage = (int)(gameController.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;
 
-            var healthPercentage = (gc.CurrentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.CurrentStage.MaxNotesMissed;
+            var healthPercentage = (gameController.CurrentStage.MaxNotesMissed - gameController.notesMissed) / (float)gameController.CurrentStage.MaxNotesMissed;
             healthPercentage = (int)(healthPercentage * totalArea) / (float)totalArea * totalAreaRatio;
 
-            var totalDuration = gc.CurrentStage.RequiredTimePassed.TotalSeconds;
-            var currentDuration = gc.CurrentStage.timePassed.TotalSeconds;
+            var totalDuration = gameController.CurrentStage.RequiredTimePassed.TotalSeconds;
+            var currentDuration = gameController.CurrentStage.timePassed.TotalSeconds;
 
             float progressPercentage;
 
-            if (gc.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnTimePassed))
+            if (gameController.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnTimePassed))
             {
                 progressPercentage = (float)(currentDuration / totalDuration);
             }
-            else if (gc.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnCollectCoins))
+            else if (gameController.CurrentStage.HasFlag(Stage.StageFlags.CompleteOnCollectCoins))
             {
-                progressPercentage = gc.CurrentStage.coinsCollected / (float)gc.CurrentStage.RequiredCoins;
+                progressPercentage = gameController.CurrentStage.coinsCollected / (float)gameController.CurrentStage.RequiredCoins;
             }
             else
             {
@@ -638,40 +638,40 @@ namespace Splerp.Change.Controllers
                     SpriteEffects.None, 0);
 
                 batch.Draw(scoreBackground, Vector2.Zero, Color.White);
-                DrawScore(batch, Vector2.Zero, gc.currentCoinScore / 100d);
+                DrawScore(batch, Vector2.Zero, gameController.currentCoinScore / 100d);
             }
             batch.End();
             #endregion
 
             // Draw laser player (over HUD).
-            if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
+            if (gameController.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake);
                 {
-                    batch.Draw(playerGraphic, (gc.laserPlayer.CollisionRect.Location + laserPlayerOffset).ToVector2(), Color.White);
+                    batch.Draw(playerGraphic, (gameController.laserPlayer.CollisionRect.Location + laserPlayerOffset).ToVector2(), Color.White);
                 }
                 batch.End();
             }
             
             // Draw lasers.
-            if (gc.laserPlayer.FiringLaser)
+            if (gameController.laserPlayer.FiringLaser)
             {
                 Color[] laserData = Enumerable.Repeat(Color.Transparent,
                     ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT).ToArray();
                 
                 // Add both lasers to colour data.
                 LineGraphic.CreateLineBoundsCheck(laserData,
-                    gc.laserPlayer.LeftEyePos.X, gc.laserPlayer.LeftEyePos.Y,
+                    gameController.laserPlayer.LeftEyePos.X, gameController.laserPlayer.LeftEyePos.Y,
                     mousePos.X, mousePos.Y, Color.Red);
                 LineGraphic.CreateLineBoundsCheck(laserData,
-                    gc.laserPlayer.RightEyePos.X, gc.laserPlayer.RightEyePos.Y,
+                    gameController.laserPlayer.RightEyePos.X, gameController.laserPlayer.RightEyePos.Y,
                     mousePos.X, mousePos.Y, Color.Red);
 
                 playerLasersLayer.SetData(laserData);
 
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
                 {
-                    var laserAlpha = Math.Min(gc.laserPlayer.laserCharge * 8, 1f);
+                    var laserAlpha = Math.Min(gameController.laserPlayer.laserCharge * 8, 1f);
                     Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
 
                     batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
@@ -680,11 +680,11 @@ namespace Splerp.Change.Controllers
             }
 
             // If there is a Stage Complete menu, draw it.
-            if(gc.CurrentMenu != null && gc.CurrentMenu is StageCompleteMenu)
+            if(gameController.CurrentMenu != null && gameController.CurrentMenu is StageCompleteMenu)
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
                 {
-                    batch.Draw(stageOverBackground, gc.CurrentMenu.MenuOffset.ToPoint().ToVector2() + stageCompleteOffset.ToVector2(), Color.White);
+                    batch.Draw(stageOverBackground, gameController.CurrentMenu.MenuOffset.ToPoint().ToVector2() + stageCompleteOffset.ToVector2(), Color.White);
                 }
                 batch.End();
             }
