@@ -413,8 +413,6 @@ namespace Splerp.Change.Controllers
                     notesOnFire.RemoveAt(i);
                 }
             }
-
-            // TODO: Explode the money
             #endregion
 
             if (CurrentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= CurrentStage.MaxNotesMissed)
