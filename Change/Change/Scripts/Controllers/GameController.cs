@@ -154,7 +154,7 @@ namespace Splerp.Change.Controllers
 
             // Set up players.
             laserPlayer = new LaserPlayer(this);
-            paddlePlayer = new PaddlePlayer(this);
+            paddlePlayer = new PaddlePlayer();
 
             // Define collections.
             enemies = new List<Enemy>();

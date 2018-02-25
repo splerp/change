@@ -474,7 +474,7 @@ namespace Splerp.Change.Controllers
                     var oldEnemySize = new Vector2(10, 10);
                     var enemyDiff = new Vector2(piggyBankGraphic.Width, piggyBankGraphic.Height) - oldEnemySize;
                     
-                    bool isBackwardsVacuum = c.EnemyReference is VacuumEnemy && c.EnemyReference.direction < 0;
+                    bool isBackwardsVacuum = c.EnemyReference is VacuumEnemy && c.EnemyReference.Direction < 0;
 
                     var fireOffset = new Vector2(-1, -5);
                     if (isBackwardsVacuum)
@@ -674,8 +674,8 @@ namespace Splerp.Change.Controllers
 
         public void DrawEnemy(SpriteBatch b, Enemy enemy, Vector2 drawPos)
         {
-            var effect = enemy.direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-            var effectInv = enemy.direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var effect = enemy.Direction < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+            var effectInv = enemy.Direction > 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
             if (enemy is PiggyBank)
             {
@@ -686,8 +686,8 @@ namespace Splerp.Change.Controllers
             }
             else if (enemy is VacuumEnemy)
             {
-                var offsetX1 = enemy.direction > 0 ? VacuumEnemy.WIDTH_HEAD : 0;
-                var offsetX2 = enemy.direction > 0 ? 0 : VacuumEnemy.WIDTH_HEAD;
+                var offsetX1 = enemy.Direction > 0 ? VacuumEnemy.WIDTH_HEAD : 0;
+                var offsetX2 = enemy.Direction > 0 ? 0 : VacuumEnemy.WIDTH_HEAD;
 
                 Color[] vacuumNoteData = new Color[VacuumEnemy.MAX_NOTES_HELD * 3];
                 for (int j = 0; j < VacuumEnemy.MAX_NOTES_HELD; j++)
@@ -702,7 +702,7 @@ namespace Splerp.Change.Controllers
                 var vacuumNotesDisplay = new Texture2D(graphicsDevice, VacuumEnemy.MAX_NOTES_HELD, 3);
                 vacuumNotesDisplay.SetData(vacuumNoteData);
 
-                Vector2 vacuumNoteGraphicOffset = enemy.direction > 0 ? new Vector2(3, 4) : new Vector2(4, 4);
+                Vector2 vacuumNoteGraphicOffset = enemy.Direction > 0 ? new Vector2(3, 4) : new Vector2(4, 4);
 
                 b.Draw(vacuumNotesDisplay, drawPos + new Vector2(offsetX2, 0) + vacuumNoteGraphicOffset, Color.White);
                 

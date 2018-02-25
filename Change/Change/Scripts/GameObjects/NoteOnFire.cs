@@ -5,20 +5,22 @@ namespace Splerp.Change.GameObjects
 {
     public sealed class NoteOnFire : GameObject
     {
+        public const int HEIGHT = 16;
+        public const int TOTAL_FRAMES = 6;
+
+        // How fast the burning note moves up.
         public float upSpeed = -0.33f;
 
+        // How quickly the fire animation should play.
         private float animationSpeed = 6;
         private float animationCount;
         public int animationFrame = 0;
 
-        public const int HEIGHT = 16;
-        public const int TOTAL_FRAMES = 6;
-
+        // Property to determine if it's safe to remove this object.
         public bool ReadyToRemove => animationFrame >= TOTAL_FRAMES;
 
         public Note.NoteType Type { get; private set; }
-
-        // Shouldn't be here? (it's a graphics thing)
+        
         public bool IsFlipped { get; set; }
 
         public NoteOnFire(Note note)

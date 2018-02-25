@@ -7,8 +7,10 @@ namespace Splerp.Change.GameObjects
         public float gravity = 0.05f;
         public Vector2 speed;
 
+        // Keeps a reference to the enemy it was created for.
         public Enemy EnemyReference;
 
+        // How quickly the death animation should play.
         private float animationSpeed = 6;
         private float animationCount;
         public int animationFrame = 0;
@@ -24,7 +26,7 @@ namespace Splerp.Change.GameObjects
 
             animationCount = animationSpeed;
             
-            speed = new Vector2(enemy.thrust, enemy.yOffsetDiff);
+            speed = enemy.Speed + (enemy.Offset - enemy.PreviousOffset);
         }
 
         public void Update()

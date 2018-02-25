@@ -11,33 +11,41 @@ namespace Splerp.Change.GameObjects
         public const int WIDTH_HEAD = 11;
         public const int MAX_NOTES_HELD = 5;
 
+        // Set Enemy-related properties.
         public override Point Size => new Point(WIDTH + WIDTH_HEAD, HEIGHT);
         public override int MaxHealth => 3500;
         public override int CoinsOnDeath => 125;
-        public int MouthPosX => CollisionRect.X + (direction > 0 ? WIDTH + 2 : 1);
-        public int CentreBodyX => CollisionRect.X + (direction > 0 ? 0 : WIDTH_HEAD);
+
+        // Position variables that depend on the direction the vacuum is travelling.
+        public int MouthPosX => CollisionRect.X + (Direction > 0 ? WIDTH + 2 : 1);
+        public int CentreBodyX => CollisionRect.X + (Direction > 0 ? 0 : WIDTH_HEAD);
 
         public readonly Note[] NotesHeld = new Note[MAX_NOTES_HELD];
+
+        // Used for Y offset calculation.
+        public float sinAmp = 0.5f;
+        public float sinPer = 0.03f;
 
         public float yOffsetCount;
         public float yPos;
 
-        public float sinAmp = 0.5f;
-        public float sinPer = 0.03f;
-
+        // How many notes the vacuum is currently "holding".
+        // This includes notes in the process of being sucked up.
         public int totalNotesHeld;
+
+        // True is looking up, false if looking down..
         public bool lookingUp;
 
         public VacuumEnemy()
         {
             yOffsetCount = GameController.random.Next(1, 1000);
 
-            thrust = 0.2f;
-            direction = GameController.random.Next(1, 3) == 1 ? 1 : -1;
-            thrust *= direction;
+            Speed = new Vector2(0.2f, 0);
+            Direction = GameController.random.Next(0, 2) == 0 ? HorizontalDirection.Left : HorizontalDirection.Right;
+            Speed *= (int)Direction;
 
             int halfAreaSize = (ChangeGame.PLAYABLE_AREA_WIDTH + Size.X) / 2;
-            SetX(ChangeGame.PLAYABLE_AREA_WIDTH - (halfAreaSize * direction + halfAreaSize));
+            SetX(ChangeGame.PLAYABLE_AREA_WIDTH - (halfAreaSize * (int)Direction + halfAreaSize));
 
             for(int i = 0; i < MAX_NOTES_HELD; i++)
             {
@@ -49,30 +57,39 @@ namespace Splerp.Change.GameObjects
 
         public override void Update()
         {
-            var previousYOffset = yOffset;
+            PreviousOffset = Offset;
 
             // TODO: Based on time passed.
             yOffsetCount++;
 
-            yOffset = sinAmp * (float)Math.Sin(yOffsetCount * sinPer);
-            yOffsetDiff = yOffset - previousYOffset;
+            Offset = new Vector2(0, sinAmp * (float)Math.Sin(yOffsetCount * sinPer));
 
-            MoveBy(new Vector2(thrust, 0));
-            SetY(yPos + yOffset);
+            MoveBy(Speed);
+            SetY(yPos + Offset.Y);
         }
 
+        // Run checks before successfully collecting the note.
         public void TryCollect(Note note)
         {
-            if(note.IsDead || note.CaughtByPlayer || note.CaughtByVacuum != null)
+            // If dead, can't collect.
+            if (note.IsDead)
             {
                 return;
             }
 
+            // If being held by something, can't collect.
+            if ( note.CaughtByPlayer || note.CaughtByVacuum != null)
+            {
+                return;
+            }
+
+            // If too far away in X direction, can't collect.
             if (Math.Abs(note.CollisionRect.X - MouthPosX) > 1)
             {
                 return;
             }
 
+            // If holding max number of notes, can't collect.
             if (totalNotesHeld >= MAX_NOTES_HELD)
             {
                 return;
@@ -83,15 +100,14 @@ namespace Splerp.Change.GameObjects
 
         public void CollectNote(Note note)
         {
-            if(totalNotesHeld < MAX_NOTES_HELD)
-            {
-                note.CaughtByVacuum = this;
-                NotesHeld[totalNotesHeld++] = note;
+            // Set references.
+            note.CaughtByVacuum = this;
+            NotesHeld[totalNotesHeld++] = note;
 
-                lookingUp = note.CollisionRect.Y < CollisionRect.Y;
+            // Look towards note.
+            lookingUp = note.CollisionRect.Y < CollisionRect.Y;
 
-                SoundController.Play(Sound.Slurp);
-            }
+            SoundController.Play(Sound.Slurp);
         }
 
         public override void OnDeath()
@@ -105,6 +121,7 @@ namespace Splerp.Change.GameObjects
         {
             for(int i = totalNotesHeld - 1; i >= 0; i--)
             {
+                // If note had been fully collected, give it a slightly randomised X position.
                 if(NotesHeld[i].InsideVacuum)
                 {
                     NotesHeld[i].SetX(GameController.random.Next(1, 5) - 2 + CentreBodyX);
@@ -117,6 +134,10 @@ namespace Splerp.Change.GameObjects
             }
         }
 
+        // A note could be destroyed by the player after it has
+        // been "collected" (while it is still moving towards the vacuum).
+        // We need to be able to handle a single note being removed
+        // from the vacuum.
         public void RemoveNoteFromVacuum(Note note)
         {
             bool found = false;
@@ -131,6 +152,7 @@ namespace Splerp.Change.GameObjects
                     found = true;
                 }
 
+                // If note was found, remove from array and move remaining notes along.
                 if(found)
                 {
                     if(i < totalNotesHeld - 1)

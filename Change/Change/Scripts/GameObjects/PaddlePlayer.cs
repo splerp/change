@@ -6,28 +6,27 @@ namespace Splerp.Change.GameObjects
 {
     public sealed class PaddlePlayer : GameObject, ICollisionObject
     {
-        private GameController gc;
-
         public const int WIDTH = 14;
         public const int HEIGHT = 5;
         public const int GRAPHIC_EDGE_WIDTH = 1;
 
+        // Set ICollisionObject-related properties.
         public Point Size => new Point(WIDTH, HEIGHT);
         public Rectangle CollisionRect => new Rectangle(new Point(
             (int)Math.Round(Position.X),
             (int)Math.Round(Position.Y)), Size);
 
+        // Set physics variables.
         public Vector2 speed;
         public float thrust = 0.1f;
         public float friction = 0.9f;
         
-        public PaddlePlayer(GameController gcIn)
+        public PaddlePlayer()
         {
-            gc = gcIn;
-
             Reset();
         }
 
+        // Default player's location to the middle of the screen.
         public void Reset()
         {
             SetX((ChangeGame.PLAYABLE_AREA_WIDTH - Size.X) / 2);
@@ -46,13 +45,11 @@ namespace Splerp.Change.GameObjects
             MoveBy(speed);
 
             RestrictToBounds();
-            
-            PrintPlayerInfo();
         }
 
         private void RestrictToBounds()
         {
-            // Only need to check X.
+            // Only need to check X for the paddle.
             if (Position.X < 0)
             {
                 SetX(0);
@@ -63,11 +60,6 @@ namespace Splerp.Change.GameObjects
                 SetX(ChangeGame.PLAYABLE_AREA_WIDTH - Size.X);
                 speed.X *= -1;
             }
-        }
-
-        private void PrintPlayerInfo()
-        {
-            //Console.WriteLine($"PLAYER PADDLE. pos: {Position.ToPoint().ToString()}; speed: {speed.ToPoint().ToString()}");
         }
     }
 }

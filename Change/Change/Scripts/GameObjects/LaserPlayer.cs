@@ -15,12 +15,16 @@ namespace Splerp.Change.GameObjects
         public const float LASER_FIRE_SHAKE_AMOUNT = 2f;
         public const int GRAPHIC_OUTER_WIDTH = 2;
 
+        // True for the first frame in which the laser has started to fire.
         public bool firstFrameLaserStart;
+
+        // True for the first frame in which the laser has stopped firing.
         public bool firstFrameLaserEnd;
 
         private GameController gc;
         public Shaker laserShake;
 
+        // Set ICollisionObject-related properties.
         public Point Size => new Point(8, 8);
         public Rectangle CollisionRect => new Rectangle(new Point(
             (int)Math.Round(Position.X),
@@ -30,12 +34,15 @@ namespace Splerp.Change.GameObjects
         public float thrust = 0.1f;
         public float friction = 0.9f;
 
+        // How quickly the laser bar depletes / replenishes.
         public float laserChargeReduceBy = 0.02f;
         public float laserChargeIncreaseBy = 0.05f;
         public float laserCharge;
 
+        // True if the laser is currently being fired.
         public bool FiringLaser { get; set; }
 
+        // Position helper properties.
         public Point LeftEyePos => CollisionRect.Location + new Point(2, 2);
         public Point RightEyePos => CollisionRect.Location + new Point(5, 2);
         
@@ -47,6 +54,7 @@ namespace Splerp.Change.GameObjects
             Reset();
         }
 
+        // Default player's location to the middle of the screen.
         public void Reset()
         {
             SetX((ChangeGame.PLAYABLE_AREA_WIDTH - Size.X) / 2);
@@ -67,6 +75,8 @@ namespace Splerp.Change.GameObjects
             // Wait for LaserStart sound to play, then start looping.
             await Task.Delay(Sound.LaserStart.data.Duration);
 
+            // We need extra checks because certain assumptions may
+            // no longer be true after the Task.Delay.
             if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled) && gc.CurrentState == GameState.Playing && Control.Attack.IsDown)
             {
                 SoundController.Play(Sound.LaserLoop, true);
