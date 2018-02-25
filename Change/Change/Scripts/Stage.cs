@@ -1,4 +1,5 @@
-﻿using Splerp.Change.GameObjects;
+﻿using Microsoft.Xna.Framework;
+using Splerp.Change.GameObjects;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +30,7 @@ namespace Splerp.Change
         public TimeSpan RequiredTimePassed { get; set; }
         public StageFlags Flags { get; set; }
         public Int64 coinsCollected;
-        public DateTime startTime;
+        public TimeSpan timePassed;
 
         private Stage(bool isTutorial = false)
         {
@@ -48,7 +49,7 @@ namespace Splerp.Change
         public void Restart()
         {
             coinsCollected = 0;
-            startTime = DateTime.Now;
+            timePassed = new TimeSpan();
         }
 
         public bool HasFlag(StageFlags flag)
@@ -73,13 +74,18 @@ namespace Splerp.Change
             // If enough time has passed, stage is complete.
             if (HasFlag(StageFlags.CompleteOnTimePassed))
             {
-                if (DateTime.Now - startTime > RequiredTimePassed)
+                if (timePassed > RequiredTimePassed)
                 {
                     complete = true;
                 }
             }
 
             return complete;
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            timePassed += gameTime.ElapsedGameTime;
         }
 
         // For a given stage, find the succeeding stage.

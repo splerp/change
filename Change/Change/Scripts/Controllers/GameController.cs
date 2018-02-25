@@ -316,6 +316,8 @@ namespace Splerp.Change.Controllers
             {
                 c.Update(gameTime);
             }
+
+            CurrentStage.Update(gameTime);
             #endregion
 
             #region Remove objects

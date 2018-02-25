@@ -588,8 +588,8 @@ namespace Splerp.Change.Controllers
             var healthPercentage = (gc.CurrentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.CurrentStage.MaxNotesMissed;
             healthPercentage = (int)(healthPercentage * totalArea) / (float)totalArea * totalAreaRatio;
 
-            var totalDuration = gc.CurrentStage.RequiredTimePassed.TotalMilliseconds;
-            var currentDuration = (DateTime.Now - gc.CurrentStage.startTime).TotalMilliseconds;
+            var totalDuration = gc.CurrentStage.RequiredTimePassed.TotalSeconds;
+            var currentDuration = gc.CurrentStage.timePassed.TotalSeconds;
 
             float progressPercentage;
 
