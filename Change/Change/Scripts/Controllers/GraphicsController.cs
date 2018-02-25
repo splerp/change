@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Splerp.Change.Events;
 using Splerp.Change.GameObjects;
 using Splerp.Change.Graphics;
+using Splerp.Change.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,12 @@ namespace Splerp.Change.Controllers
         private GraphicsDevice graphicsDevice;
         private SpriteBatch batch;
         private SamplerState samplerState;
+
+        // The base matrix for game elements. Moves content down
+        // to the defined playable area.
         private Matrix baseMatrix;
+
+        // The base matrix for all elements. Scales to required screen scale.
         private Matrix baseScaleMatrix;
 
         #region Game graphics
@@ -40,13 +46,6 @@ namespace Splerp.Change.Controllers
         private Texture2D vacuumHeadUpGraphic;
         private Texture2D vacuumHeadDownGraphic;
 
-        private Texture2D noteGraphic5;
-        private Texture2D noteGraphic10;
-        private Texture2D noteGraphic20;
-        private Texture2D noteGraphic50;
-        private Texture2D noteGraphic100;
-        private Texture2D[] enemyFireGraphics;
-        private Texture2D[] noteFireGraphics;
         private Texture2D hudBackground;
         private Texture2D hudLaserCharge;
         private Texture2D hudPlayerHealth;
@@ -63,9 +62,6 @@ namespace Splerp.Change.Controllers
         private Texture2D mutedIcon;
         private Texture2D mutedMusicIcon;
         private Texture2D noTutorialIcon;
-        private Dictionary<char, Texture2D> fontGraphics;
-
-        private List<CoinBackgroundLayer> coinBackgroundLayers;
         private Texture2D currentCoinBackground;
 
         private Texture2D changeControlsBackground;
@@ -73,11 +69,21 @@ namespace Splerp.Change.Controllers
         private Texture2D changeControlsBack;
         private Texture2D changeControlsLeft;
         private Texture2D changeControlsRight;
+
+        // TODO: Make this a Dictionary which maps to note types.
+        private Texture2D[] noteFireGraphics;
+
+        private Texture2D[] enemyFireGraphics;
+
+        private Dictionary<char, Texture2D> fontGraphics;
+
+        private List<CoinBackgroundLayer> coinBackgroundLayers;
         #endregion
 
         private const int vaultWallWidth = 10;
         private const int vaultFloorHeight = 20;
 
+        // Various offsets for graphics.
         private Point gameOverOffset = new Point(0, -6);
         private Point stageCompleteOffset = new Point(0, -6);
         private Point laserPlayerOffset = new Point(-LaserPlayer.GRAPHIC_OUTER_WIDTH, -LaserPlayer.GRAPHIC_OUTER_WIDTH);
@@ -86,6 +92,10 @@ namespace Splerp.Change.Controllers
         private Point noTutorialIconOffset;
         private Point bestScoreBackgroundOffset;
 
+        // Map note types to the textures they use.
+        private Dictionary<Note.NoteType, Texture2D> noteGraphics;
+
+        // Map note types to the colour they appear as in vacuums.
         private Dictionary<Note.NoteType, Color> noteColours = new Dictionary<Note.NoteType, Color>
         {
             { Note.NoteType.None, Color.White },
@@ -96,13 +106,12 @@ namespace Splerp.Change.Controllers
             { Note.NoteType.Green100, new Color(81, 231, 97) },
         };
 
-        private Dictionary<Note.NoteType, Texture2D> noteGraphics;
-
         public GraphicsController(ChangeGame cgIn, InputController icIn, GraphicsDevice graphicsDeviceIn)
         {
             cg = cgIn;
             ic = icIn;
 
+            // Subscribe to coin background events.
             CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
             CoinBackgroundController.CurrentCoinBufferUpdated += OnCoinBufferUpdated;
 
@@ -123,12 +132,14 @@ namespace Splerp.Change.Controllers
             gc = gcIn;
         }
 
+        // Remove all background layers. Add the initial end-of-room background.
         public void ResetCoinBuffers()
         {
             coinBackgroundLayers.Clear();
             coinBackgroundLayers.Add(new CoinBackgroundLayer() { graphic = backgroundGraphic });
         }
 
+        // Move the current coin buffer into the background layers collection.
         public void CreateNewCoinBuffer(object sender, EventArgs e)
         {
             Color[] theCurrentData = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
@@ -157,14 +168,15 @@ namespace Splerp.Change.Controllers
             currentCoinBackground.SetData(e.updatedBuffer.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray());
         }
 
+        // Load all graphics.
         public void LoadContent(ContentManager Content)
         {
-            playerGraphic = Content.Load<Texture2D>("Graphics/Player");
+            // Initialise variables but don't set data (need to set data on each draw call).
             playerLasersLayer = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT);
+            currentCoinBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT);
 
-            coinGraphic = new Texture2D(graphicsDevice, 1, 1);
-            coinGraphic.SetData(new Color[] { Color.Yellow });
-
+            #region Textures from ContentManager
+            playerGraphic = Content.Load<Texture2D>("Graphics/Player");
             backgroundGraphic = Content.Load<Texture2D>("Graphics/Background");
             titleGraphic = Content.Load<Texture2D>("Graphics/Title");
             titleBorderGraphic = Content.Load<Texture2D>("Graphics/TitleBorder");
@@ -186,19 +198,6 @@ namespace Splerp.Change.Controllers
             changeControlsLeft = Content.Load<Texture2D>("Graphics/ChangeControlsLeft");
             changeControlsRight = Content.Load<Texture2D>("Graphics/ChangeControlsRight");
 
-            bestScoreBackgroundOffset = new Point(ChangeGame.WINDOW_WIDTH - 2, 2);
-            mutedIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height - 3);
-            mutedMusicIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height * 2 - 3 - 2);
-            noTutorialIconOffset = new Point(ChangeGame.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, ChangeGame.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
-            
-            currentCoinBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT);
-            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, ChangeGame.PLAYABLE_AREA_HEIGHT);
-            VaultFloor = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
-            hudBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.HUD_HEIGHT);
-            hudLaserCharge = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
-            hudPlayerHealth = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
-            hudTimeRemaining = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 1);
-
             piggyBankGraphic = Content.Load<Texture2D>("Graphics/Pig");
             enemyFireGraphics = new Texture2D[]
             {
@@ -211,22 +210,7 @@ namespace Splerp.Change.Controllers
             vacuumBodyGraphic = Content.Load<Texture2D>("Graphics/VacuumBody");
             vacuumHeadUpGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadUp");
             vacuumHeadDownGraphic = Content.Load<Texture2D>("Graphics/VacuumHeadDown");
-
-            noteGraphic5 = Content.Load<Texture2D>("Graphics/5Dollars");
-            noteGraphic10 = Content.Load<Texture2D>("Graphics/10Dollars");
-            noteGraphic20 = Content.Load<Texture2D>("Graphics/20Dollars");
-            noteGraphic50 = Content.Load<Texture2D>("Graphics/50Dollars");
-            noteGraphic100 = Content.Load<Texture2D>("Graphics/100Dollars");
-
-            noteGraphics = new Dictionary<Note.NoteType, Texture2D>
-            {
-                { Note.NoteType.Pink5, noteGraphic5 },
-                { Note.NoteType.Blue10, noteGraphic10 },
-                { Note.NoteType.Red20, noteGraphic20 },
-                { Note.NoteType.Yellow50, noteGraphic50 },
-                { Note.NoteType.Green100, noteGraphic100 },
-            };
-
+            
             fontGraphics = new Dictionary<char, Texture2D>
             {
                 { '0', Content.Load<Texture2D>("Graphics/Font/Font_0")},
@@ -242,6 +226,15 @@ namespace Splerp.Change.Controllers
                 { '.', Content.Load<Texture2D>("Graphics/Font/Font_Dot")},
             };
 
+            noteGraphics = new Dictionary<Note.NoteType, Texture2D>
+            {
+                { Note.NoteType.Pink5, Content.Load<Texture2D>("Graphics/5Dollars") },
+                { Note.NoteType.Blue10, Content.Load<Texture2D>("Graphics/10Dollars") },
+                { Note.NoteType.Red20, Content.Load<Texture2D>("Graphics/20Dollars") },
+                { Note.NoteType.Yellow50, Content.Load<Texture2D>("Graphics/50Dollars") },
+                { Note.NoteType.Green100, Content.Load<Texture2D>("Graphics/100Dollars") },
+            };
+
             noteFireGraphics = new Texture2D[]
             {
                 Content.Load<Texture2D>("Graphics/FireMoney1"),
@@ -251,18 +244,39 @@ namespace Splerp.Change.Controllers
                 Content.Load<Texture2D>("Graphics/FireMoney5"),
                 Content.Load<Texture2D>("Graphics/FireMoney6"),
             };
+            #endregion
 
+            #region Other textures
+            coinGraphic = new Texture2D(graphicsDevice, 1, 1);
+            coinGraphic.SetData(new Color[] { Color.Yellow });
+
+            VaultWalls = new Texture2D(graphicsDevice, vaultWallWidth, ChangeGame.PLAYABLE_AREA_HEIGHT);
             VaultWalls.SetData(Enumerable.Repeat(new Color(59, 33, 12), VaultWalls.Width * VaultWalls.Height).ToArray());
+
+            VaultFloor = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH + vaultWallWidth * 2, vaultFloorHeight);
             VaultFloor.SetData(Enumerable.Repeat(new Color(36, 17, 1), VaultFloor.Width * VaultFloor.Height).ToArray());
+
+            hudBackground = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.HUD_HEIGHT);
             hudBackground.SetData(Enumerable.Repeat(Color.Black, hudBackground.Width * hudBackground.Height).ToArray());
+
+            hudLaserCharge = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
             hudLaserCharge.SetData(Enumerable.Repeat(Color.Red, hudLaserCharge.Width * hudLaserCharge.Height).ToArray());
 
+            hudPlayerHealth = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 2);
             var hpBar = Enumerable.Repeat(Color.Green, hudPlayerHealth.Width * (hudPlayerHealth.Height - 1))
                 .Concat(Enumerable.Repeat(Color.DarkGreen, hudPlayerHealth.Width * 1))
                 .ToArray();
             hudPlayerHealth.SetData(hpBar);
 
+            hudTimeRemaining = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, 1);
             hudTimeRemaining.SetData(Enumerable.Repeat(Color.Blue, hudTimeRemaining.Width * hudTimeRemaining.Height).ToArray());
+            #endregion
+
+            // Set offsets.
+            bestScoreBackgroundOffset = new Point(ChangeGame.WINDOW_WIDTH - 2, 2);
+            mutedIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height - 3);
+            mutedMusicIconOffset = new Point(ChangeGame.WINDOW_WIDTH - mutedIcon.Width - 3, ChangeGame.WINDOW_HEIGHT - mutedIcon.Height * 2 - 3 - 2);
+            noTutorialIconOffset = new Point(ChangeGame.WINDOW_WIDTH - noTutorialIcon.Width * 2 - 3 - 2, ChangeGame.WINDOW_HEIGHT - noTutorialIcon.Height - 3);
 
             // Set draw functions on game states.
             GameState.Title.Draw = DrawMainMenu;
@@ -280,6 +294,7 @@ namespace Splerp.Change.Controllers
         #region State "Draw" methods.
         public void DrawMainMenu()
         {
+            // Set "cursor" position on menu.
             Vector2 coinPos = Vector2.Zero;
             switch (gc.CurrentMenu.SelectedOption)
             {
@@ -302,12 +317,14 @@ namespace Splerp.Change.Controllers
                 var totalScoreLength = 11 + ScoreRenderer.LengthOf(gc.bestCoinScore / 100d);
                 var diff = bestScoreBackgroundOffset.X - totalScoreLength;
 
+                // Draw "best score" section.
                 if(gc.bestCoinScore > 0)
                 {
                     batch.Draw(bestScoreBackground, bestScoreBackgroundOffset.ToVector2() - new Vector2(totalScoreLength, 0), Color.White);
                     DrawScore(batch, bestScoreBackgroundOffset.ToVector2() + new Vector2(11, 2) - new Vector2(totalScoreLength, 0), gc.bestCoinScore / 100d);
                 }
 
+                #region Main menu icons
                 if (SoundController.Muted())
                 {
                     batch.Draw(mutedIcon, mutedIconOffset.ToVector2(), Color.White);
@@ -322,7 +339,9 @@ namespace Splerp.Change.Controllers
                 {
                     batch.Draw(noTutorialIcon, noTutorialIconOffset.ToVector2(), Color.White);
                 }
-                
+                #endregion
+
+                // Draw the border graphic over the bestScoreBackground.
                 batch.Draw(titleBorderGraphic, Vector2.Zero, Color.White);
             }
             batch.End();
@@ -332,6 +351,7 @@ namespace Splerp.Change.Controllers
         {
             if(!ic.FinishedRemapping)
             {
+                // Choose which controlDirective to display.
                 var currentControl = ic.CurrentRemappingControl;
                 Texture2D controlDirective = null;
                 if (currentControl == Control.MoveUp)
@@ -368,6 +388,7 @@ namespace Splerp.Change.Controllers
         {
             DrawGame();
 
+            // Set "cursor" position on menu.
             Vector2 coinPos = Vector2.Zero;
             switch (gc.CurrentMenu.SelectedOption)
             {
@@ -394,6 +415,8 @@ namespace Splerp.Change.Controllers
             var baseMatrixWithLaserShake = Matrix.CreateTranslation(
                 new Vector3(gc.laserPlayer.laserShake.CurrentShake, 0))
                 * baseMatrix;
+
+            var mousePos = InputController.CurrentMousePosition;
 
             graphicsDevice.Clear(Color.Black);
 
@@ -442,7 +465,8 @@ namespace Splerp.Change.Controllers
                 }
                 batch.End();
             }
-
+            
+            // Draw current coin background.
             batch.Begin(samplerState: samplerState, transformMatrix: baseMatrix);
             {
                 batch.Draw(currentCoinBackground, new Vector2(0, 0), Color.White);
@@ -549,7 +573,8 @@ namespace Splerp.Change.Controllers
             var totalArea = ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength) / (float)ChangeGame.PLAYABLE_AREA_WIDTH;
 
-            // Draw hud.
+            #region Draw hud
+            // Calculate values for drawing the hud.
             var laserPercentage = (int)(gc.laserPlayer.laserCharge * totalArea) / (float)totalArea * totalAreaRatio;
 
             var healthPercentage = (gc.CurrentStage.MaxNotesMissed - gc.notesMissed) / (float)gc.CurrentStage.MaxNotesMissed;
@@ -575,6 +600,7 @@ namespace Splerp.Change.Controllers
 
             progressPercentage = (int)(progressPercentage * totalArea) / (float)totalArea * totalAreaRatio;
 
+            // Draw the hud.
             batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
             {
                 batch.Draw(hudBackground, Vector2.Zero, Color.White);
@@ -607,6 +633,7 @@ namespace Splerp.Change.Controllers
                 DrawScore(batch, Vector2.Zero, gc.currentCoinScore / 100d);
             }
             batch.End();
+            #endregion
 
             // Draw laser player (over HUD).
             if (gc.CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
@@ -618,8 +645,7 @@ namespace Splerp.Change.Controllers
                 batch.End();
             }
             
-            var mousePos = InputController.CurrentMousePosition;
-            
+            // Draw lasers.
             if (gc.laserPlayer.FiringLaser)
             {
                 Color[] laserData = Enumerable.Repeat(Color.Transparent,
@@ -645,7 +671,8 @@ namespace Splerp.Change.Controllers
                 batch.End();
             }
 
-            if(gc.CurrentMenu != null)
+            // If there is a Stage Complete menu, draw it.
+            if(gc.CurrentMenu != null && gc.CurrentMenu is StageCompleteMenu)
             {
                 batch.Begin(samplerState: samplerState, transformMatrix: baseScaleMatrix);
                 {

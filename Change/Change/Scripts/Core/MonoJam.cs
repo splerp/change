@@ -51,8 +51,8 @@ namespace Splerp.Change
         protected override void Initialize()
         {
             ic = new InputController();
+            sc = new SoundController();
             grc = new GraphicsController(this, ic, GraphicsDevice);
-            sc = new SoundController(this);
             gc = new GameController(this, grc, ic);
 
             base.Initialize();

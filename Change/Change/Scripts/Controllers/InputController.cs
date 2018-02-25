@@ -9,9 +9,12 @@ namespace Splerp.Change.Controllers
         public enum ControlType { Mouse, Keyboard, GamePad }
         public enum MouseButtons { Left, Right }
 
+        // Keep track of input states.
         public static KeyboardState currentKeyboard;
         public static GamePadState currentGamepad;
         public static MouseState currentMouse;
+
+        // Keep track of mouse position.
         public static Point CurrentMousePosition =>
             currentMouse.Position / new Point(ChangeGame.SCALE) - new Point(0, ChangeGame.PLAYABLE_AREA_Y);
         
@@ -30,6 +33,7 @@ namespace Splerp.Change.Controllers
         public bool FinishedRemapping => currentRemapIndex >= MappingOrder.Length;
         #endregion
 
+        // Update input states.
         public void UpdateControlStates()
         {
             currentKeyboard = Keyboard.GetState();

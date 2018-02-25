@@ -15,16 +15,10 @@ namespace Splerp.Change.Controllers
         public const float SONG_MASTER_VOLUME = 0.5f;
         public const float SOUND_EFFECT_MASTER_VOLUME = 1f;
 
-        Song song;
+        private Song song;
 
-        private ChangeGame cg;
-
-        public SoundController(ChangeGame cgIn)
+        public SoundController()
         {
-            cg = cgIn;
-
-            song = cg.Content.Load<Song>("Audio/Song");
-
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(song);
             MediaPlayer.Volume = SONG_MASTER_VOLUME;
@@ -37,6 +31,8 @@ namespace Splerp.Change.Controllers
 
         public void LoadContent(ContentManager cm)
         {
+            song = cm.Load<Song>("Audio/Song");
+
             foreach (var sound in Sound.AllSounds)
             {
                 sound.data = cm.Load<SoundEffect>("Audio/" + sound.audioName);

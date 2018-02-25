@@ -15,6 +15,7 @@ namespace Splerp.Change.GameObjects
             SetY(-1);
         }
 
+        // Move the coin, and return true if it has landed.
         public bool MoveAndCheckLand(byte[] coinData)
         {
             Point coinPos = CollisionRect.Location;
