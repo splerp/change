@@ -34,7 +34,7 @@ namespace Splerp.Change.GameObjects
             speed = Vector2.Zero;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             int input = Control.MoveLeft.IsDown ? -1 : Control.MoveRight.IsDown ? 1 : 0;
             Vector2 inputVector = new Vector2(input, 0) * thrust;

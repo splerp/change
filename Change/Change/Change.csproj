@@ -87,7 +87,7 @@
     <Compile Include="Scripts\Graphics\CoinBackgroundLayer.cs" />
     <Compile Include="Scripts\Graphics\LineGraphic.cs" />
     <Compile Include="Scripts\Interfaces\ICollisionObject.cs" />
-    <Compile Include="Scripts\Core\MonoJam.cs" />
+    <Compile Include="Scripts\Core\ChangeGame.cs" />
     <Compile Include="Scripts\Controllers\GameController.cs" />
     <Compile Include="Scripts\Controllers\GraphicsController.cs" />
     <Compile Include="Scripts\GameObject.cs" />

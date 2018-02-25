@@ -1,4 +1,5 @@
-﻿using Splerp.Change.GameObjects;
+﻿using Microsoft.Xna.Framework;
+using Splerp.Change.GameObjects;
 using Splerp.Change.Menus;
 using Splerp.Change.Utils;
 using System;
@@ -12,7 +13,7 @@ namespace Splerp.Change.Controllers
     {
         #region Delegates
         public delegate void StartEnter();
-        public delegate void StageUpdate();
+        public delegate void StageUpdate(GameTime gameTime);
         #endregion
 
         // Random object used everywhere.
@@ -123,10 +124,10 @@ namespace Splerp.Change.Controllers
             GameState.BetweenStages = new GameState("betweenstages")
             {
                 OnEnterState = () => { },
-                OnStateUpdate = () =>
+                OnStateUpdate = (GameTime gameTime) =>
                 {
-                    UpdatePlay();
-                    UpdateBetweenStages();
+                    UpdatePlay(gameTime);
+                    UpdateBetweenStages(gameTime);
                 }
             };
             GameState.GameOver = new GameState("gameover")
@@ -163,7 +164,7 @@ namespace Splerp.Change.Controllers
             notesOnFire = new List<NoteOnFire>();
 
             // Define timers.
-            piggyBankSpawner = new Timer(30000);
+            piggyBankSpawner = new Timer(3000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
             vacuumSpawner = new Timer();
@@ -173,13 +174,13 @@ namespace Splerp.Change.Controllers
             noteSpawner.Elapsed += (a, b) => ReadyToSpawnNote = true;
         }
         
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             // Do state-specific update logic.
-            CurrentState.OnStateUpdate();
+            CurrentState.OnStateUpdate(gameTime);
 
             // Update current menu.
-            CurrentMenu?.Update();
+            CurrentMenu?.Update(gameTime);
 
             #region Global input handling
             if (Control.MuteSound.IsJustPressed)
@@ -245,7 +246,7 @@ namespace Splerp.Change.Controllers
         #endregion
 
         #region State "Update" methods
-        public void UpdatePlay()
+        public void UpdatePlay(GameTime gameTime)
         {
             #region Create objects
             if (ReadyToSpawnPiggyBank)
@@ -273,19 +274,20 @@ namespace Splerp.Change.Controllers
             #region Update objects
             if (CurrentStage.HasFlag(Stage.StageFlags.LaserPlayerEnabled))
             {
-                laserPlayer.Update();
+                laserPlayer.Update(gameTime);
+                laserPlayer.FixedUpdate();
             }
             if (CurrentStage.HasFlag(Stage.StageFlags.PaddlePlayerEnabled))
             {
-                paddlePlayer.Update();
+                paddlePlayer.Update(gameTime);
             }
 
-            coinBackgroundController.Update();
+            coinBackgroundController.Update(gameTime);
 
             // Update enemies.
             for (int i = 0; i < enemies.Count; i++)
             {
-                enemies[i].Update();
+                enemies[i].Update(gameTime);
 
                 if (enemies[i] is VacuumEnemy)
                 {
@@ -302,17 +304,17 @@ namespace Splerp.Change.Controllers
 
             for (int i = 0; i < notes.Count; i++)
             {
-                notes[i].Update();
+                notes[i].Update(gameTime);
             }
 
             foreach (var c in corpses)
             {
-                c.Update();
+                c.Update(gameTime);
             }
 
             foreach (var c in notesOnFire)
             {
-                c.Update();
+                c.Update(gameTime);
             }
             #endregion
 
@@ -415,11 +417,13 @@ namespace Splerp.Change.Controllers
             }
             #endregion
 
+            // If run out of health, game over.
             if (CurrentStage.HasFlag(Stage.StageFlags.NotesEnabled) && notesMissed >= CurrentStage.MaxNotesMissed)
             {
                 SetState(GameState.GameOver);
             }
 
+            // Move on to the next stage.
             if (CurrentState == GameState.Playing && CurrentStage.IsComplete())
             {
                 ToNextStage();
@@ -431,7 +435,7 @@ namespace Splerp.Change.Controllers
             }
         }
 
-        public void UpdateMainMenu()
+        public void UpdateMainMenu(GameTime gameTime)
         {
             if (Control.Return.IsJustPressed)
             {
@@ -439,7 +443,7 @@ namespace Splerp.Change.Controllers
             }
         }
 
-        public void UpdateGameOverMenu()
+        public void UpdateGameOverMenu(GameTime gameTime)
         {
             if (Control.Return.IsJustPressed)
             {
@@ -447,7 +451,7 @@ namespace Splerp.Change.Controllers
             }
         }
 
-        public void UpdateBetweenStages()
+        public void UpdateBetweenStages(GameTime gameTime)
         {
             if (stageCompleteMenu.AnimationComplete)
             {
@@ -455,7 +459,7 @@ namespace Splerp.Change.Controllers
             }
         }
 
-        public void UpdateMapControls()
+        public void UpdateMapControls(GameTime gameTime)
         {
             ic.UpdateMapControls(this);
         }

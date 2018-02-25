@@ -15,17 +15,17 @@ namespace Splerp.Change.GameObjects
         public override int CoinsOnDeath => 5000;
 
         // Used for Y offset calculation.
-        public float sinAmp = 3f;
-        public float sinPer = 0.12f;
+        public double sinAmp = 3d;
+        public double sinPer = 7.5d;
 
-        public float yOffsetCount;
+        public double yOffsetCount;
         public float yPos;
 
         public PiggyBank()
         {
             yOffsetCount = GameController.random.Next(1, 1000);
 
-            Speed = new Vector2(0.2f, 0);
+            Speed = new Vector2(11f, 0);
             Direction = GameController.random.Next(0, 2) == 0 ? HorizontalDirection.Left : HorizontalDirection.Right;
             Speed *= (int)Direction;
 
@@ -37,16 +37,15 @@ namespace Splerp.Change.GameObjects
             SoundController.Play(Sound.Oink);
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
             PreviousOffset = Offset;
+            
+            yOffsetCount += gameTime.ElapsedGameTime.TotalSeconds;
 
-            // TODO: Based on time passed.
-            yOffsetCount++;
+            Offset = new Vector2(0, (float)(sinAmp * Math.Sin(yOffsetCount * sinPer)));
 
-            Offset = new Vector2(0, sinAmp * (float)Math.Sin(yOffsetCount * sinPer));
-
-            MoveBy(Speed);
+            MoveBy(Speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
             SetY(yPos + Offset.Y);
         }
 

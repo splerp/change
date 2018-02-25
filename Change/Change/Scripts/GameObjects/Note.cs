@@ -48,12 +48,13 @@ namespace Splerp.Change.GameObjects
         public bool InsideVacuum;
 
         // How quickly the note moves.
-        public float downSpeed = 0.1f;
+        public float downSpeed = 5.5f;
+        public float caughtByVacuumSpeed = 50f;
 
         // For how long the note should be invulnerable.
         // When a player kills a vacuum, the released notes shouldn't die on the next frame.
-        public int invulnCount = 100;
-        public int invulnCountdown;
+        public float invulnCount = 1.5f;
+        public float invulnCountdown;
 
         public int MaxHealth => 1;
         public int CurrentHealth { get; set; }
@@ -73,7 +74,7 @@ namespace Splerp.Change.GameObjects
             CurrentHealth = MaxHealth;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             if(CaughtByPlayer)
             {
@@ -86,7 +87,7 @@ namespace Splerp.Change.GameObjects
                     SetX(gc.paddlePlayer.CollisionRect.Right - PaddlePlayer.GRAPHIC_EDGE_WIDTH - WIDTH);
                 }
 
-                MoveBy(new Vector2(0, downSpeed));
+                MoveBy(new Vector2(0, downSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));
             }
             else if(CaughtByVacuum != null)
             {
@@ -95,11 +96,11 @@ namespace Splerp.Change.GameObjects
                 // Move towards the vacuum.
                 if (CollisionRect.Y < CaughtByVacuum.CollisionRect.Y)
                 {
-                    MoveBy(new Vector2(0, 1));
+                    MoveBy(new Vector2(0, caughtByVacuumSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));
                 }
                 else if (CollisionRect.Y > CaughtByVacuum.CollisionRect.Y + VacuumEnemy.HEIGHT)
                 {
-                    MoveBy(new Vector2(0, -1));
+                    MoveBy(new Vector2(0, -caughtByVacuumSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));
                 }
                 else
                 {
@@ -110,10 +111,10 @@ namespace Splerp.Change.GameObjects
             }
             else
             {
-                MoveBy(new Vector2(0, downSpeed));
+                MoveBy(new Vector2(0, downSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));
             }
 
-            invulnCountdown--;
+            invulnCountdown -= (float)gameTime.ElapsedGameTime.TotalSeconds;
         }
 
         public void Damage(int amount)

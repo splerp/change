@@ -22,8 +22,8 @@ namespace Splerp.Change.Menus
         public void Drop()
         {
             // Reset speed on drop.
-            speed = new Vector2(0, 5);
-            gravity = new Vector2(0, 0.2f);
+            speed = new Vector2(0, 300f);
+            gravity = new Vector2(0, 700f);
 
             MenuOffset = new Vector2(0, -ChangeGame.WINDOW_HEIGHT);
 
@@ -31,10 +31,10 @@ namespace Splerp.Change.Menus
         }
 
         // Drop / bounce the menu.
-        public override void OnUpdate()
+        public override void OnUpdate(GameTime gameTime)
         {
-            speed += gravity;
-            MenuOffset += speed;
+            speed += gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            MenuOffset += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if(MenuOffset.Y > 0)
             {

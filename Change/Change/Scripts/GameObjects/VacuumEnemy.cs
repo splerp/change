@@ -23,10 +23,10 @@ namespace Splerp.Change.GameObjects
         public readonly Note[] NotesHeld = new Note[MAX_NOTES_HELD];
 
         // Used for Y offset calculation.
-        public float sinAmp = 0.5f;
-        public float sinPer = 0.03f;
+        public double sinAmp = 0.5d;
+        public double sinPer = 2d;
 
-        public float yOffsetCount;
+        public double yOffsetCount;
         public float yPos;
 
         // How many notes the vacuum is currently "holding".
@@ -40,7 +40,7 @@ namespace Splerp.Change.GameObjects
         {
             yOffsetCount = GameController.random.Next(1, 1000);
 
-            Speed = new Vector2(0.2f, 0);
+            Speed = new Vector2(11f, 0);
             Direction = GameController.random.Next(0, 2) == 0 ? HorizontalDirection.Left : HorizontalDirection.Right;
             Speed *= (int)Direction;
 
@@ -55,16 +55,15 @@ namespace Splerp.Change.GameObjects
             yPos = GameController.random.Next((int)sinAmp, ChangeGame.PLAYABLE_AREA_HEIGHT - Size.Y - (int)sinAmp / 2);
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
             PreviousOffset = Offset;
+            
+            yOffsetCount += gameTime.ElapsedGameTime.TotalSeconds;
 
-            // TODO: Based on time passed.
-            yOffsetCount++;
+            Offset = new Vector2(0, (float)(sinAmp * Math.Sin(yOffsetCount * sinPer)));
 
-            Offset = new Vector2(0, sinAmp * (float)Math.Sin(yOffsetCount * sinPer));
-
-            MoveBy(Speed);
+            MoveBy(Speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
             SetY(yPos + Offset.Y);
         }
 

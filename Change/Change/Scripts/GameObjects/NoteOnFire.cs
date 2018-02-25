@@ -9,10 +9,10 @@ namespace Splerp.Change.GameObjects
         public const int TOTAL_FRAMES = 6;
 
         // How fast the burning note moves up.
-        public float upSpeed = -0.33f;
+        public float upSpeed = -20f;
 
         // How quickly the fire animation should play.
-        private float animationSpeed = 6;
+        private float animationSpeed = 0.1f;
         private float animationCount;
         public int animationFrame = 0;
 
@@ -35,13 +35,12 @@ namespace Splerp.Change.GameObjects
             animationCount = animationSpeed;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            MoveBy(new Vector2(0, upSpeed));
+            MoveBy(new Vector2(0, upSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds));
 
             // Update selected animation frame.
-            // TODO: Based on time passed
-            animationCount--;
+            animationCount -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (animationCount <= 0)
             {
                 animationCount += animationSpeed;

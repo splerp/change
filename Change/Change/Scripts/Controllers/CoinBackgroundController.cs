@@ -61,7 +61,7 @@ namespace Splerp.Change.Controllers
         }
 
         // Determines when coins should be spawned, updated, and moved into the background.
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             if (coinsToSpawn > 0)
             {
@@ -95,7 +95,9 @@ namespace Splerp.Change.Controllers
             // Update and remove destroyed coins.
             for (int i = coins.Count - 1; i >= 0; i--)
             {
-                for (int m = 0; m < coins[i].fallBy; m++)
+                var moveBy = coins[i].fallBy * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                for (int m = 0; m < moveBy; m++)
                 {
                     coins[i].MoveBy(new Vector2(0, 1));
 

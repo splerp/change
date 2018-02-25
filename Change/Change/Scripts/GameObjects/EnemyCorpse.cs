@@ -4,14 +4,14 @@ namespace Splerp.Change.GameObjects
 {
     public sealed class EnemyCorpse : GameObject
     {
-        public float gravity = 0.05f;
+        public float gravity = 100f;
         public Vector2 speed;
 
         // Keeps a reference to the enemy it was created for.
         public Enemy EnemyReference;
 
         // How quickly the death animation should play.
-        private float animationSpeed = 6;
+        private float animationSpeed = 0.1f;
         private float animationCount;
         public int animationFrame = 0;
 
@@ -26,18 +26,17 @@ namespace Splerp.Change.GameObjects
 
             animationCount = animationSpeed;
             
-            speed = enemy.Speed + (enemy.Offset - enemy.PreviousOffset);
+            speed = enemy.Speed + ((enemy.Offset - enemy.PreviousOffset) * 100);
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            speed += new Vector2(0, gravity);
+            speed += new Vector2(0, gravity * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            MoveBy(speed);
+            MoveBy(speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
             // Update selected animation frame.
-            // TODO: Based on time passed
-            animationCount--;
+            animationCount -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (animationCount <= 0)
             {
                 animationCount += animationSpeed;

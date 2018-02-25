@@ -37,6 +37,8 @@ namespace Splerp.Change
             
             IsMouseVisible = true;
 
+            IsFixedTimeStep = false;
+
             // Automatically centre the game window.
             var screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
             var screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
@@ -73,7 +75,7 @@ namespace Splerp.Change
         protected override void Update(GameTime gameTime)
         {
             ic.UpdateControlStates();
-            gc.Update();
+            gc.Update(gameTime);
 
             base.Update(gameTime);
         }

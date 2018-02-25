@@ -6,12 +6,12 @@ namespace Splerp.Change.GameObjects
     public sealed class Coin : GameObject
     {
         public Rectangle CollisionRect => new Rectangle(Position.ToPoint(), new Point(1, 1));
-
+        
         public int fallBy;
 
         public Coin()
         {
-            fallBy = GameController.random.Next(1, 5);
+            fallBy = GameController.random.Next(5, 15) * 10;
             SetY(-1);
         }
 

@@ -28,7 +28,7 @@ namespace Splerp.Change.GameObjects
         }
 
         public abstract void OnDeath();
-        public abstract void Update();
+        public abstract void Update(GameTime gameTime);
 
         public void Damage(int amount)
         {

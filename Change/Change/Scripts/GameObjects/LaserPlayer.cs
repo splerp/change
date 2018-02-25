@@ -31,7 +31,7 @@ namespace Splerp.Change.GameObjects
             (int)Math.Round(Position.Y)), Size);
 
         public Vector2 speed;
-        public float thrust = 0.1f;
+        public float thrust = 5f;
         public float friction = 0.9f;
 
         // How quickly the laser bar depletes / replenishes.
@@ -83,12 +83,41 @@ namespace Splerp.Change.GameObjects
             }
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             var mousePos = InputController.CurrentMousePosition;
             var lineToMouse = (mousePos - CollisionRect.Center);
 
+            Vector2 inputVector = Vector2.Zero;
+            if (Control.MoveUp.IsDown)
+            {
+                var angle = Math.Atan2(lineToMouse.Y, lineToMouse.X);
+
+                if (lineToMouse.ToVector2().LengthSquared() > 1f)
+                {
+                    inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
+                }
+            }
+            else if (Control.MoveDown.IsDown)
+            {
+                var angle = Math.Atan2(-lineToMouse.Y, -lineToMouse.X);
+
+                inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
+            }
+
+            speed += inputVector * new Vector2((float)gameTime.ElapsedGameTime.TotalSeconds);
+            speed *= friction;
+
+            MoveBy(speed);
+
+            RestrictToBounds();
+
             laserShake.Update();
+        }
+
+        public void FixedUpdate()
+        {
+            var mousePos = InputController.CurrentMousePosition;
             
             var laserButtonDown = Control.Attack.IsDown;
 
@@ -110,30 +139,6 @@ namespace Splerp.Change.GameObjects
             }
 
             FiringLaser = laserButtonDown && laserCharge > 0;
-            
-            Vector2 inputVector = Vector2.Zero;
-            if (Control.MoveUp.IsDown)
-            {
-                var angle = Math.Atan2(lineToMouse.Y, lineToMouse.X);
-
-                if(lineToMouse.ToVector2().LengthSquared() > 1f)
-                {
-                    inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
-                }
-            }
-            else if (Control.MoveDown.IsDown)
-            {
-                var angle = Math.Atan2(-lineToMouse.Y, -lineToMouse.X);
-
-                inputVector = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * thrust;
-            }
-
-            speed += inputVector;
-            speed *= friction;
-
-            MoveBy(speed);
-
-            RestrictToBounds();
             
             if (FiringLaser)
             {

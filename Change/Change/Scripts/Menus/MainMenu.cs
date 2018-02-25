@@ -1,4 +1,5 @@
-﻿using Splerp.Change.Controllers;
+﻿using Microsoft.Xna.Framework;
+using Splerp.Change.Controllers;
 
 namespace Splerp.Change.Menus
 {
@@ -15,7 +16,7 @@ namespace Splerp.Change.Menus
             gc = gcIn;
         }
 
-        public override void OnUpdate() { }
+        public override void OnUpdate(GameTime gameTime) { }
 
         public override void OnSelectOption(int selectedOption)
         {

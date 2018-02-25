@@ -11,10 +11,10 @@ namespace Splerp.Change.Menus
         public int SelectedOption { get; set; }
         public abstract int TotalOptions { get; }
 
-        public abstract void OnUpdate();
+        public abstract void OnUpdate(GameTime gameTime);
         public abstract void OnSelectOption(int selectedOption);
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             // Avoid playing sounds on input, if menu has no options.
             if(TotalOptions > 0)
@@ -39,7 +39,7 @@ namespace Splerp.Change.Menus
                 }
             }
             
-            OnUpdate();
+            OnUpdate(gameTime);
         }
     }
 }
