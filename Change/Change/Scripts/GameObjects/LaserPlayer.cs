@@ -19,7 +19,7 @@ namespace Splerp.Change.GameObjects
         public bool firstFrameLaserEnd;
 
         private GameController gc;
-        public ShakeController laserShake;
+        public Shaker laserShake;
 
         public Point Size => new Point(8, 8);
         public Rectangle CollisionRect => new Rectangle(new Point(
@@ -42,7 +42,7 @@ namespace Splerp.Change.GameObjects
         public LaserPlayer(GameController gcIn)
         {
             gc = gcIn;
-            laserShake = new ShakeController();
+            laserShake = new Shaker();
 
             Reset();
         }

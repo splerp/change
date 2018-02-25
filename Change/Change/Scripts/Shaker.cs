@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Splerp.Change.Utils;
 
-namespace Splerp.Change.Controllers
+namespace Splerp.Change
 {
-    public sealed class ShakeController
+    public sealed class Shaker
     {
         public float currentAmplitude;
         public float pos;

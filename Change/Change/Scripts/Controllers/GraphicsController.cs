@@ -299,7 +299,7 @@ namespace Splerp.Change.Controllers
                 batch.Draw(titleGraphic, Vector2.Zero, Color.White);
                 batch.Draw(titleCursor, coinPos, Color.White);
 
-                var totalScoreLength = 11 + ScoreController.LengthOf(gc.bestCoinScore / 100d);
+                var totalScoreLength = 11 + ScoreRenderer.LengthOf(gc.bestCoinScore / 100d);
                 var diff = bestScoreBackgroundOffset.X - totalScoreLength;
 
                 if(gc.bestCoinScore > 0)
@@ -545,7 +545,7 @@ namespace Splerp.Change.Controllers
                 batch.End();
             }
 
-            var scoreLength = ScoreController.LengthOf(gc.currentCoinScore / 100d);
+            var scoreLength = ScoreRenderer.LengthOf(gc.currentCoinScore / 100d);
             var totalArea = ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength;
             var totalAreaRatio = (ChangeGame.PLAYABLE_AREA_WIDTH - scoreLength) / (float)ChangeGame.PLAYABLE_AREA_WIDTH;
 
@@ -659,14 +659,14 @@ namespace Splerp.Change.Controllers
         #region Other draw methods
         public void DrawScore(SpriteBatch b, Vector2 drawPos, double score)
         {
-            var scoreStr = ScoreController.StringFor(score);
+            var scoreStr = ScoreRenderer.StringFor(score);
 
             for (int i = 0; i < scoreStr.Length; i++)
             {
                 // Only attempt to draw character if supported.
                 if(fontGraphics.ContainsKey(scoreStr[i]))
                 {
-                    Vector2 offset = drawPos + new Vector2(ScoreController.OffsetOf(scoreStr, i), 1);
+                    Vector2 offset = drawPos + new Vector2(ScoreRenderer.OffsetOf(scoreStr, i), 1);
                     b.Draw(fontGraphics[scoreStr[i]], offset, Color.White);
                 }
             }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Splerp.Change.Controllers
+namespace Splerp.Change
 {
-    // TODO Do not use static?
-    public static class ScoreController
+    public static class ScoreRenderer
     {
         // Lengths in pixels.
         public static Dictionary<char, int> charLengths = new Dictionary<char, int>

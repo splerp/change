@@ -69,7 +69,7 @@
     <Compile Include="Scripts\Control.cs" />
     <Compile Include="Scripts\Menus\Menu.cs" />
     <Compile Include="Scripts\Menus\StageCompleteMenu.cs" />
-    <Compile Include="Scripts\Controllers\ScoreController.cs" />
+    <Compile Include="Scripts\ScoreRenderer.cs" />
     <Compile Include="Scripts\Controllers\SoundController.cs" />
     <Compile Include="Scripts\Menus\GameOverMenu.cs" />
     <Compile Include="Scripts\Events\CoinBufferUpdatedArgs.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="Scripts\GameObjects\LaserPlayer.cs" />
     <Compile Include="Scripts\Core\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scripts\Controllers\ShakeController.cs" />
+    <Compile Include="Scripts\Shaker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
