@@ -619,29 +619,27 @@ namespace Splerp.Change.Controllers
             }
             
             var mousePos = InputController.CurrentMousePosition;
-
-            // TODO: Combine both sets of data, add to texture2D, draw once.
+            
             if (gc.laserPlayer.FiringLaser)
             {
-                var laserAlpha = Math.Min(gc.laserPlayer.laserCharge * 8, 1f);
-                Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
+                Color[] laserData = Enumerable.Repeat(Color.Transparent,
+                    ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT).ToArray();
+                
+                // Add both lasers to colour data.
+                LineGraphic.CreateLineBoundsCheck(laserData,
+                    gc.laserPlayer.LeftEyePos.X, gc.laserPlayer.LeftEyePos.Y,
+                    mousePos.X, mousePos.Y, Color.Red);
+                LineGraphic.CreateLineBoundsCheck(laserData,
+                    gc.laserPlayer.RightEyePos.X, gc.laserPlayer.RightEyePos.Y,
+                    mousePos.X, mousePos.Y, Color.Red);
 
-                var startPos = gc.laserPlayer.LeftEyePos;
-                var newData = LineGraphic.CreateLineBoundsCheck(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
-                playerLasersLayer.SetData(newData);
-
-                batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
-                {
-                    batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
-                }
-                batch.End();
-
-                startPos = gc.laserPlayer.RightEyePos;
-                newData = LineGraphic.CreateLineBoundsCheck(startPos.X, startPos.Y, mousePos.X, mousePos.Y, Color.Red);
-                playerLasersLayer.SetData(newData);
+                playerLasersLayer.SetData(laserData);
 
                 batch.Begin(samplerState: samplerState, transformMatrix: baseMatrixWithLaserShake, blendState: BlendState.NonPremultiplied);
                 {
+                    var laserAlpha = Math.Min(gc.laserPlayer.laserCharge * 8, 1f);
+                    Color laserFadeColor = new Color(1f, 1f, 1f, laserAlpha);
+
                     batch.Draw(playerLasersLayer, Vector2.Zero, laserFadeColor);
                 }
                 batch.End();
