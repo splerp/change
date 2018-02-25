@@ -3,6 +3,8 @@ using System;
 
 namespace Splerp.Change
 {
+    // The game's current GameState determines which OnEnter, OnUpdate, and
+    // Draw functionality should be run.
     public sealed class GameState : IEquatable<GameState>
     {
         public string Key { get; set; }
@@ -20,10 +22,12 @@ namespace Splerp.Change
             return Key == other.Key;
         }
 
+        #region GameState definitions
         public static GameState Title;
         public static GameState MapControls;
         public static GameState Playing;
         public static GameState BetweenStages;
         public static GameState GameOver;
+        #endregion
     }
 }

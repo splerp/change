@@ -2,6 +2,7 @@
 
 namespace Splerp.Change
 {
+    // Base object type for game entities.
     public abstract class GameObject
     {
         public Vector2 Position { get; private set; }

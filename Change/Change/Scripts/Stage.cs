@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 namespace Splerp.Change
 {
+    // Defines a "level" in the game.
     public sealed class Stage
     {
+        // The various level feature toggles.
         [Flags]
         public enum StageFlags
         {
@@ -41,6 +43,8 @@ namespace Splerp.Change
             Restart();
         }
 
+        // Reset any values that may have changed. Important when
+        // a stage is used again (e.g. on a second playthrough)
         public void Restart()
         {
             coinsCollected = 0;
@@ -52,10 +56,12 @@ namespace Splerp.Change
             return Flags.HasFlag(flag);
         }
 
+        // Check whether this stage is over, and the next one should be loaded.
         public bool IsComplete()
         {
             bool complete = false;
 
+            // If collected enough coins, stage is complete.
             if (HasFlag(StageFlags.CompleteOnCollectCoins))
             {
                 if (coinsCollected >= RequiredCoins)
@@ -64,6 +70,7 @@ namespace Splerp.Change
                 }
             }
 
+            // If enough time has passed, stage is complete.
             if (HasFlag(StageFlags.CompleteOnTimePassed))
             {
                 if (DateTime.Now - startTime > RequiredTimePassed)
@@ -75,6 +82,7 @@ namespace Splerp.Change
             return complete;
         }
 
+        // For a given stage, find the succeeding stage.
         public static Stage NextStage(Stage current)
         {
             // Don't check final stage (there will be no next stage for it).

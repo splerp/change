@@ -5,6 +5,7 @@ namespace Splerp.Change.Utils
 {
     public sealed class BoxCollisionTest
     {
+        // https://noonat.github.io/intersect/#aabb-vs-aabb
         public static bool IntersectAABB(Rectangle r1, Rectangle r2)
         {
             var r1Pos = r1.Center;

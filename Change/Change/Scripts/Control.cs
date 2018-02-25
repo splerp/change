@@ -4,14 +4,22 @@ using System.Collections.Generic;
 
 namespace Splerp.Change
 {
-    public class Control
+    // Defines a key / button the player can press that is recognisable by the game.
+    public sealed class Control
     {
         private bool _prevDownState;
 
+        public static List<Control> PlayerControls = new List<Control>();
+        
+        // The keys / buttons that can be pressed to activate this control.
         public Keys[] KeyCodes { get; set; } = new Keys[0];
         public Buttons[] ButtonCodes { get; set; } = new Buttons[0];
         public InputController.MouseButtons[] MouseButtonCodes { get; set; } = new InputController.MouseButtons[0];
+
+        // True when the control is currently pressed.
         public bool IsDown { get; private set; }
+
+        // True for the first frame that the control is pressed for.
         public bool IsJustPressed { get; private set; }
 
         #region Update methods
@@ -75,8 +83,7 @@ namespace Splerp.Change
         }
         #endregion
 
-        public static List<Control> PlayerControls = new List<Control>();
-
+        #region Control definitions
         public static Control MoveUp = new Control(Keys.W, Keys.Up);
         public static Control MoveDown = new Control(Keys.S, Keys.Down);
         public static Control MoveLeft = new Control(Keys.A, Keys.Left);
@@ -88,5 +95,6 @@ namespace Splerp.Change
         public static Control MuteMusic = new Control(Keys.M);
         public static Control MuteSound = new Control(Keys.N);
         public static Control SkipTutorial = new Control(Keys.T);
+        #endregion
     }
 }

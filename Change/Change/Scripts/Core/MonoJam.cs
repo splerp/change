@@ -12,6 +12,7 @@ namespace Splerp.Change
 
         public const int HUD_HEIGHT = 5;
 
+        // The playable area is the space in the window that the player / other objects appear in.
         public const int PLAYABLE_AREA_WIDTH = 120;
         public const int PLAYABLE_AREA_HEIGHT = WINDOW_HEIGHT - HUD_HEIGHT - PADDLE_AREA_HEIGHT;
         public const int PLAYABLE_AREA_Y = HUD_HEIGHT;
@@ -29,14 +30,17 @@ namespace Splerp.Change
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+            // Set the overall scale of the game.
             graphics.PreferredBackBufferWidth = WINDOW_WIDTH * SCALE;
             graphics.PreferredBackBufferHeight = WINDOW_HEIGHT * SCALE;
             graphics.ApplyChanges();
+            
+            IsMouseVisible = true;
 
+            // Automatically centre the game window.
             var screenWidth = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Width;
             var screenHeight = graphics.GraphicsDevice.Adapter.CurrentDisplayMode.Height;
 
-            IsMouseVisible = true;
             Window.Position = new Point(
                 (screenWidth - graphics.PreferredBackBufferWidth) / 2,
                 (screenHeight - graphics.PreferredBackBufferHeight) / 2 - 100);
