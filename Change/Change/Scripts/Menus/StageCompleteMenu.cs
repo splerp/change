@@ -47,7 +47,7 @@ namespace Splerp.Change.Menus
             fallFor--;
             if(fallFor <= 0)
             {
-                gravity = new Vector2(0, -0.2f);
+                gravity = new Vector2(0, -700f);
             }
         }
 
