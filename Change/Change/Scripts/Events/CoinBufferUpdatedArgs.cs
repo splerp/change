@@ -4,11 +4,11 @@ namespace Splerp.Change.Events
 {
     public sealed class CoinBufferUpdatedArgs : EventArgs
     {
-        public byte[] updatedBuffer;
+        public int arrayLoc;
 
-        public CoinBufferUpdatedArgs(byte[] completedBufferIn)
+        public CoinBufferUpdatedArgs(int arrayLocIn)
         {
-            updatedBuffer = completedBufferIn;
+            arrayLoc = arrayLocIn;
         }
     }
 }

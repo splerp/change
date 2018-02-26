@@ -26,6 +26,9 @@ namespace Splerp.Change.Controllers
         private SpriteBatch batch;
         private SamplerState samplerState;
 
+        private Color[] currentCoinBackgroundData;
+        private Color[] emptyCoinBackground;
+
         // The base matrix for game elements. Moves content down
         // to the defined playable area.
         private Matrix baseMatrix;
@@ -115,8 +118,13 @@ namespace Splerp.Change.Controllers
             // Subscribe to coin background events.
             CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
             CoinBackgroundController.CurrentCoinBufferUpdated += OnCoinBufferUpdated;
+            CoinBackgroundController.CurrentCoinBufferCleared += OnCoinBufferCleared;
 
             temporaryVacuumTextureStore = new List<Texture2D>();
+
+            // Set reusable data.
+            currentCoinBackgroundData = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
+            emptyCoinBackground = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
 
             graphicsDevice = graphicsDeviceIn;
             coinBackgroundLayers = new List<CoinBackgroundLayer>();
@@ -145,22 +153,24 @@ namespace Splerp.Change.Controllers
         // Move the current coin buffer into the background layers collection.
         public void CreateNewCoinBuffer(object sender, EventArgs e)
         {
-            Color[] theCurrentData = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
-
             var NewCoinBackground = new CoinBackgroundLayer
             {
                 graphic = new Texture2D(graphicsDevice, ChangeGame.PLAYABLE_AREA_WIDTH, ChangeGame.PLAYABLE_AREA_HEIGHT)
             };
+
+            Color[] newBackgroundData = new Color[ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT];
+            Array.Copy(currentCoinBackgroundData, newBackgroundData,
+                ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT);
             
             // Put data into background.
-            currentCoinBackground.GetData(theCurrentData);
-            NewCoinBackground.graphic.SetData(theCurrentData);
+            NewCoinBackground.graphic.SetData(newBackgroundData);
 
             coinBackgroundLayers = new List<CoinBackgroundLayer> { NewCoinBackground }.Concat(coinBackgroundLayers).ToList();
 
             // Forcefully remove any past this stage.
             if(coinBackgroundLayers.Count > MAX_VAULT_BG_LAYERS)
             {
+                coinBackgroundLayers[MAX_VAULT_BG_LAYERS].graphic.Dispose();
                 coinBackgroundLayers.RemoveAt(MAX_VAULT_BG_LAYERS);
             }
         }
@@ -168,7 +178,17 @@ namespace Splerp.Change.Controllers
         public void OnCoinBufferUpdated(object sender, CoinBufferUpdatedArgs e)
         {
             // Update current coin data.
-            currentCoinBackground.SetData(e.updatedBuffer.Select(c => c == 0 ? Color.Transparent : Color.Yellow).ToArray());
+            currentCoinBackgroundData[e.arrayLoc] = Color.Yellow;
+            currentCoinBackground.SetData(currentCoinBackgroundData);
+        }
+
+        public void OnCoinBufferCleared(object sender, CoinBufferClearedArgs e)
+        {
+            // Update current coin data.
+            Array.Copy(emptyCoinBackground, currentCoinBackgroundData,
+                ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT);
+            
+            currentCoinBackground.SetData(emptyCoinBackground);
         }
 
         // Load all graphics.

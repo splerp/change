@@ -67,6 +67,7 @@
     <Compile Include="Scripts\Controllers\CoinBackgroundController.cs" />
     <Compile Include="Scripts\Controllers\InputController.cs" />
     <Compile Include="Scripts\Control.cs" />
+    <Compile Include="Scripts\Events\CoinBufferClearedArgs.cs" />
     <Compile Include="Scripts\Menus\Menu.cs" />
     <Compile Include="Scripts\Menus\StageCompleteMenu.cs" />
     <Compile Include="Scripts\ScoreRenderer.cs" />

@@ -33,6 +33,7 @@ namespace Splerp.Change.Controllers
         // Custom events for use in other classes.
         public static event EventHandler<EventArgs> CoinBufferCompleted;
         public static event EventHandler<CoinBufferUpdatedArgs> CurrentCoinBufferUpdated;
+        public static event EventHandler<CoinBufferClearedArgs> CurrentCoinBufferCleared;
 
         public CoinBackgroundController()
         {
@@ -57,7 +58,7 @@ namespace Splerp.Change.Controllers
         public void ClearCoinDataBuffer()
         {
             Array.Clear(coinDataBuffer, 0, ChangeGame.PLAYABLE_AREA_WIDTH * ChangeGame.PLAYABLE_AREA_HEIGHT);
-            CurrentCoinBufferUpdated(this, new CoinBufferUpdatedArgs(coinDataBuffer));
+            CurrentCoinBufferCleared(this, new CoinBufferClearedArgs(coinDataBuffer));
         }
 
         // Determines when coins should be spawned, updated, and moved into the background.
@@ -113,7 +114,7 @@ namespace Splerp.Change.Controllers
 
                         coinsInLayer++;
 
-                        CurrentCoinBufferUpdated(this, new CoinBufferUpdatedArgs(coinDataBuffer));
+                        CurrentCoinBufferUpdated(this, new CoinBufferUpdatedArgs(arrayLoc));
                         break;
                     }
                 }
