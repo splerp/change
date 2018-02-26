@@ -42,7 +42,14 @@ namespace Splerp.Change.Controllers
         public static void Play(Sound s, bool loop = false)
         {
             // Remove any that are no longer playing.
-            s.instances = s.instances.Where(a => a.State == SoundState.Playing).ToList();
+            for(int i = s.instances.Count - 1; i >= 0; i--)
+            {
+                if(s.instances[i].State == SoundState.Stopped)
+                {
+                    s.instances[i].Dispose();
+                    s.instances.RemoveAt(i);
+                }
+            }
 
             if (s.instances.Count < MAX_INSTANCES_PER_SOUND)
             {
