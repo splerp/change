@@ -207,6 +207,7 @@ namespace Splerp.Change.Controllers
         public void SetState(GameState newState)
         {
             // HACK: special case for between stages -> playing, don't reset content.
+            // Would be better to use a FSM to control moving between game states.
             if (!(newState == GameState.Playing && CurrentState == GameState.BetweenStages))
             {
                 newState.OnEnterState();
