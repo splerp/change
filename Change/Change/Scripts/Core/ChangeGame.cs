@@ -61,6 +61,9 @@ namespace Splerp.Change
 
             // Set initial state to the main menu.
             gameController.SetState(GameState.Title);
+
+            // Start the now-loaded song.
+            soundController.StartSong();
         }
 
         protected override void LoadContent()

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Splerp.Change.Controllers
 {
     public sealed class SoundController
-    {
+    { 
         public const int MAX_INSTANCES_PER_SOUND = 3;
         public const float SONG_MASTER_VOLUME = 0.5f;
         public const float SOUND_EFFECT_MASTER_VOLUME = 1f;
@@ -17,7 +17,6 @@ namespace Splerp.Change.Controllers
         public SoundController()
         {
             MediaPlayer.IsRepeating = true;
-            MediaPlayer.Play(song);
             MediaPlayer.Volume = SONG_MASTER_VOLUME;
 
 #if MUTED
@@ -34,6 +33,11 @@ namespace Splerp.Change.Controllers
             {
                 sound.data = cm.Load<SoundEffect>("Audio/" + sound.audioName);
             }
+        }
+
+        public void StartSong()
+        {
+            MediaPlayer.Play(song);
         }
 
         public static void Play(Sound s, bool loop = false)
