@@ -1,11 +1,8 @@
-﻿#define MUTED
-
-using Microsoft.Xna.Framework.Audio;
+﻿using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using Splerp.Change.Utils;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Splerp.Change.Controllers
 {
