@@ -27,7 +27,7 @@ namespace Splerp.Change.Controllers
         public int currentRemapIndex;
         public Control CurrentRemappingControl => MappingOrder[currentRemapIndex];
 
-        // Keep track of last frame's key presses (avoids remapping multiple controls 
+        // Keep track of last frame's key presses (avoids remapping multiple controls)
         public bool pressingKeyboardLastFrame;
 
         public bool FinishedRemapping => currentRemapIndex >= MappingOrder.Length;
@@ -50,6 +50,9 @@ namespace Splerp.Change.Controllers
         public void StartRemapping()
         {
             currentRemapIndex = 0;
+
+            // They've just started remapping, so ignore any already-pressed keys.
+            pressingKeyboardLastFrame = true;
         }
 
         // Keep track of current control to override and listen for input.
