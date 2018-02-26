@@ -74,6 +74,7 @@ namespace Splerp.Change.Controllers
         private Texture2D[] noteFireGraphics;
 
         private Texture2D[] enemyFireGraphics;
+        private List<Texture2D> temporaryVacuumTextureStore;
 
         private Dictionary<char, Texture2D> fontGraphics;
 
@@ -114,6 +115,8 @@ namespace Splerp.Change.Controllers
             // Subscribe to coin background events.
             CoinBackgroundController.CoinBufferCompleted += CreateNewCoinBuffer;
             CoinBackgroundController.CurrentCoinBufferUpdated += OnCoinBufferUpdated;
+
+            temporaryVacuumTextureStore = new List<Texture2D>();
 
             graphicsDevice = graphicsDeviceIn;
             coinBackgroundLayers = new List<CoinBackgroundLayer>();
@@ -688,6 +691,13 @@ namespace Splerp.Change.Controllers
                 }
                 batch.End();
             }
+
+            // Clean up temporary enemy Texture2Ds.
+            foreach(var t in temporaryVacuumTextureStore)
+            {
+                t.Dispose();
+            }
+            temporaryVacuumTextureStore.Clear();
         }
         #endregion
 
@@ -735,6 +745,8 @@ namespace Splerp.Change.Controllers
                 }
 
                 var vacuumNotesDisplay = new Texture2D(graphicsDevice, VacuumEnemy.MAX_NOTES_HELD, 3);
+                temporaryVacuumTextureStore.Add(vacuumNotesDisplay);
+
                 vacuumNotesDisplay.SetData(vacuumNoteData);
 
                 Vector2 vacuumNoteGraphicOffset = enemy.Direction > 0 ? new Vector2(3, 4) : new Vector2(4, 4);
