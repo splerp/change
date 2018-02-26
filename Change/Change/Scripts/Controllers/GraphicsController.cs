@@ -72,9 +72,9 @@ namespace Splerp.Change.Controllers
         private Texture2D changeControlsBack;
         private Texture2D changeControlsLeft;
         private Texture2D changeControlsRight;
-
-        // TODO: Make this a Dictionary which maps to note types.
-        private Texture2D[] noteFireGraphics;
+        
+        // Maps each note type to the set of fire graphics in its death animation.
+        private Dictionary<Note.NoteType, Texture2D[]> noteFireGraphics;
 
         private Texture2D[] enemyFireGraphics;
         private List<Texture2D> temporaryVacuumTextureStore;
@@ -258,14 +258,53 @@ namespace Splerp.Change.Controllers
                 { Note.NoteType.Green100, Content.Load<Texture2D>("Graphics/100Dollars") },
             };
 
-            noteFireGraphics = new Texture2D[]
+            noteFireGraphics = new Dictionary<Note.NoteType, Texture2D[]>
             {
-                Content.Load<Texture2D>("Graphics/FireMoney1"),
-                Content.Load<Texture2D>("Graphics/FireMoney2"),
-                Content.Load<Texture2D>("Graphics/FireMoney3"),
-                Content.Load<Texture2D>("Graphics/FireMoney4"),
-                Content.Load<Texture2D>("Graphics/FireMoney5"),
-                Content.Load<Texture2D>("Graphics/FireMoney6"),
+                {Note.NoteType.Pink5, new Texture2D[]
+                    {
+                        Content.Load<Texture2D>("Graphics/FireMoney1-5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney2-5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney3-5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney4"),
+                        Content.Load<Texture2D>("Graphics/FireMoney5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney6"),
+                    }},
+                {Note.NoteType.Blue10, new Texture2D[]
+                    {
+                        Content.Load<Texture2D>("Graphics/FireMoney1-10"),
+                        Content.Load<Texture2D>("Graphics/FireMoney2-10"),
+                        Content.Load<Texture2D>("Graphics/FireMoney3-10"),
+                        Content.Load<Texture2D>("Graphics/FireMoney4"),
+                        Content.Load<Texture2D>("Graphics/FireMoney5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney6"),
+                    }},
+                {Note.NoteType.Red20, new Texture2D[]
+                    {
+                        Content.Load<Texture2D>("Graphics/FireMoney1-20"),
+                        Content.Load<Texture2D>("Graphics/FireMoney2-20"),
+                        Content.Load<Texture2D>("Graphics/FireMoney3-20"),
+                        Content.Load<Texture2D>("Graphics/FireMoney4"),
+                        Content.Load<Texture2D>("Graphics/FireMoney5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney6"),
+                    }},
+                {Note.NoteType.Yellow50, new Texture2D[]
+                    {
+                        Content.Load<Texture2D>("Graphics/FireMoney1-50"),
+                        Content.Load<Texture2D>("Graphics/FireMoney2-50"),
+                        Content.Load<Texture2D>("Graphics/FireMoney3-50"),
+                        Content.Load<Texture2D>("Graphics/FireMoney4"),
+                        Content.Load<Texture2D>("Graphics/FireMoney5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney6"),
+                    }},
+                {Note.NoteType.Green100, new Texture2D[]
+                    {
+                        Content.Load<Texture2D>("Graphics/FireMoney1-100"),
+                        Content.Load<Texture2D>("Graphics/FireMoney2-100"),
+                        Content.Load<Texture2D>("Graphics/FireMoney3-100"),
+                        Content.Load<Texture2D>("Graphics/FireMoney4"),
+                        Content.Load<Texture2D>("Graphics/FireMoney5"),
+                        Content.Load<Texture2D>("Graphics/FireMoney6"),
+                    }}
             };
             #endregion
 
@@ -574,7 +613,8 @@ namespace Splerp.Change.Controllers
 
                     var effect = c.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
-                    batch.Draw(noteFireGraphics[c.animationFrame % noteFireGraphics.Length],
+                    var noteFireGraphicsSet = noteFireGraphics[c.Type];
+                    batch.Draw(noteFireGraphicsSet[c.animationFrame % noteFireGraphicsSet.Length],
                         (c.Position + fireOffset).ToPoint().ToVector2(),
                         null,
                         Color.White,
