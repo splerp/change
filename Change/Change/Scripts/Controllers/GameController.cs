@@ -164,7 +164,7 @@ namespace Splerp.Change.Controllers
             notesOnFire = new List<NoteOnFire>();
 
             // Define timers.
-            piggyBankSpawner = new Timer(3000);
+            piggyBankSpawner = new Timer(30000);
             piggyBankSpawner.Elapsed += (a, b) => ReadyToSpawnPiggyBank = true;
 
             vacuumSpawner = new Timer();
