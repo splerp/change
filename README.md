@@ -17,7 +17,7 @@ Hi, thanks for trying the game out! Instructions and scoring system are below.
 
 ### Laser drone
 > **Mouse**: aim laser  
-  **Left** mouse: fire laser  
+  **Left click**: fire laser  
   **W**: move towards mouse  
   **S**: move away from mouse  
 
@@ -39,7 +39,7 @@ Hi, thanks for trying the game out! Instructions and scoring system are below.
   **Green note**: $100  
 
 > **Piggy bank**: $50  
-  **Evil vacuum**: $1.25 (not much left after they explode)  
+  **Evil vacuum**: $1.25 (not much material left to salvage after they explode)  
 
 ## Story
 > You really like coins. Whenever you get any money, you immediately
